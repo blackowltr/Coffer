@@ -44,10 +44,10 @@ public enum ArchiveCategoryFilter: String, CaseIterable, Identifiable, Sendable 
 
     public var iconName: String {
         switch self {
-        case .images: return "photo.on.rectangle.fill"
-        case .documents: return "doc.richtext.fill"
+        case .images: return "photo.stack.fill"
+        case .documents: return "doc.text.fill"
         case .media: return "film.stack.fill"
-        case .code: return "chevron.left.forwardslash.chevron.right"
+        case .code: return "curlybraces.square.fill"
         }
     }
 }

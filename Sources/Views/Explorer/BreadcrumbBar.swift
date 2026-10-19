@@ -35,6 +35,7 @@ public struct BreadcrumbBar: View {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.system(size: 14))
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(settings.accentColorChoice.color)
                     Text("Yukarı")
                         .font(.system(size: 11, weight: .medium))
@@ -63,7 +64,8 @@ public struct BreadcrumbBar: View {
                     // Kök Arşiv
                     Button(action: { onNavigateTo("") }) {
                         HStack(spacing: 3) {
-                            Image(systemName: "archivebox.fill")
+                            Image(systemName: "archivebox.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
                                 .foregroundColor(settings.accentColorChoice.color)
                             Text(archiveName.isEmpty ? "Arşiv" : archiveName)
                                 .fontWeight(currentPath.isEmpty ? .bold : .regular)

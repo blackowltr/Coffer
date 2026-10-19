@@ -97,9 +97,10 @@ public struct ArchiveSidebarView: View {
                         onSelectDirectory("")
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "archivebox.fill")
+                            Image(systemName: "archivebox.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
                                 .foregroundColor(settings.accentColorChoice.color)
-                                .font(.system(size: 13))
+                                .font(.system(size: 14))
                                 .frame(width: 16)
 
                             Text(archiveName.isEmpty ? "Ana Dizin" : archiveName)
@@ -133,8 +134,9 @@ public struct ArchiveSidebarView: View {
                             }) {
                                 HStack(spacing: 8) {
                                     Image(systemName: cat.iconName)
+                                        .symbolRenderingMode(.hierarchical)
                                         .foregroundColor(isCatSelected ? settings.accentColorChoice.color : .secondary)
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 13))
                                         .frame(width: 16)
 
                                     Text(cat.rawValue)
@@ -209,10 +211,11 @@ public struct ArchiveSidebarView: View {
                                     }
                                 }) {
                                     HStack(spacing: 6) {
-                                        Image(systemName: isExpanded ? "folder.fill" : (isDirSelected ? "folder.fill" : "folder"))
-                                            .foregroundColor(isDirSelected ? settings.accentColorChoice.color : .secondary)
-                                            .font(.system(size: 12))
-                                            .frame(width: 14)
+                                        Image(systemName: "folder.fill")
+                                            .symbolRenderingMode(.hierarchical)
+                                            .foregroundColor(isDirSelected ? settings.accentColorChoice.color : .secondary.opacity(0.85))
+                                            .font(.system(size: 13))
+                                            .frame(width: 15)
 
                                         Text(dir.name)
                                             .font(.system(size: 12, weight: isDirSelected ? .semibold : .regular))

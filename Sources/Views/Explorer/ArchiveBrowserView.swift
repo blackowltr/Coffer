@@ -114,14 +114,14 @@ public struct ArchiveBrowserView: View {
             // 1. Üst Eylem Araç Çubuğu (Toolbar)
             HStack(spacing: 6) {
                 if let onNew = onNewArchive {
-                    WinRARToolbarButton(title: "Sıkıştır", icon: "plus.circle.fill", color: settings.accentColorChoice.color, action: onNew)
+                    WinRARToolbarButton(title: "Sıkıştır", icon: "archivebox.circle.fill", color: settings.accentColorChoice.color, action: onNew)
                 }
-                WinRARToolbarButton(title: "Dizine Çıkart", icon: "arrow.down.doc.fill", color: .cyan, action: onExtract)
-                WinRARToolbarButton(title: "Dosya Ekle", icon: "plus.doc.fill", color: .green, action: onAddFiles)
+                WinRARToolbarButton(title: "Dizine Çıkart", icon: "tray.and.arrow.down.fill", color: .cyan, action: onExtract)
+                WinRARToolbarButton(title: "Dosya Ekle", icon: "doc.badge.plus", color: .green, action: onAddFiles)
                 WinRARToolbarButton(title: "Test Et", icon: "checkmark.shield.fill", color: .purple, action: onTestArchive)
 
                 // Quick Look Önizleme Butonu
-                WinRARToolbarButton(title: "Önizle", icon: "eye.fill", color: .indigo) {
+                WinRARToolbarButton(title: "Önizle", icon: "eye.circle.fill", color: .indigo) {
                     if let firstID = selectedItemIDs.first, let item = items.first(where: { $0.id == firstID }), !item.isDirectory {
                         onPreviewItem(item)
                     } else if let firstFile = items.first(where: { !$0.isDirectory }) {
@@ -134,12 +134,12 @@ public struct ArchiveBrowserView: View {
 
                 Divider().frame(height: 18)
 
-                WinRARToolbarButton(title: "Dönüştür", icon: "arrow.triangle.2.circlepath", color: settings.accentColorChoice.color, action: onConvertArchive)
-                WinRARToolbarButton(title: "Farklar", icon: "arrow.left.arrow.right", color: .teal, action: onDiffArchive)
+                WinRARToolbarButton(title: "Dönüştür", icon: "arrow.triangle.2.circlepath.circle.fill", color: settings.accentColorChoice.color, action: onConvertArchive)
+                WinRARToolbarButton(title: "Farklar", icon: "arrow.left.and.right.circle.fill", color: .teal, action: onDiffArchive)
                 WinRARToolbarButton(title: "Bilgi", icon: "info.circle.fill", color: .cyan, action: onShowInfo)
                 WinRARToolbarButton(title: "Kilitle", icon: "lock.shield.fill", color: .pink, action: onLockArchive)
                 WinRARToolbarButton(title: "Onar", icon: "wrench.and.screwdriver.fill", color: .indigo, action: onRepairArchive)
-                WinRARToolbarButton(title: "Güvenlik", icon: "shield.lefthalf.filled", color: .red) {
+                WinRARToolbarButton(title: "Güvenlik", icon: "shield.checkered", color: .red) {
                     onShowSecurity?()
                 }
 
@@ -154,6 +154,7 @@ public struct ArchiveBrowserView: View {
                 Divider()
                 HStack(spacing: 8) {
                     Image(systemName: sec.riskLevel.systemIcon)
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundColor(sec.riskLevel == .danger ? .red : .orange)
                         .font(.system(size: 13, weight: .bold))
 
@@ -172,6 +173,7 @@ public struct ArchiveBrowserView: View {
                     Button(action: { onShowSecurity?() }) {
                         HStack(spacing: 4) {
                             Image(systemName: "magnifyingglass.shield.fill")
+                                .symbolRenderingMode(.hierarchical)
                             Text("Analizi İncele")
                         }
                         .font(.system(size: 10.5, weight: .semibold))
@@ -190,6 +192,7 @@ public struct ArchiveBrowserView: View {
                 Divider()
                 HStack(spacing: 8) {
                     Image(systemName: mp.isComplete ? "square.split.2x1.fill" : "exclamationmark.triangle.fill")
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundColor(mp.isComplete ? .indigo : .red)
                         .font(.system(size: 12))
 
@@ -217,6 +220,7 @@ public struct ArchiveBrowserView: View {
                 Divider()
                 HStack(spacing: 8) {
                     Image(systemName: "sparkles")
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundColor(.mint)
                         .font(.system(size: 12))
 
@@ -228,6 +232,7 @@ public struct ArchiveBrowserView: View {
                     Button(action: onCleanMacJunk) {
                         HStack(spacing: 4) {
                             Image(systemName: "trash.slash.fill")
+                                .symbolRenderingMode(.hierarchical)
                             Text("Artıkları Şimdi Temizle")
                         }
                         .font(.system(size: 11, weight: .semibold))

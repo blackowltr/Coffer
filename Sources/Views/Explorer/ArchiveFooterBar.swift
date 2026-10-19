@@ -33,8 +33,9 @@ public struct ArchiveFooterBar: View {
             if selectedItemsCount > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "checkmark.circle.fill")
+                        .symbolRenderingMode(.hierarchical)
                         .foregroundColor(settings.accentColorChoice.color)
-                        .font(.system(size: 11))
+                        .font(.system(size: 12))
                     Text("Seçili: \(selectedItemsCount) (\(ByteCountFormatter.string(fromByteCount: selectedSize, countStyle: .file)))")
                         .font(.system(size: 11, weight: .medium))
                 }
@@ -49,7 +50,8 @@ public struct ArchiveFooterBar: View {
 
             // Toplam dosya sayısı ve orijinal / paketlenmiş boyut
             HStack(spacing: 4) {
-                Image(systemName: "doc.on.doc.fill")
+                Image(systemName: "doc.stack.fill")
+                    .symbolRenderingMode(.hierarchical)
                     .foregroundColor(.secondary)
                     .font(.system(size: 11))
                 if let meta = metadata {

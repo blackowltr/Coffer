@@ -59,8 +59,9 @@ public struct ArchiveTableView: View {
                         .lineLimit(1)
 
                     if item.isEncrypted {
-                        Image(systemName: "lock.fill")
-                            .font(.system(size: 10))
+                        Image(systemName: "lock.shield.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .font(.system(size: 11))
                             .foregroundColor(settings.accentColorChoice.color)
                             .help("Parola Korumalı / Şifreli")
                     }
@@ -70,9 +71,10 @@ public struct ArchiveTableView: View {
                     // Quick Look Göz İkonu
                     if !item.isDirectory {
                         Button(action: { onPreviewItem(item) }) {
-                            Image(systemName: "eye")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary.opacity(0.8))
+                            Image(systemName: "eye.circle.fill")
+                                .symbolRenderingMode(.hierarchical)
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
                         }
                         .buttonStyle(.plain)
                         .help("Quick Look ile Önizle (Boşluk)")
