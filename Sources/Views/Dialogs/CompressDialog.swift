@@ -108,7 +108,7 @@ public struct CompressDialog: View {
 
     private var sourceSummaryText: String {
         if currentSourceURLs.isEmpty {
-            return "1.0 GB referans model üzerinden hesaplanıyor"
+            return "Referans model üzerinden hesaplanıyor"
         } else if currentSourceURLs.count == 1 {
             return "\(currentSourceURLs[0].lastPathComponent) (\(ByteCountFormatter.string(fromByteCount: simulation.originalTotalSize, countStyle: .file)))"
         } else {
@@ -188,7 +188,7 @@ public struct CompressDialog: View {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(settings.accentColorChoice.color)
-                    Text("RAR 5 formatında arşiv oluşturmak için RARLAB 'RAR for macOS' aracı gereklidir.")
+                    Text("RAR formatında arşiv oluşturmak için RAR for macOS aracı gereklidir.")
                         .font(.system(size: 11))
                     Spacer()
                     Button("RAR Aracını İndir") {
@@ -526,7 +526,7 @@ public struct CompressDialog: View {
                     Image(systemName: "lock.shield")
                         .font(.system(size: 11))
                         .foregroundColor(supportsEncryption ? settings.accentColorChoice.color : .secondary)
-                    Text("Parola Koruması (AES-256 Şifreleme)")
+                    Text("Parola Koruması")
                         .font(.system(size: 12))
                 }
             }
@@ -551,7 +551,7 @@ public struct CompressDialog: View {
                         HStack(spacing: 6) {
                             Image(systemName: "text.badge.lock")
                                 .font(.system(size: 11))
-                            Text("Dosya İsimlerini de Şifrele (-hp / -mhe)")
+                            Text("Dosya Adlarını Şifrele")
                                 .font(.system(size: 11))
                         }
                     }
@@ -569,7 +569,7 @@ public struct CompressDialog: View {
                     Image(systemName: "cube.fill")
                         .font(.system(size: 11))
                         .foregroundColor(supportsSolid ? .purple : .secondary)
-                    Text("Katı Arşiv Oluştur (Solid - Daha Yüksek Sıkıştırma)")
+                    Text("Katı Arşiv (Solid)")
                         .font(.system(size: 12))
                 }
             }
@@ -583,7 +583,7 @@ public struct CompressDialog: View {
                     Image(systemName: "cross.case.fill")
                         .font(.system(size: 11))
                         .foregroundColor(supportsRecoveryRecord ? .green : .secondary)
-                    Text("Kurtarma Kaydı Ekle (%3 Recovery Record - RAR)")
+                    Text("Kurtarma Kaydı Ekle (%3)")
                         .font(.system(size: 12))
                 }
             }
@@ -597,7 +597,7 @@ public struct CompressDialog: View {
                     Image(systemName: "square.split.2x1")
                         .font(.system(size: 11))
                         .foregroundColor(.indigo)
-                    Text("Arşivi Ciltlere Böl (Split Volumes)")
+                    Text("Arşivi Ciltlere Böl")
                         .font(.system(size: 12))
                 }
             }
@@ -611,11 +611,11 @@ public struct CompressDialog: View {
                         .frame(width: 80, alignment: .leading)
 
                     Picker("", selection: $splitVolumeSizeMB) {
-                        Text("10 MB (Web / Mesajlaşma)").tag(10)
+                        Text("10 MB (Web)").tag(10)
                         Text("25 MB (E-posta Eki)").tag(25)
-                        Text("100 MB (Discord / Hızlı)").tag(100)
-                        Text("700 MB (CD-ROM)").tag(700)
-                        Text("4000 MB (FAT32 / USB)").tag(4000)
+                        Text("100 MB (Hızlı Paylaşım)").tag(100)
+                        Text("700 MB (CD)").tag(700)
+                        Text("4000 MB (FAT32)").tag(4000)
                         Text("4700 MB (DVD)").tag(4700)
                     }
                     .labelsHidden()
@@ -643,7 +643,7 @@ public struct CompressDialog: View {
                     Image(systemName: "trash")
                         .font(.system(size: 11))
                         .foregroundColor(.red)
-                    Text("Arşivleme Tamamlandıktan Sonra Kaynak Dosyaları Sil")
+                    Text("Tamamlandıktan sonra kaynak dosyaları sil")
                         .font(.system(size: 12))
                 }
             }
@@ -656,7 +656,7 @@ public struct CompressDialog: View {
                     Image(systemName: "sparkles")
                         .font(.system(size: 11))
                         .foregroundColor(.mint)
-                    Text("macOS Sistem Artıklarını Temizle (.DS_Store, __MACOSX)")
+                    Text("macOS sistem artıklarını temizle (.DS_Store)")
                         .font(.system(size: 12))
                 }
             }
