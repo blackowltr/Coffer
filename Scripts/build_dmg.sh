@@ -75,6 +75,8 @@ if [ -d "${SCRIPT_DIR}/Coffer.app" ]; then
     APP_PATH="${SCRIPT_DIR}/Coffer.app"
 elif [ -d "/Volumes/Coffer/Coffer.app" ]; then
     APP_PATH="/Volumes/Coffer/Coffer.app"
+elif [ -d "${HOME}/Desktop/Coffer-Kurulum/Coffer.app" ]; then
+    APP_PATH="${HOME}/Desktop/Coffer-Kurulum/Coffer.app"
 elif [ -d "${HOME}/Desktop/Coffer/Coffer.app" ]; then
     APP_PATH="${HOME}/Desktop/Coffer/Coffer.app"
 fi
