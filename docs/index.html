@@ -1,149 +1,183 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coffer — macOS için Modern, Hızlı ve Akıllı Arşiv Yöneticisi</title>
-    <meta name="description" content="Saf Swift ve SwiftUI ile geliştirilmiş, Apple Silicon ve Intel destekli yeni nesil macOS arşiv yöneticisi. RAR, ZIP, 7Z, TAR formatlarını sıfır takılmayla açın ve yönetin.">
+    <meta name="description" content="Saf Swift ve SwiftUI ile geliştirilmiş; 60 FPS akıcılığında, Apple Silicon ve Intel mimarilerinde yerel çalışan yeni nesil macOS arşiv yöneticisi.">
+    <meta name="keywords" content="macOS, archive, unrar, 7zip, winrar mac, swift, swiftui, apple silicon, zip, tar">
     
-    <!-- Open Graph / Meta -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://blackowltr.github.io/Coffer/">
     <meta property="og:title" content="Coffer — macOS için Modern ve Akıllı Arşiv Yöneticisi">
-    <meta property="og:description" content="Ultra hızlı, güvenli, saf Swift ve SwiftUI ile tasarlanmış modern macOS arşiv yöneticisi.">
+    <meta property="og:description" content="Saf Swift & SwiftUI ile 60 FPS hızında arşivleme deneyimi. RAR, ZIP, 7Z, TAR formatlarını sıfır takılmayla yönetin.">
     <meta property="og:image" content="https://raw.githubusercontent.com/blackowltr/Coffer/main/Resources/AppIcon_1024.png">
 
-    <!-- Fonts -->
+    <!-- Fonts: Inter & Plus Jakarta Sans + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-base: #06080d;
-            --bg-card: rgba(255, 255, 255, 0.035);
-            --bg-card-hover: rgba(255, 255, 255, 0.06);
-            --border-card: rgba(255, 255, 255, 0.08);
-            --border-card-hover: rgba(255, 255, 255, 0.18);
-            --text-primary: #f5f6f8;
-            --text-secondary: #9aa2b1;
-            --text-muted: #626b7d;
-            --accent-primary: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.35);
-            --accent-purple: #8b5cf6;
-            --accent-mint: #10b981;
+            --bg: #07090e;
+            --bg-subtle: #0d111a;
+            --surface: rgba(255, 255, 255, 0.035);
+            --surface-hover: rgba(255, 255, 255, 0.065);
+            --surface-active: rgba(255, 255, 255, 0.09);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --text-1: #f3f5f8;
+            --text-2: #94a3b8;
+            --text-3: #64748b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --accent-purple: #a855f7;
+            --accent-emerald: #10b981;
             --accent-cyan: #06b6d4;
-            --radius-lg: 20px;
-            --radius-md: 14px;
+            --accent-amber: #f59e0b;
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
             --radius-sm: 8px;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-primary);
+            background-color: var(--bg);
+            color: var(--text-1);
             line-height: 1.6;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 60%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 15% 70%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
+                radial-gradient(circle at 85% 25%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 15% 65%, rgba(6, 182, 212, 0.1) 0%, transparent 45%);
             background-repeat: no-repeat;
         }
 
-        /* Glass Utility */
-        .glass {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-card);
+        /* Ambient Lighting Canvas */
+        .ambient-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.7;
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
         }
 
-        /* Container */
         .container {
-            max-width: 1200px;
+            max-width: 1220px;
             margin: 0 auto;
             padding: 0 24px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Header / Navbar */
+        /* Glassmorphism Standard */
+        .glass {
+            background: var(--surface);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            transition: all 0.3s var(--ease-spring);
+        }
+
+        .glass:hover {
+            border-color: var(--border-hover);
+        }
+
+        /* Navigation Bar (Saaspo / Linear style floating header) */
         header {
             position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 16px 0;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            background: rgba(6, 8, 13, 0.75);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            top: 14px;
+            z-index: 1000;
+            margin: 0 auto;
+            max-width: 1080px;
+            padding: 0 16px;
         }
 
-        .nav-inner {
+        .nav-island {
+            background: rgba(13, 17, 26, 0.78);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 8px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             text-decoration: none;
-            color: var(--text-primary);
+            color: var(--text-1);
         }
 
         .brand-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
             background: linear-gradient(135deg, #2563eb, #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);
         }
 
         .brand-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
+            width: 17px;
+            height: 17px;
+            fill: #fff;
         }
 
         .brand-text {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
             list-style: none;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--text-2);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
             transition: color 0.2s;
         }
 
         .nav-links a:hover {
-            color: var(--text-primary);
+            color: var(--text-1);
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
         }
 
         .btn {
@@ -151,76 +185,92 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 13.5px;
             font-weight: 600;
-            border-radius: var(--radius-sm);
+            border-radius: 999px;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s var(--ease-spring);
+            white-space: nowrap;
         }
 
         .btn-primary {
             background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 22px rgba(37, 99, 235, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transform: translateY(-1.5px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            border: 1px solid var(--border-card);
+            color: var(--text-1);
+            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border-card-hover);
+            background: rgba(255, 255, 255, 0.09);
+            border-color: var(--border-hover);
             transform: translateY(-1px);
         }
 
         /* Hero Section */
         .hero {
-            padding: 80px 0 60px;
+            padding: 70px 0 40px;
             text-align: center;
         }
 
-        .hero-badge {
+        .hero-pill {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 14px;
-            background: rgba(59, 130, 246, 0.12);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 5px 14px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.25);
             border-radius: 999px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
-            color: #60a5fa;
+            color: #93c5fd;
             margin-bottom: 24px;
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: #60a5fa;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #60a5fa;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { border-color: rgba(59, 130, 246, 0.25); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
+            50% { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 18px 2px rgba(59, 130, 246, 0.25); }
         }
 
         .hero h1 {
-            font-size: clamp(38px, 6vw, 64px);
+            font-size: clamp(40px, 6.5vw, 68px);
             font-weight: 800;
-            letter-spacing: -1.8px;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.65) 100%);
+            letter-spacing: -2px;
+            line-height: 1.08;
+            margin-bottom: 22px;
+            background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.7) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero p {
-            font-size: clamp(17px, 2.5vw, 20px);
-            color: var(--text-secondary);
-            max-width: 720px;
+            font-size: clamp(17px, 2.4vw, 20px);
+            color: var(--text-2);
+            max-width: 740px;
             margin: 0 auto 36px;
             font-weight: 400;
+            line-height: 1.55;
         }
 
         .hero-cta {
@@ -229,50 +279,74 @@
             justify-content: center;
             gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .btn-large {
-            padding: 14px 28px;
-            font-size: 16px;
-            border-radius: var(--radius-md);
+        .btn-lg {
+            padding: 13px 28px;
+            font-size: 15.5px;
+            border-radius: 999px;
         }
 
-        .hero-meta {
-            font-size: 13px;
-            color: var(--text-muted);
+        /* Interactive Terminal Chip */
+        .terminal-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(13, 17, 26, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .terminal-chip:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            color: var(--text-1);
+        }
+
+        .terminal-chip code {
+            color: #60a5fa;
+        }
+
+        .terminal-copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-3);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 18px;
         }
 
-        .hero-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .terminal-chip:hover .terminal-copy-btn {
+            color: var(--text-1);
         }
 
-        /* App Window Showcase Mockup */
-        .showcase {
-            margin: 50px auto 80px;
+        /* Interactive macOS App Simulator */
+        .simulator-wrap {
+            margin: 36px auto 70px;
             max-width: 1040px;
-            position: relative;
+            perspective: 1200px;
         }
 
-        .window-frame {
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: 
-                0 30px 100px -20px rgba(0, 0, 0, 0.9),
-                0 0 0 1px rgba(255, 255, 255, 0.12),
-                0 0 40px rgba(59, 130, 246, 0.2);
+        .simulator-window {
             background: #11141c;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 30px 90px -15px rgba(0, 0, 0, 0.9),
+                0 0 50px rgba(59, 130, 246, 0.15);
+            overflow: hidden;
+            transition: transform 0.4s var(--ease-spring);
         }
 
-        .window-titlebar {
-            background: #181c26;
+        .sim-titlebar {
             height: 42px;
+            background: #171b26;
             display: flex;
             align-items: center;
             padding: 0 16px;
@@ -280,420 +354,640 @@
             position: relative;
         }
 
-        .traffic-lights {
+        .sim-dots {
             display: flex;
-            gap: 8px;
+            gap: 7px;
         }
 
-        .traffic-light {
-            width: 12px;
-            height: 12px;
+        .sim-dot {
+            width: 11px;
+            height: 11px;
             border-radius: 50%;
         }
 
-        .tl-red { background: #ff5f56; }
-        .tl-yellow { background: #ffbd2e; }
-        .tl-green { background: #27c93f; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
 
-        .window-title {
+        .sim-title {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-2);
+            pointer-events: none;
         }
 
-        .window-toolbar {
-            background: #151922;
-            padding: 8px 16px;
+        /* Simulator Toolbar with Active Clickable Buttons */
+        .sim-toolbar {
+            background: #141722;
+            padding: 8px 14px;
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             overflow-x: auto;
         }
 
-        .toolbar-btn {
-            display: flex;
+        .sim-btn {
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             padding: 6px 12px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--text-1);
+            cursor: pointer;
+            transition: all 0.15s;
             white-space: nowrap;
         }
 
-        .toolbar-btn.highlight {
-            background: rgba(59, 130, 246, 0.15);
+        .sim-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .sim-btn.active {
+            background: rgba(59, 130, 246, 0.18);
             border-color: rgba(59, 130, 246, 0.4);
             color: #60a5fa;
         }
 
-        .window-breadcrumb {
-            background: #12151e;
-            padding: 8px 16px;
+        /* Simulator Breadcrumb */
+        .sim-breadcrumb {
+            background: #11141d;
+            padding: 7px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 11.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .bc-path {
+        .sim-path {
             display: flex;
             align-items: center;
             gap: 6px;
-            color: var(--text-secondary);
+            color: var(--text-2);
         }
 
-        .bc-path strong {
-            color: var(--text-primary);
+        .sim-path strong {
+            color: #93c5fd;
         }
 
-        .bc-search {
+        .sim-search-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 6px;
             padding: 4px 10px;
-            font-size: 11px;
-            color: var(--text-muted);
-            width: 140px;
         }
 
-        .window-body {
+        .sim-search-input {
+            background: none;
+            border: none;
+            color: var(--text-1);
+            font-size: 11.5px;
+            outline: none;
+            width: 130px;
+        }
+
+        .sim-search-input::placeholder {
+            color: var(--text-3);
+        }
+
+        /* Simulator Body (Sidebar + Table) */
+        .sim-body {
             display: grid;
-            grid-template-columns: 200px 1fr;
-            min-height: 280px;
+            grid-template-columns: 190px 1fr;
+            min-height: 290px;
             background: #0d1017;
+            position: relative;
         }
 
-        .sidebar {
-            background: #11141c;
+        .sim-sidebar {
+            background: #12151f;
             border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px 10px;
-            font-size: 12px;
+            padding: 10px 8px;
+            font-size: 11.5px;
         }
 
-        .sidebar-sec {
-            font-size: 10px;
+        .sim-sec-title {
+            font-size: 9.5px;
             font-weight: 700;
-            color: var(--text-muted);
-            margin: 8px 6px 4px;
+            color: var(--text-3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin: 6px 6px 3px;
         }
 
-        .sidebar-item {
+        .sim-nav-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 8px;
-            border-radius: 6px;
-            color: var(--text-secondary);
+            padding: 5px 8px;
+            border-radius: 5px;
+            color: var(--text-2);
+            cursor: pointer;
             margin-bottom: 2px;
+            transition: all 0.15s;
         }
 
-        .sidebar-item.active {
+        .sim-nav-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-1);
+        }
+
+        .sim-nav-item.active {
             background: rgba(59, 130, 246, 0.15);
             color: #60a5fa;
             font-weight: 600;
         }
 
-        .table-area {
-            padding: 8px 16px;
+        .sim-count {
+            font-size: 9.5px;
+            padding: 1px 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            color: var(--text-3);
         }
 
-        .file-table {
+        /* Table */
+        .sim-table-wrap {
+            padding: 6px 14px;
+            overflow-x: auto;
+        }
+
+        .sim-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11.5px;
             text-align: left;
         }
 
-        .file-table th {
-            padding: 8px 10px;
-            color: var(--text-muted);
+        .sim-table th {
+            padding: 7px 8px;
+            color: var(--text-3);
             font-weight: 600;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 11px;
+            font-size: 10.5px;
         }
 
-        .file-table td {
-            padding: 8px 10px;
-            color: var(--text-secondary);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        .sim-table td {
+            padding: 7px 8px;
+            color: var(--text-2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.025);
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
+            cursor: pointer;
         }
 
-        .file-table tr.selected {
-            background: rgba(59, 130, 246, 0.1);
+        .sim-table tr.selected {
+            background: rgba(59, 130, 246, 0.12);
         }
 
-        .file-table td.name {
+        .sim-table tr:hover:not(.selected) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .sim-table td.name {
             font-family: inherit;
-            color: var(--text-primary);
+            color: var(--text-1);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             font-size: 12px;
             font-weight: 500;
         }
 
-        .file-table .ratio {
+        .sim-ratio {
             color: #34d399;
             font-weight: 600;
         }
 
-        .window-footer {
+        .sim-footer {
             background: #11141c;
-            padding: 8px 16px;
+            padding: 7px 16px;
             font-size: 11px;
-            color: var(--text-muted);
+            color: var(--text-3);
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .badge-pill {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            background: rgba(139, 92, 246, 0.15);
-            color: #c084fc;
+        /* Quick Look Interactive Modal Simulator */
+        .ql-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(14px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
         }
 
-        /* Features Section */
+        .ql-overlay.show {
+            display: flex;
+        }
+
+        .ql-card {
+            background: #171b26;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 24px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            animation: ql-pop 0.2s var(--ease-spring);
+        }
+
+        @keyframes ql-pop {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Saaspo Bento Grid Section */
         .section {
-            padding: 80px 0;
+            padding: 90px 0;
         }
 
         .section-header {
             text-align: center;
-            max-width: 640px;
-            margin: 0 auto 50px;
+            max-width: 660px;
+            margin: 0 auto 54px;
         }
 
         .section-tag {
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-primary);
-            margin-bottom: 8px;
+            letter-spacing: 1.2px;
+            color: var(--accent);
+            margin-bottom: 10px;
             display: block;
         }
 
         .section-title {
-            font-size: clamp(28px, 4vw, 40px);
+            font-size: clamp(30px, 4.2vw, 44px);
             font-weight: 800;
-            letter-spacing: -1px;
+            letter-spacing: -1.2px;
             margin-bottom: 14px;
         }
 
         .section-desc {
-            color: var(--text-secondary);
-            font-size: 16px;
+            color: var(--text-2);
+            font-size: 16.5px;
         }
 
-        .features-grid {
+        /* Bento Grid Layout (Saaspo / 60fps Inspiration) */
+        .bento-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
         }
 
-        .feature-card {
+        .bento-col-8 { grid-column: span 8; }
+        .bento-col-4 { grid-column: span 4; }
+        .bento-col-6 { grid-column: span 6; }
+        .bento-col-12 { grid-column: span 12; }
+
+        .bento-card {
             padding: 32px;
-            border-radius: var(--radius-lg);
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-card-hover);
-            background: var(--bg-card-hover);
+        .bento-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
         }
 
-        .feature-icon {
-            width: 50px;
-            height: 50px;
+        .bento-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-bottom: 16px;
+            width: fit-content;
+        }
+
+        .bento-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            margin-bottom: 10px;
+        }
+
+        .bento-card p {
+            color: var(--text-2);
+            font-size: 14.5px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* Tactile Keycaps (60fps design pattern) */
+        .keycap-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .keycap {
+            background: linear-gradient(180deg, #2b303e 0%, #171b26 100%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-bottom: 3px solid rgba(0, 0, 0, 0.6);
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Benchmark Speed Bar */
+        .benchmark-box {
+            background: rgba(13, 17, 26, 0.8);
             border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 14px;
+        }
+
+        .bench-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .bench-bar-bg {
+            height: 7px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .bench-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+        .fill-coffer {
+            width: 95%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
+
+        .fill-legacy {
+            width: 25%;
+            background: #64748b;
+        }
+
+        /* Security Radar Card */
+        .security-dial {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 14px;
+        }
+
+        .score-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            font-size: 22px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #34d399;
+            flex-shrink: 0;
         }
 
-        .icon-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-        .icon-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; }
-        .icon-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .icon-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
-        .icon-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
-        .icon-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-
-        .feature-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: -0.3px;
+        /* Smart Extraction Interactive Switch */
+        .smart-extract-widget {
+            background: rgba(13, 17, 26, 0.8);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 10px;
         }
 
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 14.5px;
-            line-height: 1.6;
+        .compare-toggle-btn {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 14px;
         }
 
-        /* Formats Badge Grid */
-        .formats-section {
-            background: rgba(255, 255, 255, 0.015);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .c-toggle {
+            flex: 1;
+            padding: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            color: var(--text-3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .formats-grid {
+        .c-toggle.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Formats Showcase */
+        .format-pills-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-top: 36px;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-top: 30px;
         }
 
-        .format-badge-card {
-            padding: 20px;
+        .format-card {
+            padding: 18px;
             border-radius: var(--radius-md);
             text-align: center;
-            transition: all 0.2s ease;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .format-badge-card:hover {
-            transform: scale(1.03);
-            border-color: rgba(255, 255, 255, 0.2);
+        .format-card:hover {
+            transform: translateY(-2px);
+            background: var(--surface-hover);
         }
 
-        .format-tag {
-            font-size: 20px;
+        .format-card-title {
+            font-size: 19px;
             font-weight: 800;
             letter-spacing: -0.5px;
             margin-bottom: 4px;
         }
 
-        .format-desc {
-            font-size: 12px;
-            color: var(--text-muted);
+        .format-card-sub {
+            font-size: 11.5px;
+            color: var(--text-3);
         }
 
         /* Comparison Table */
-        .comparison-table {
+        .table-card {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            margin-top: 20px;
+        }
+
+        .comp-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 30px;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-        }
-
-        .comparison-table th, .comparison-table td {
-            padding: 16px 20px;
+            font-size: 13.5px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 14px;
         }
 
-        .comparison-table th {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-secondary);
+        .comp-table th, .comp-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comp-table th {
+            color: var(--text-3);
             font-weight: 600;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .comparison-table th.highlight-col, .comparison-table td.highlight-col {
+        .comp-table td.brand-col, .comp-table th.brand-col {
             background: rgba(59, 130, 246, 0.08);
-            font-weight: 600;
             color: #93c5fd;
+            font-weight: 600;
         }
 
-        .check { color: #34d399; font-weight: bold; }
-        .cross { color: #64748b; }
-
-        /* CTA Download Box */
-        .cta-box {
-            padding: 64px 32px;
-            border-radius: 28px;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(37, 99, 235, 0.15) 0%, rgba(255, 255, 255, 0.02) 100%);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 80px -20px rgba(37, 99, 235, 0.3);
-        }
-
-        .cta-box h2 {
-            font-size: clamp(30px, 4.5vw, 44px);
+        .check-icon {
+            color: #34d399;
             font-weight: 800;
-            letter-spacing: -1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cross-icon {
+            color: #64748b;
+        }
+
+        /* Big CTA Card */
+        .cta-wrap {
+            padding: 80px 32px;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.16) 0%, rgba(13, 17, 26, 0.8) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 30px 100px -20px rgba(37, 99, 235, 0.25);
+            position: relative;
+        }
+
+        .cta-wrap h2 {
+            font-size: clamp(32px, 4.5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -1.2px;
             margin-bottom: 14px;
         }
 
-        .cta-box p {
-            color: var(--text-secondary);
+        .cta-wrap p {
+            color: var(--text-2);
             font-size: 17px;
-            max-width: 580px;
-            margin: 0 auto 30px;
+            max-width: 600px;
+            margin: 0 auto 32px;
         }
 
         /* Footer */
         footer {
-            padding: 40px 0;
+            padding: 50px 0 40px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--text-3);
         }
 
-        .footer-inner {
+        .footer-flex {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 20px;
         }
 
-        .footer-links {
+        .footer-nav {
             display: flex;
             gap: 20px;
         }
 
-        .footer-links a {
-            color: var(--text-secondary);
+        .footer-nav a {
+            color: var(--text-2);
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        .footer-links a:hover {
-            color: var(--text-primary);
+        .footer-nav a:hover {
+            color: var(--text-1);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .window-body { grid-template-columns: 1fr; }
-            .sidebar { display: none; }
-            .comparison-table { display: block; overflow-x: auto; }
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            .bento-col-8, .bento-col-4, .bento-col-6 {
+                grid-column: span 12;
+            }
+            .sim-body {
+                grid-template-columns: 1fr;
+            }
+            .sim-sidebar {
+                display: none;
+            }
+            .nav-links {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header / Navbar -->
+    <div class="ambient-mesh"></div>
+
+    <!-- Floating Navigation Bar -->
     <header>
-        <div class="container nav-inner">
+        <div class="nav-island">
             <a href="#" class="brand">
                 <div class="brand-icon">
                     <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
@@ -702,19 +996,19 @@
             </a>
 
             <ul class="nav-links">
+                <li><a href="#simulasyon">Arayüz</a></li>
                 <li><a href="#ozellikler">Özellikler</a></li>
-                <li><a href="#vitrin">Arayüz</a></li>
                 <li><a href="#formatlar">Formatlar</a></li>
                 <li><a href="#karsilastirma">Karşılaştırma</a></li>
             </ul>
 
             <div class="nav-actions">
                 <a href="https://github.com/blackowltr/Coffer" target="_blank" class="btn btn-secondary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                     GitHub
                 </a>
                 <a href="https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg" class="btn btn-primary">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     İndir (DMG)
                 </a>
             </div>
@@ -724,27 +1018,33 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="hero-badge">
-                <span></span> macOS 14+ Sonoma & Sequoia ile Yerel Uyumlu
+            <div class="hero-pill">
+                <span class="pulse-dot"></span>
+                <span>Coffer v1.0.0 Hazır — macOS Sonoma & Sequoia ile Yerel Uyumlu</span>
             </div>
 
-            <h1>macOS İçin Ultra Hızlı,<br>Akıllı ve Güvenli Arşiv Yöneticisi</h1>
+            <h1>macOS'in Hak Ettiği<br>Yeni Nesil Arşiv Yöneticisi</h1>
 
             <p>
-                Saf Swift ve SwiftUI mimarisiyle geliştirildi. Apple Silicon (M1–M4) ve Intel işlemcilerde sıfır takılmayla çalışır; RAR, ZIP, 7Z ve çok parçalı arşivleri yerel hızda yönetir.
+                Saf Swift ve SwiftUI ile 60 FPS hızında geliştirildi. Apple Silicon (M1–M4) ve Intel işlemcilerde sıfır takılmayla çalışır; RAR, ZIP, 7Z ve çok parçalı arşivleri anında yönetir.
             </p>
 
             <div class="hero-cta">
-                <a href="https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg" class="btn btn-primary btn-large">
+                <a href="https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg" class="btn btn-primary btn-lg">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Coffer'ı Ücretsiz İndirin (v1.0.0)
+                    macOS için Ücretsiz İndir (v1.0.0 DMG)
                 </a>
-                <a href="https://github.com/blackowltr/Coffer" target="_blank" class="btn btn-secondary btn-large">
-                    Depoyu İncele
-                </a>
+
+                <div class="terminal-chip" onclick="copyInstallCommand()" title="Terminal Komutunu Kopyala">
+                    <span>$</span>
+                    <code id="cmd-text">brew install blackowltr/coffer</code>
+                    <button class="terminal-copy-btn" id="copy-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="hero-meta">
+            <div style="font-size: 13px; color: var(--text-3); display: flex; justify-content: center; gap: 18px; flex-wrap: wrap;">
                 <span>✓ Evrensel (Universal Binary)</span>
                 <span>✓ 15.6 MB Hafif Kurulum</span>
                 <span>✓ %100 Çevrimdışı & Güvenli</span>
@@ -752,303 +1052,407 @@
         </div>
     </section>
 
-    <!-- App Window Showcase -->
-    <section id="vitrin" class="container showcase">
-        <div class="window-frame">
+    <!-- Interactive macOS Simulator Window (60fps & Saaspo Feature Showcase) -->
+    <section id="simulasyon" class="container simulator-wrap">
+        <div class="simulator-window">
             <!-- Window Titlebar -->
-            <div class="window-titlebar">
-                <div class="traffic-lights">
-                    <div class="traffic-light tl-red"></div>
-                    <div class="traffic-light tl-yellow"></div>
-                    <div class="traffic-light tl-green"></div>
+            <div class="sim-titlebar">
+                <div class="sim-dots">
+                    <div class="sim-dot dot-red"></div>
+                    <div class="sim-dot dot-yellow"></div>
+                    <div class="sim-dot dot-green"></div>
                 </div>
-                <div class="window-title">Coffer — macOS Proje_Yedekleri_2026.rar</div>
+                <div class="sim-title">Coffer — macOS Proje_Yedekleri_2026.rar (WinRAR Archive)</div>
             </div>
 
-            <!-- Toolbar -->
-            <div class="window-toolbar">
-                <div class="toolbar-btn highlight">
+            <!-- Toolbar with Clickable Interactive Actions -->
+            <div class="sim-toolbar">
+                <button class="sim-btn active" onclick="simulateAction('sikistir')">
                     <span>📦</span> Sıkıştır
-                </div>
-                <div class="toolbar-btn">
-                    <span>📥</span> Dizine Çıkart
-                </div>
-                <div class="toolbar-btn">
+                </button>
+                <button class="sim-btn" onclick="simulateAction('cikart')">
+                    <span>📥</span> Dizine Çıkart (⌘E)
+                </button>
+                <button class="sim-btn" onclick="simulateAction('ekle')">
                     <span>➕</span> Dosya Ekle
-                </div>
-                <div class="toolbar-btn">
+                </button>
+                <button class="sim-btn" onclick="simulateAction('test')">
                     <span>🛡️</span> Test Et
-                </div>
-                <div class="toolbar-btn">
-                    <span>👁️</span> Önizle (Boşluk)
-                </div>
-                <div class="toolbar-btn">
+                </button>
+                <button class="sim-btn" onclick="toggleQuickLook()">
+                    <span>👁️</span> Quick Look (Boşluk)
+                </button>
+                <button class="sim-btn" onclick="simulateAction('donustur')">
                     <span>🔄</span> Dönüştür
-                </div>
-                <div class="toolbar-btn">
-                    <span>🔒</span> Kilitle
-                </div>
+                </button>
+                <button class="sim-btn" onclick="simulateAction('guvenlik')">
+                    <span>🔒</span> Güvenlik Raporu
+                </button>
             </div>
 
-            <!-- Breadcrumb -->
-            <div class="window-breadcrumb">
-                <div class="bc-path">
+            <!-- Breadcrumb & Search -->
+            <div class="sim-breadcrumb">
+                <div class="sim-path">
                     <span>📦 Arşiv</span>
                     <span>›</span>
                     <strong>Proje_Kaynak_Kodlari</strong>
                     <span>›</span>
-                    <span>Modüller</span>
+                    <span id="active-folder-label">Sources</span>
                 </div>
-                <div class="bc-search">🔍 Arşivde ara...</div>
+                <div class="sim-search-box">
+                    <span>🔍</span>
+                    <input type="text" class="sim-search-input" id="table-search" placeholder="Arşivde ara..." oninput="filterTable(this.value)">
+                </div>
             </div>
 
             <!-- Body -->
-            <div class="window-body">
+            <div class="sim-body">
                 <!-- Sidebar -->
-                <div class="sidebar">
-                    <div class="sidebar-sec">Konum</div>
-                    <div class="sidebar-item active">
+                <div class="sim-sidebar">
+                    <div class="sim-sec-title">Konum</div>
+                    <div class="sim-nav-item active" onclick="filterCategory('all', this)">
                         <span>📦 Ana Arşiv</span>
-                        <span class="badge-pill">48</span>
+                        <span class="sim-count" id="total-count-badge">5</span>
                     </div>
 
-                    <div class="sidebar-sec">Akıllı Filtreler</div>
-                    <div class="sidebar-item">
-                        <span>🖼️ Görseller</span>
-                        <span class="badge-pill">14</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>📄 Belgeler</span>
-                        <span class="badge-pill">8</span>
-                    </div>
-                    <div class="sidebar-item">
+                    <div class="sim-sec-title">Akıllı Filtreler</div>
+                    <div class="sim-nav-item" onclick="filterCategory('code', this)">
                         <span>💻 Kaynak Kod</span>
-                        <span class="badge-pill">26</span>
+                        <span class="sim-count">3</span>
+                    </div>
+                    <div class="sim-nav-item" onclick="filterCategory('image', this)">
+                        <span>🖼️ Görseller</span>
+                        <span class="sim-count">1</span>
+                    </div>
+                    <div class="sim-nav-item" onclick="filterCategory('doc', this)">
+                        <span>📄 Belgeler</span>
+                        <span class="sim-count">1</span>
                     </div>
 
-                    <div class="sidebar-sec">Klasörler</div>
-                    <div class="sidebar-item">
+                    <div class="sim-sec-title">Klasörler</div>
+                    <div class="sim-nav-item" onclick="filterCategory('code', this)">
                         <span>📁 Sources</span>
                     </div>
-                    <div class="sidebar-item">
+                    <div class="sim-nav-item" onclick="filterCategory('image', this)">
                         <span>📁 Resources</span>
                     </div>
                 </div>
 
-                <!-- Table Area -->
-                <div class="table-area">
-                    <table class="file-table">
+                <!-- Table -->
+                <div class="sim-table-wrap">
+                    <table class="sim-table">
                         <thead>
                             <tr>
                                 <th>Dosya Adı</th>
                                 <th>Boyut</th>
                                 <th>Sıkıştırılmış</th>
                                 <th>Oran</th>
-                                <th>Değiştirilme</th>
+                                <th>Tarih</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="selected">
+                        <tbody id="sim-tbody">
+                            <tr class="selected" onclick="selectRow(this, 'ArchiveEngine.swift', '32.4 KB', '11.2 KB', '-%65.4')">
                                 <td class="name">
                                     <span>⚙️</span> ArchiveEngine.swift <span>🔒</span>
                                 </td>
                                 <td>32.4 KB</td>
                                 <td>11.2 KB</td>
-                                <td class="ratio">-%65.4</td>
+                                <td class="sim-ratio">-%65.4</td>
                                 <td>19 Eki 2026</td>
                             </tr>
-                            <tr>
+                            <tr onclick="selectRow(this, 'LiquidGlassDesign.swift', '18.9 KB', '7.1 KB', '-%62.4')">
                                 <td class="name">
                                     <span>🎨</span> LiquidGlassDesign.swift
                                 </td>
                                 <td>18.9 KB</td>
                                 <td>7.1 KB</td>
-                                <td class="ratio">-%62.4</td>
+                                <td class="sim-ratio">-%62.4</td>
                                 <td>19 Eki 2026</td>
                             </tr>
-                            <tr>
+                            <tr onclick="selectRow(this, 'UpdateDownloadManager.swift', '14.2 KB', '4.8 KB', '-%66.2')">
+                                <td class="name">
+                                    <span>🚀</span> UpdateDownloadManager.swift
+                                </td>
+                                <td>14.2 KB</td>
+                                <td>4.8 KB</td>
+                                <td class="sim-ratio">-%66.2</td>
+                                <td>19 Eki 2026</td>
+                            </tr>
+                            <tr onclick="selectRow(this, 'AppIcon_1024.png', '1.4 MB', '1.1 MB', '-%21.4')">
                                 <td class="name">
                                     <span>🖼️</span> AppIcon_1024.png
                                 </td>
                                 <td>1.4 MB</td>
                                 <td>1.1 MB</td>
-                                <td class="ratio">-%21.4</td>
+                                <td class="sim-ratio">-%21.4</td>
                                 <td>18 Eki 2026</td>
                             </tr>
-                            <tr>
+                            <tr onclick="selectRow(this, 'Kullanim_Rehberi.pdf', '180 KB', '142 KB', '-%21.1')">
                                 <td class="name">
-                                    <span>📄</span> Lisans_Sozlesmesi.pdf
+                                    <span>📄</span> Kullanim_Rehberi.pdf
                                 </td>
                                 <td>180 KB</td>
                                 <td>142 KB</td>
-                                <td class="ratio">-%21.1</td>
+                                <td class="sim-ratio">-%21.1</td>
                                 <td>17 Eki 2026</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Quick Look Modal Overlay Simulator -->
+                <div class="ql-overlay" id="ql-overlay" onclick="toggleQuickLook()">
+                    <div class="ql-card" onclick="event.stopPropagation()">
+                        <div style="font-size: 34px; margin-bottom: 10px;">👁️</div>
+                        <h4 id="ql-filename" style="font-size: 16px; margin-bottom: 6px;">ArchiveEngine.swift</h4>
+                        <p style="font-size: 12px; color: var(--text-2); margin-bottom: 14px;">Quick Look Önizlemesi (Arşivden Çıkarmadan)</p>
+                        <div style="background: #0d1017; border-radius: 8px; padding: 12px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #93c5fd; max-height: 120px; overflow-y: auto;">
+                            import Foundation<br>
+                            import AppKit<br><br>
+                            // Coffer Zero-Lag Extraction Engine<br>
+                            public final class ArchiveEngine { ... }
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 16px; width: 100%;" onclick="toggleQuickLook()">Önizlemeyi Kapat (Boşluk)</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Footer Status -->
-            <div class="window-footer">
-                <div>Seçili: 1 (32.4 KB) • Toplam: 48 öğe (24.8 MB)</div>
+            <!-- Simulator Footer -->
+            <div class="sim-footer">
+                <div id="sim-status-left">Seçili: 1 (32.4 KB) • Toplam: 5 dosya (1.64 MB)</div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <span class="badge-pill">RAR5</span>
-                    <span class="badge-pill">AES-256</span>
-                    <span class="badge-pill" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">Tasarruf: %48.2</span>
-                    <span style="color: #34d399;">● Hazır</span>
+                    <span style="padding: 2px 7px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border-radius: 4px; font-size: 10px; font-weight: 700;">RAR5</span>
+                    <span style="padding: 2px 7px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-radius: 4px; font-size: 10px; font-weight: 700;">AES-256</span>
+                    <span style="color: #34d399; font-weight: 600;">● Hazır</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Saaspo Bento Grid Section -->
     <section id="ozellikler" class="section">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag">Yenilikçi Mimari</span>
-                <h2 class="section-title">Klasik Arşivleyicilerden Çok Daha Ötede</h2>
-                <p class="section-desc">Eski pencereli, hantal ve sisteme yabancı arşiv araçlarını unutun. Coffer, macOS için baştan tasarlandı.</p>
+                <span class="section-tag">Detaylı İnceleme</span>
+                <h2 class="section-title">Hız ve Sadeliğin Kusursuz Uyumu</h2>
+                <p class="section-desc">Eski ve hantal arşiv uygulamalarını unutun. Coffer, modern macOS tasarım standartlarına ve güçlü donanımınıza göre optimize edildi.</p>
             </div>
 
-            <div class="features-grid">
-                <!-- 1 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-blue">⚡</div>
-                    <h3>Sıfır Gecikmeli Gezgin</h3>
-                    <p>Büyük arşivleri diske çıkarmadan doğrudan içeride gezinin. Anında O(1) önbellekleme ve Quick Look (Boşluk Tuşu) ile dosyaları saniyeler içinde görüntüleyin.</p>
+            <div class="bento-grid">
+                <!-- Bento 1 (Span 8): Akıllı Çıkarma -->
+                <div class="glass bento-card bento-col-8">
+                    <div>
+                        <div class="bento-badge">
+                            <span>🛡️</span> Akıllı Çıkarma (Smart Extraction)
+                        </div>
+                        <h3>Masaüstünüzü Asla Kirletmeyen Zeka</h3>
+                        <p>Dağınık 100+ dosyadan oluşan bir arşiv açtığınızda masaüstünüz dosyalarla dolmaz. Coffer içeriği analiz eder: Dağınık arşivleri otomatik klasörler, tek klasörlü arşivleri ise gereksiz iç içe dizinler oluşturmadan anında çıkarır.</p>
+                    </div>
+
+                    <div class="smart-extract-widget">
+                        <div class="compare-toggle-btn">
+                            <button class="c-toggle active" id="btn-smart-on" onclick="toggleSmartView(true)">Coffer (Akıllı Klasörleme)</button>
+                            <button class="c-toggle" id="btn-smart-off" onclick="toggleSmartView(false)">Eski Uygulamalar (Masaüstü Kaosu)</button>
+                        </div>
+                        <div id="smart-demo-box" style="font-size: 12.5px; color: #94a3b8; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 22px;">📁</span>
+                            <div>
+                                <strong style="color: #f3f5f8;">Masaüstü/Proje_Dosyalari/</strong> (Tek düzenli klasör açıldı)
+                                <div style="font-size: 11px; color: #34d399;">✓ 0 masaüstü kirliliği • Düzen korundu</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 2 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-emerald">🛡️</div>
-                    <h3>Akıllı Çıkarma (Smart Extraction)</h3>
-                    <p>Çok sayıda dağınık dosyayı otomatik olarak arşiv adı altında toplar; tek klasörlü arşivleri ise gereksiz iç içe dizinler oluşturmadan doğrudan açar.</p>
+                <!-- Bento 2 (Span 4): Sıfır Gecikme & Benchmark -->
+                <div class="glass bento-card bento-col-4">
+                    <div>
+                        <div class="bento-badge">
+                            <span>⚡</span> O(1) Anında Dizin Gezinmesi
+                        </div>
+                        <h3>Sıfır Takılma ve 60 FPS</h3>
+                        <p>On binlerce dosya barındıran devasa arşivlerde bile klasörler arasında takılmadan, anında gezinirsiniz.</p>
+                    </div>
+
+                    <div class="benchmark-box">
+                        <div class="bench-row">
+                            <span>Coffer (Pre-Indexed)</span>
+                            <strong style="color: #60a5fa;">0.01 sn</strong>
+                        </div>
+                        <div class="bench-bar-bg">
+                            <div class="bench-bar-fill fill-coffer"></div>
+                        </div>
+
+                        <div class="bench-row">
+                            <span>Klasik Arşivleyiciler</span>
+                            <span style="color: #64748b;">1.20 sn</span>
+                        </div>
+                        <div class="bench-bar-bg">
+                            <div class="bench-bar-fill fill-legacy"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 3 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-purple">🔒</div>
-                    <h3>Askeri Düzeyde Güvenlik</h3>
-                    <p>AES-256 bit şifreleme ve başlık gizleme. Zip Slip zaafiyetlerine, gizli kabuk scriptlerine ve şüpheli dosya yapılarına karşı gerçek zamanlı koruma.</p>
+                <!-- Bento 3 (Span 4): Klavye Kısayolları -->
+                <div class="glass bento-card bento-col-4">
+                    <div>
+                        <div class="bento-badge">
+                            <span>⌨️</span> Klavye Odaklı Deneyim
+                        </div>
+                        <h3>Parmaklarınızın Ucunda Güç</h3>
+                        <p>Fareye uzanmadan tüm arşivleme işlerinizi Apple standart kısayollarıyla yönetin.</p>
+                    </div>
+
+                    <div class="keycap-row">
+                        <span class="keycap">Space (Önizle)</span>
+                        <span class="keycap"><kbd>⌘</kbd> E (Çıkart)</span>
+                        <span class="keycap">Enter (Aç)</span>
+                        <span class="keycap"><kbd>⌘</kbd> F (Ara)</span>
+                    </div>
                 </div>
 
-                <!-- 4 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-cyan">🔄</div>
-                    <h3>Kayıpsız Format Dönüştürücü</h3>
-                    <p>Arşivi dışarı aktarmadan tek hamlede RAR biçimini modern 7Z veya ZIP biçimine dönüştürün. İki arşiv arasındaki farkları görsel diff ile karşılaştırın.</p>
+                <!-- Bento 4 (Span 4): Zip Slip & Güvenlik -->
+                <div class="glass bento-card bento-col-4">
+                    <div>
+                        <div class="bento-badge">
+                            <span>🔒</span> Zip Slip & Zararlı Koruması
+                        </div>
+                        <h3>Askeri Düzeyde Koruma</h3>
+                        <p>Dizin dışına taşma (Zip Slip) açıklarını, şüpheli kabuk scriptlerini ve parola gizleme tuzaklarını önceden denetler.</p>
+                    </div>
+
+                    <div class="security-dial">
+                        <div class="score-circle">100</div>
+                        <div style="font-size: 12px;">
+                            <strong style="color: #34d399; font-size: 13px;">Güvenli Arşiv</strong>
+                            <div style="color: var(--text-3); font-size: 11px;">0 Tehdit • AES-256 Şifreleme</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 5 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-rose">🚀</div>
-                    <h3>Dahili Otomatik Güncelleyici</h3>
-                    <p>GitHub Releases entegrasyonuyla yeni sürümleri uygulama içerisinden akıcı indirme ekranıyla edinin; arka planda tek tıkla kurup devam edin.</p>
-                </div>
+                <!-- Bento 5 (Span 4): Otomatik Güncelleme -->
+                <div class="glass bento-card bento-col-4">
+                    <div>
+                        <div class="bento-badge">
+                            <span>🚀</span> Doğrudan GitHub Entegrasyonu
+                        </div>
+                        <h3>Dahili Otomatik Güncelleyici</h3>
+                        <p>Yeni sürümler çıktığında tarayıcı açmanıza gerek kalmaz. Doğrudan uygulama içinden canlı ilerleme barıyla güncellenir.</p>
+                    </div>
 
-                <!-- 6 -->
-                <div class="glass feature-card">
-                    <div class="feature-icon icon-amber">🖱️</div>
-                    <h3>Finder & Hızlı Bırakma</h3>
-                    <p>macOS Finder sağ tık menüsünden tek hamlede çıkarma veya sıkıştırma. Dosyaları pencereye sürükleyin ve saniyeler içinde arşivleyin.</p>
+                    <div style="background: rgba(13, 17, 26, 0.8); border-radius: 12px; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 11.5px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span>Coffer-v1.0.1.dmg</span>
+                            <span style="color: #60a5fa; font-weight: 700;">%100</span>
+                        </div>
+                        <div style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden;">
+                            <div style="width: 100%; height: 100%; background: #3b82f6;"></div>
+                        </div>
+                        <div style="color: #34d399; margin-top: 6px; font-size: 10.5px;">✓ Doğrulandı & Atomik Olarak Güncellendi</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Formats Showcase -->
-    <section id="formatlar" class="section formats-section">
+    <!-- Formats Showcase Grid -->
+    <section id="formatlar" class="section" style="background: rgba(255, 255, 255, 0.015); border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
         <div class="container">
             <div class="section-header">
-                <span class="section-tag">Geniş Biçim Yelpazesi</span>
+                <span class="section-tag">Geniş Biçim Desteği</span>
                 <h2 class="section-title">İhtiyacınız Olan Tüm Formatlar</h2>
-                <p class="section-desc">En yaygın sıkıştırma biçimlerinden eski disk kalıplarına kadar eksiksiz destek.</p>
+                <p class="section-desc">En popüler sıkıştırma formatlarından eski disk kalıplarına kadar eksiksiz okuma ve yazma desteği.</p>
             </div>
 
-            <div class="formats-grid">
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #a855f7;">RAR / RAR5</div>
-                    <div class="format-desc">WinRAR Arşivleri & Çok Parçalı</div>
+            <div class="format-pills-grid">
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #c084fc;">RAR / RAR5</div>
+                    <div class="format-card-sub">WinRAR & Çok Parçalı Arşivler</div>
                 </div>
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #3b82f6;">ZIP / ZIPX</div>
-                    <div class="format-desc">Evrensel Standart & Parola</div>
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #60a5fa;">ZIP / ZIPX</div>
+                    <div class="format-card-sub">Apple & Evrensel Standart</div>
                 </div>
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #10b981;">7Z (7-Zip)</div>
-                    <div class="format-desc">Yüksek Oranlı LZMA2 Sıkıştırma</div>
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #34d399;">7-ZIP (.7z)</div>
+                    <div class="format-card-sub">Ultra Yüksek LZMA2 Sıkıştırma</div>
                 </div>
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #06b6d4;">TAR.GZ / XZ</div>
-                    <div class="format-desc">Unix & Geliştirici Paketleri</div>
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #22d3ee;">TAR.GZ / XZ</div>
+                    <div class="format-card-sub">Geliştirici & Unix Paketleri</div>
                 </div>
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #f59e0b;">ISO / DMG</div>
-                    <div class="format-desc">Sanal Disk Kalıpları</div>
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #fbbf24;">ISO / DMG</div>
+                    <div class="format-card-sub">Sanal Disk Kalıpları</div>
                 </div>
-                <div class="glass format-badge-card">
-                    <div class="format-tag" style="color: #64748b;">CAB / WIM / BZ2</div>
-                    <div class="format-desc">Sistem ve Gömülü İmajlar</div>
+                <div class="glass format-card">
+                    <div class="format-card-title" style="color: #94a3b8;">CAB / WIM / BZ2</div>
+                    <div class="format-card-sub">Sistem İmajları & Katı Arşivler</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Comparison Table -->
+    <!-- Comparison Table (Saaspo Matrix style) -->
     <section id="karsilastirma" class="section">
         <div class="container">
             <div class="section-header">
                 <span class="section-tag">Neden Coffer?</span>
-                <h2 class="section-title">Geleneksel Çözümlerle Karşılaştırma</h2>
-                <p class="section-desc">Coffer, modern macOS gereksinimleri için sıfırdan inşa edildi.</p>
+                <h2 class="section-title">Farkı Hissedin</h2>
+                <p class="section-desc">macOS ekosistemindeki geleneksel araçlarla Coffer arasındaki farkları karşılaştırın.</p>
             </div>
 
-            <div class="glass" style="border-radius: var(--radius-lg); overflow: hidden;">
-                <table class="comparison-table">
+            <div class="glass table-card">
+                <table class="comp-table">
                     <thead>
                         <tr>
                             <th>Özellik</th>
-                            <th class="highlight-col">Coffer</th>
-                            <th>Varsayılan Arşiv İzlencesi</th>
+                            <th class="brand-col">Coffer</th>
+                            <th>macOS Arşiv İzlencesi</th>
                             <th>Eski Tip Uygulamalar</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Arşiv İçi Gezinme & Arama</td>
-                            <td class="highlight-col"><span class="check">✓</span> Var (Anında)</td>
-                            <td><span class="cross">✕</span> Yok (Sadece Çıkarır)</td>
+                            <td>Arşiv İçini Diske Açmadan Gezinme</td>
+                            <td class="brand-col"><span class="check-icon">✓ Anında O(1)</span></td>
+                            <td><span class="cross-icon">✕ Yok (Sadece Çıkarır)</span></td>
                             <td>Kısmi / Yavaş</td>
                         </tr>
                         <tr>
-                            <td>RAR & Çok Parçalı Arşivler</td>
-                            <td class="highlight-col"><span class="check">✓</span> Tam Destek</td>
-                            <td><span class="cross">✕</span> Desteklenmez</td>
-                            <td>Ekstra Eklenti İster</td>
+                            <td>RAR ve Parçalı (.part1) Desteği</td>
+                            <td class="brand-col"><span class="check-icon">✓ Tam Destek</span></td>
+                            <td><span class="cross-icon">✕ Desteklenmez</span></td>
+                            <td>Eklenti İster</td>
                         </tr>
                         <tr>
                             <td>Akıllı Çıkarma (Masaüstü Koruma)</td>
-                            <td class="highlight-col"><span class="check">✓</span> Otomatik</td>
-                            <td><span class="cross">✕</span> Yok (Dağıtır)</td>
-                            <td><span class="cross">✕</span> Yok</td>
+                            <td class="brand-col"><span class="check-icon">✓ Otomatik Zeka</span></td>
+                            <td><span class="cross-icon">✕ Yok (Dağıtır)</span></td>
+                            <td><span class="cross-icon">✕ Yok</span></td>
                         </tr>
                         <tr>
-                            <td>Quick Look (Boşluk Tuşu) Önizleme</td>
-                            <td class="highlight-col"><span class="check">✓</span> Var</td>
-                            <td><span class="cross">✕</span> Yok</td>
-                            <td><span class="cross">✕</span> Yok</td>
+                            <td>Quick Look (Boşluk) ile Önizleme</td>
+                            <td class="brand-col"><span class="check-icon">✓ Dahili</span></td>
+                            <td><span class="cross-icon">✕ Yok</span></td>
+                            <td><span class="cross-icon">✕ Yok</span></td>
                         </tr>
                         <tr>
-                            <td>AES-256 & Başlık Şifreleme</td>
-                            <td class="highlight-col"><span class="check">✓</span> Tam Destek</td>
-                            <td><span class="cross">✕</span> Yok</td>
-                            <td>Kısmi</td>
+                            <td>Zip Slip ve Zararlı Kod Taraması</td>
+                            <td class="brand-col"><span class="check-icon">✓ Dahili Kalkan</span></td>
+                            <td><span class="cross-icon">✕ Yok</span></td>
+                            <td><span class="cross-icon">✕ Yok</span></td>
+                        </tr>
+                        <tr>
+                            <td>Otomatik Sürüm Güncelleyici</td>
+                            <td class="brand-col"><span class="check-icon">✓ Uygulama İçi</span></td>
+                            <td><span class="check-icon">✓ Sistem</span></td>
+                            <td>Manuel İndirme</td>
                         </tr>
                         <tr>
                             <td>Gizlilik & Telemetri</td>
-                            <td class="highlight-col"><span class="check">✓</span> %100 Çevrimdışı</td>
-                            <td><span class="check">✓</span> Çevrimdışı</td>
+                            <td class="brand-col"><span class="check-icon">✓ %100 Çevrimdışı</span></td>
+                            <td><span class="check-icon">✓ Çevrimdışı</span></td>
                             <td>İzleyiciler / Reklamlar</td>
                         </tr>
                     </tbody>
@@ -1057,32 +1461,30 @@
         </div>
     </section>
 
-    <!-- CTA Download -->
-    <section class="section">
-        <div class="container">
-            <div class="cta-box">
-                <h2>Coffer ile Arşivlerinizi Özgürleştirin</h2>
-                <p>macOS Sonoma ve Sequoia için optimize edilmiş, hafif ve hızlı deneyime hemen başlayın.</p>
-                <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
-                    <a href="https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg" class="btn btn-primary btn-large">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Coffer v1.0.0 İndir (.dmg)
-                    </a>
-                    <a href="https://github.com/blackowltr/Coffer" target="_blank" class="btn btn-secondary btn-large">
-                        GitHub Deposu
-                    </a>
-                </div>
+    <!-- Call to Action Banner -->
+    <section class="container" style="padding-bottom: 80px;">
+        <div class="cta-wrap">
+            <h2>Coffer ile Arşivlerinize Hakim Olun</h2>
+            <p>Apple Silicon ve macOS Sonoma & Sequoia için optimize edilmiş, hafif ve hızlı deneyime hemen katılın.</p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                <a href="https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg" class="btn btn-primary btn-lg">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Coffer v1.0.0 İndir (.dmg)
+                </a>
+                <a href="https://github.com/blackowltr/Coffer" target="_blank" class="btn btn-secondary btn-lg">
+                    GitHub Deposu
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="container footer-inner">
+        <div class="container footer-flex">
             <div>
                 © 2026 Coffer • <strong>blackowltr</strong> tarafından açık kaynak olarak geliştirildi.
             </div>
-            <div class="footer-links">
+            <div class="footer-nav">
                 <a href="https://github.com/blackowltr/Coffer" target="_blank">GitHub</a>
                 <a href="https://github.com/blackowltr/Coffer/releases" target="_blank">Sürümler</a>
                 <a href="https://github.com/blackowltr/Coffer/blob/main/LICENSE" target="_blank">Lisans (MIT)</a>
@@ -1090,5 +1492,138 @@
         </div>
     </footer>
 
+    <!-- Interactive JavaScript Engine (60fps micro-interactions) -->
+    <script>
+        // Terminal Copy
+        function copyInstallCommand() {
+            const text = "brew install blackowltr/coffer";
+            navigator.clipboard.writeText(text);
+            const btn = document.getElementById("copy-btn");
+            btn.innerHTML = `<span style="color: #34d399; font-size: 11px;">Kopyalandı!</span>`;
+            setTimeout(() => {
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+            }, 2000);
+        }
+
+        // Row Selection
+        let currentSelectedFile = "ArchiveEngine.swift";
+        function selectRow(el, filename, size, compSize, ratio) {
+            document.querySelectorAll("#sim-tbody tr").forEach(r => r.classList.remove("selected"));
+            el.classList.add("selected");
+            currentSelectedFile = filename;
+            document.getElementById("ql-filename").innerText = filename;
+            document.getElementById("sim-status-left").innerText = `Seçili: 1 (${size}) • Toplam: 5 dosya (1.64 MB)`;
+        }
+
+        // Quick Look Toggle
+        function toggleQuickLook() {
+            const ql = document.getElementById("ql-overlay");
+            ql.classList.toggle("show");
+        }
+
+        // Keypress for Quick Look (Space key inside window simulation)
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && e.target.tagName !== "INPUT") {
+                const sim = document.getElementById("simulasyon");
+                const rect = sim.getBoundingClientRect();
+                if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+                    e.preventDefault();
+                    toggleQuickLook();
+                }
+            }
+        });
+
+        // Search Filter in Simulator
+        function filterTable(val) {
+            const query = val.toLowerCase();
+            const rows = document.querySelectorAll("#sim-tbody tr");
+            let count = 0;
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    r.style.display = "";
+                    count++;
+                } else {
+                    r.style.display = "none";
+                }
+            });
+            document.getElementById("sim-status-left").innerText = `${count} öğe filtrelendi`;
+        }
+
+        // Category Filter in Simulator
+        function filterCategory(type, el) {
+            document.querySelectorAll(".sim-nav-item").forEach(i => i.classList.remove("active"));
+            el.classList.add("active");
+            const rows = document.querySelectorAll("#sim-tbody tr");
+
+            let visible = 0;
+            rows.forEach(r => {
+                const name = r.querySelector(".name").innerText;
+                if (type === 'all') {
+                    r.style.display = "";
+                    visible++;
+                } else if (type === 'code' && (name.includes('.swift'))) {
+                    r.style.display = "";
+                    visible++;
+                } else if (type === 'image' && (name.includes('.png'))) {
+                    r.style.display = "";
+                    visible++;
+                } else if (type === 'doc' && (name.includes('.pdf'))) {
+                    r.style.display = "";
+                    visible++;
+                } else {
+                    r.style.display = "none";
+                }
+            });
+            document.getElementById("sim-status-left").innerText = `${visible} dosya listeleniyor`;
+            document.getElementById("active-folder-label").innerText = el.innerText.trim();
+        }
+
+        // Smart Extraction Demo Switch
+        function toggleSmartView(isSmart) {
+            const box = document.getElementById("smart-demo-box");
+            const btnOn = document.getElementById("btn-smart-on");
+            const btnOff = document.getElementById("btn-smart-off");
+
+            if (isSmart) {
+                btnOn.classList.add("active");
+                btnOff.classList.remove("active");
+                box.innerHTML = `
+                    <span style="font-size: 22px;">📁</span>
+                    <div>
+                        <strong style="color: #f3f5f8;">Masaüstü/Proje_Dosyalari/</strong> (Tek düzenli klasör açıldı)
+                        <div style="font-size: 11px; color: #34d399;">✓ 0 masaüstü kirliliği • Düzen korundu</div>
+                    </div>
+                `;
+            } else {
+                btnOff.classList.add("active");
+                btnOn.classList.remove("active");
+                box.innerHTML = `
+                    <span style="font-size: 22px;">💥</span>
+                    <div>
+                        <strong style="color: #fb7185;">Masaüstü/ (84 adet dosya doğrudan masaüstüne saçıldı)</strong>
+                        <div style="font-size: 11px; color: #fb7185;">✕ Dağınık simgeler, ekran karışıklığı</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Simulated Toolbar Action Feedback
+        function simulateAction(type) {
+            if (type === 'test') {
+                alert("🛡️ Coffer Bütünlük Testi: Tüm arşiv blokları ve CRC32 sağlamaları doğrulandı (0 Hata).");
+            } else if (type === 'guvenlik') {
+                alert("🔒 Güvenlik Raporu: Arşiv güvenli. Zip Slip açıklığı bulunamadı, şüpheli gizli scriptler saptanmadı.");
+            } else if (type === 'donustur') {
+                alert("🔄 Arşiv Dönüştürücü: RAR arşivi doğrudan modern 7Z veya ZIP formatına diske çıkarmadan dönüştürülebilir.");
+            } else if (type === 'sikistir') {
+                alert("📦 Sıkıştırma: Dosyaları pencereye sürükleyip bırakarak yeni arşiv oluşturabilirsiniz.");
+            } else if (type === 'cikart') {
+                alert("📥 Dizine Çıkart: Arşiv tek tıkla hedef klasöre çıkarılmaya hazır.");
+            } else if (type === 'ekle') {
+                alert("➕ Dosya Ekle: Mevcut arşive yeni dosya veya klasör ekleyebilirsiniz.");
+            }
+        }
+    </script>
 </body>
 </html>
