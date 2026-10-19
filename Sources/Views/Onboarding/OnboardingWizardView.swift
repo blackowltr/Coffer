@@ -4,30 +4,85 @@ import UniformTypeIdentifiers
 import UserNotifications
 import FinderSync
 
+@MainActor
+private final class OnboardingStepState: ObservableObject {
+    @Published var currentStep: Int = 0
+    @Published var isApplying: Bool = false
+    @Published var progressMessage: String = "Yapılandırma uygulanıyor..."
+
+    @Published var isInstallToApplicationsSelected: Bool = true
+    @Published var isDefaultAppSelected: Bool = true
+    @Published var isFinderIntegrationSelected: Bool = true
+    @Published var isNotificationsSelected: Bool = true
+    @Published var isCleanJunkSelected: Bool = true
+
+    @Published var hasNotificationPermission: Bool = false
+    @Published var hasDiskAccessPermission: Bool = false
+    @Published var isFinderExtensionActive: Bool = false
+
+    @Published var checkmarkScale: CGFloat = 0.3
+    @Published var checkmarkOpacity: Double = 0.0
+}
+
 /// macOS standartlarına uygun, ölçeklenebilir, 3D derinlik eğim efektli ve çoklu sahne renkli Coffer Kurulum Sihirbazı
+@MainActor
 public struct OnboardingWizardView: View {
     @ObservedObject private var settings = AppSettings.shared
+    @StateObject private var stepState = OnboardingStepState()
     @Binding public var isPresented: Bool
 
-    @State private var currentStep: Int = 0
-    @State private var isApplying: Bool = false
-
-    // MARK: - Kurulum & Sistem Tercihleri (Varsayılan olarak hepsi seçili)
-    @State private var isInstallToApplicationsSelected: Bool = true
-    @State private var isDefaultAppSelected: Bool = true
-    @State private var isFinderIntegrationSelected: Bool = true
-    @State private var isNotificationsSelected: Bool = true
-    @State private var isCleanJunkSelected: Bool = true
-
-    // MARK: - Sistem İzinleri Durumu
-    @State private var hasNotificationPermission: Bool = false
-    @State private var hasDiskAccessPermission: Bool = false
-    @State private var isFinderExtensionActive: Bool = false
-
-    // Tamamlanma Durumu Animasyonları
-    @State private var checkmarkScale: CGFloat = 0.3
-    @State private var checkmarkOpacity: Double = 0.0
-    @State private var progressMessage: String = "Yapılandırma uygulanıyor..."
+    private var currentStep: Int {
+        get { stepState.currentStep }
+        nonmutating set { stepState.currentStep = newValue }
+    }
+    private var isApplying: Bool {
+        get { stepState.isApplying }
+        nonmutating set { stepState.isApplying = newValue }
+    }
+    private var progressMessage: String {
+        get { stepState.progressMessage }
+        nonmutating set { stepState.progressMessage = newValue }
+    }
+    private var isInstallToApplicationsSelected: Bool {
+        get { stepState.isInstallToApplicationsSelected }
+        nonmutating set { stepState.isInstallToApplicationsSelected = newValue }
+    }
+    private var isDefaultAppSelected: Bool {
+        get { stepState.isDefaultAppSelected }
+        nonmutating set { stepState.isDefaultAppSelected = newValue }
+    }
+    private var isFinderIntegrationSelected: Bool {
+        get { stepState.isFinderIntegrationSelected }
+        nonmutating set { stepState.isFinderIntegrationSelected = newValue }
+    }
+    private var isNotificationsSelected: Bool {
+        get { stepState.isNotificationsSelected }
+        nonmutating set { stepState.isNotificationsSelected = newValue }
+    }
+    private var isCleanJunkSelected: Bool {
+        get { stepState.isCleanJunkSelected }
+        nonmutating set { stepState.isCleanJunkSelected = newValue }
+    }
+    private var hasNotificationPermission: Bool {
+        get { stepState.hasNotificationPermission }
+        nonmutating set { stepState.hasNotificationPermission = newValue }
+    }
+    private var hasDiskAccessPermission: Bool {
+        get { stepState.hasDiskAccessPermission }
+        nonmutating set { stepState.hasDiskAccessPermission = newValue }
+    }
+    private var isFinderExtensionActive: Bool {
+        get { stepState.isFinderExtensionActive }
+        nonmutating set { stepState.isFinderExtensionActive = newValue }
+    }
+    private var checkmarkScale: CGFloat {
+        get { stepState.checkmarkScale }
+        nonmutating set { stepState.checkmarkScale = newValue }
+    }
+    private var checkmarkOpacity: Double {
+        get { stepState.checkmarkOpacity }
+        nonmutating set { stepState.checkmarkOpacity = newValue }
+    }
 
     /// Uygulamanın /Applications dizini dışından (örneğin DMG veya İndirilenler) çalışıp çalışmadığını kontrol eder
     private var isRunningOutsideApplications: Bool {
@@ -302,7 +357,7 @@ public struct OnboardingWizardView: View {
                             badge: "Önerilen",
                             badgeColor: settings.accentColorChoice.color,
                             description: "Coffer'ı kalıcı olarak /Applications dizinine kopyalar ve Launchpad'e ekler.",
-                            isOn: $isInstallToApplicationsSelected
+                            isOn: $stepState.isInstallToApplicationsSelected
                         )
                     }
 
@@ -315,7 +370,7 @@ public struct OnboardingWizardView: View {
                         badge: "Önerilen",
                         badgeColor: .blue,
                         description: ".rar, .zip, .7z ve .tar dosyaları Finder'da otomatik olarak Coffer ile açılır.",
-                        isOn: $isDefaultAppSelected
+                        isOn: $stepState.isDefaultAppSelected
                     )
 
                     // 2. Finder Sağ Tık Menüsü
@@ -327,7 +382,7 @@ public struct OnboardingWizardView: View {
                         badge: "Kısayol",
                         badgeColor: .indigo,
                         description: "Finder bağlam menüsüne 'Coffer ile Sıkıştır' ve 'Buraya Çıkart' seçeneklerini ekler.",
-                        isOn: $isFinderIntegrationSelected
+                        isOn: $stepState.isFinderIntegrationSelected
                     )
 
                     // 3. Bildirimler ve Sesler
@@ -339,7 +394,7 @@ public struct OnboardingWizardView: View {
                         badge: "Sistem",
                         badgeColor: settings.accentColorChoice.color,
                         description: "Büyük arşivler arka planda tamamlandığında sistem bildirimi ve ses verir.",
-                        isOn: $isNotificationsSelected
+                        isOn: $stepState.isNotificationsSelected
                     )
 
                     // 4. Akıllı Çıkarma & Temizlik
@@ -351,7 +406,7 @@ public struct OnboardingWizardView: View {
                         badge: "Otomasyon",
                         badgeColor: .mint,
                         description: "Dağınık arşivleri korur ve harici disklere aktarırken .DS_Store artıklarını temizler.",
-                        isOn: $isCleanJunkSelected
+                        isOn: $stepState.isCleanJunkSelected
                     )
                 }
                 .padding(.horizontal, 20)
@@ -846,13 +901,13 @@ public struct OnboardingWizardView: View {
     // MARK: - Kurulum & Yapılandırma Yürütücüsü
 
     private func applyConfigurationAndFinish() {
-        isApplying = true
-        progressMessage = "Uygulama ve ayarlar yapılandırılıyor..."
+        stepState.isApplying = true
+        stepState.progressMessage = "Uygulama ve ayarlar yapılandırılıyor..."
 
         Task {
             // 1. Gerekirse Uygulamalar (/Applications) dizinine kur
             if isInstallToApplicationsSelected && isRunningOutsideApplications {
-                await MainActor.run { progressMessage = "Uygulamalar klasörüne kuruluyor..." }
+                await MainActor.run { self.stepState.progressMessage = "Uygulamalar klasörüne kuruluyor..." }
                 let currentAppURL = Bundle.main.bundleURL
                 let applicationsURL = URL(fileURLWithPath: "/Applications/Coffer.app")
                 do {
@@ -867,13 +922,13 @@ public struct OnboardingWizardView: View {
 
             // 2. Saptanmış arşiv yöneticisi yap
             if isDefaultAppSelected {
-                await MainActor.run { progressMessage = "Dosya ilişkilendirmeleri kaydediliyor..." }
+                await MainActor.run { self.stepState.progressMessage = "Dosya ilişkilendirmeleri kaydediliyor..." }
                 DefaultAppManager.shared.registerAsDefaultArchiveHandler()
             }
 
             // 3. Finder sağ tık servisleri
             if isFinderIntegrationSelected {
-                await MainActor.run { progressMessage = "Finder servisleri etkinleştiriliyor..." }
+                await MainActor.run { self.stepState.progressMessage = "Finder servisleri etkinleştiriliyor..." }
                 NSApp.servicesProvider = CofferServicesProvider.shared
                 NSUpdateDynamicServices()
                 CofferServicesProvider.shared.registerFinderServices()
@@ -900,10 +955,10 @@ public struct OnboardingWizardView: View {
                 self.settings.hasCompletedOnboarding = true
                 UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
                 UserDefaults.standard.synchronize()
-                self.isApplying = false
+                self.stepState.isApplying = false
 
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
-                    self.currentStep = 3
+                    self.stepState.currentStep = 3
                 }
             }
         }

@@ -236,9 +236,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
+    @MainActor
     private func handleCommandLineArguments() {
         let args = CommandLine.arguments
         guard args.count >= 2 else { return }
+
+        // Gerçek Retina ekran görüntüleri üretme komutu
+        if args.contains("--generate-screenshots") {
+            let outDir = args.count >= 3 ? args[2] : "docs/assets"
+            ScreenshotGenerator.generateAll(outputDir: outDir)
+            exit(0)
+        }
 
         // Durum 1: Doğrudan dosya açma (Örnek: Coffer /path/to/archive.zip)
         if args.count == 2 && !args[1].hasPrefix("--") {

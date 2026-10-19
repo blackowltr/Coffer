@@ -48,6 +48,27 @@ Apple Silicon (M1–M4) ve Intel işlemcileri evrensel (Universal Binary) olarak
 
 ---
 
+## 📸 Uygulama İçi Gerçek Ekran Görüntüleri
+
+<div align="center">
+  <p><strong>🗂️ Arşiv Gezgini (Explorer Modu & Retina SF Symbols)</strong></p>
+  <img src="docs/assets/screenshot-explorer.png" width="880" alt="Coffer Arşiv Gezgini" />
+  <br><br>
+</div>
+
+| ⚙️ Ayarlar & Motor Mimarisi | 🚀 Dahili Otomatik Güncelleyici |
+| :---: | :---: |
+| <img src="docs/assets/screenshot-settings.png" width="430" alt="Coffer Ayarlar Paneli" /> | <img src="docs/assets/screenshot-updater.png" width="430" alt="Coffer Canlı Güncelleyici" /> |
+
+<div align="center">
+  <br>
+  <p><strong>⚡ Hızlı Bırakma (Minimalist Drop Zone)</strong></p>
+  <img src="docs/assets/screenshot-quickdrop.png" width="680" alt="Coffer Hızlı Mod" />
+  <br>
+</div>
+
+---
+
 ## 📦 Desteklenen Formatlar
 
 | Format | Görüntüleme & Açma | Oluşturma & Sıkıştırma |

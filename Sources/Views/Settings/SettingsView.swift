@@ -1,16 +1,18 @@
 import SwiftUI
 import FinderSync
 
+@MainActor
+private final class SettingsViewState: ObservableObject {
+    @Published var activeTab: SettingsTab = .general
+    @Published var feedbackMessage: String? = nil
+}
+
 /// Modernize edilmiş Coffer Ayarlar Penceresi
+@MainActor
 public struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
+    @StateObject private var viewState = SettingsViewState()
     @Binding public var isPresented: Bool
-
-    // Aktif sekme
-    @State private var activeTab: SettingsTab = .general
-
-    // Geri bildirim mesajları
-    @State private var feedbackMessage: String? = nil
 
     public init(isPresented: Binding<Bool>) {
         self._isPresented = isPresented
@@ -52,11 +54,11 @@ public struct SettingsView: View {
                     ForEach(SettingsTab.allCases) { tab in
                         SidebarTabButton(
                             tab: tab,
-                            isSelected: activeTab == tab,
+                            isSelected: viewState.activeTab == tab,
                             accentColor: settings.accentColorChoice.color,
                             onSelect: {
                                 withAnimation(settings.enableAnimations ? .spring(response: 0.25, dampingFraction: 0.8) : nil) {
-                                    activeTab = tab
+                                    viewState.activeTab = tab
                                 }
                             }
                         )
@@ -93,22 +95,22 @@ public struct SettingsView: View {
                         // Sekme Başlığı
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 8) {
-                                Image(systemName: activeTab.icon)
+                                Image(systemName: viewState.activeTab.icon)
                                     .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(activeTab.iconColor)
+                                    .foregroundColor(viewState.activeTab.iconColor)
 
-                                Text(activeTab.title)
+                                Text(viewState.activeTab.title)
                                     .font(.system(size: 18, weight: .bold))
                             }
 
-                            Text(activeTab.subtitle)
+                            Text(viewState.activeTab.subtitle)
                                 .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                         }
                         .padding(.bottom, 4)
 
                         // Aktif Sekme Görünümü
-                        switch activeTab {
+                        switch viewState.activeTab {
                         case .general:
                             GeneralSettingsPane(settings: settings)
                         case .appearance:
@@ -122,11 +124,11 @@ public struct SettingsView: View {
                                 isPresented: $isPresented,
                                 onShowFeedback: { msg in
                                     withAnimation {
-                                        feedbackMessage = msg
+                                        viewState.feedbackMessage = msg
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                                         withAnimation {
-                                            feedbackMessage = nil
+                                            viewState.feedbackMessage = nil
                                         }
                                     }
                                 }
@@ -144,7 +146,7 @@ public struct SettingsView: View {
                         .opacity(0.5)
 
                     HStack {
-                        if let msg = feedbackMessage {
+                        if let msg = viewState.feedbackMessage {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.green)
@@ -243,13 +245,12 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
 }
 
 // MARK: - Sol Kenar Çubuğu Butonu
+@MainActor
 private struct SidebarTabButton: View {
     let tab: SettingsTab
     let isSelected: Bool
     let accentColor: Color
     let onSelect: () -> Void
-
-    @State private var isHovered = false
 
     var body: some View {
         Button(action: onSelect) {
@@ -278,12 +279,11 @@ private struct SidebarTabButton: View {
                     .fill(
                         isSelected
                             ? accentColor
-                            : (isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                            : Color.clear
                     )
             )
         }
         .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
     }
 }
 
@@ -973,13 +973,12 @@ private struct InfoDetailRow: View {
 }
 
 /// Görsel Tema Seçim Kartı
+@MainActor
 private struct ThemeSelectionCard: View {
     let theme: AppSettings.AppTheme
     let isSelected: Bool
     let accentColor: Color
     let onSelect: () -> Void
-
-    @State private var isHovered = false
 
     var body: some View {
         Button(action: onSelect) {
@@ -1040,7 +1039,6 @@ private struct ThemeSelectionCard: View {
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
     }
 
     private var themePreviewBackground: Color {
@@ -1078,12 +1076,11 @@ private struct ThemeSelectionCard: View {
 }
 
 /// Modernize Edilmiş Vurgu Rengi Seçim Butonu
+@MainActor
 private struct ModernAccentColorItem: View {
     let accent: AppSettings.AppAccentColor
     let isSelected: Bool
     let onSelect: () -> Void
-
-    @State private var isHovered = false
 
     var body: some View {
         Button(action: onSelect) {
@@ -1106,7 +1103,7 @@ private struct ModernAccentColorItem: View {
                 }
                 .overlay(
                     Circle()
-                        .stroke(isSelected ? accent.color : (isHovered ? accent.color.opacity(0.5) : Color.clear), lineWidth: 2)
+                        .stroke(isSelected ? accent.color : Color.clear, lineWidth: 2)
                         .frame(width: 36, height: 36)
                 )
 
@@ -1117,7 +1114,6 @@ private struct ModernAccentColorItem: View {
             }
         }
         .buttonStyle(.plain)
-        .onHover { isHovered = $0 }
         .help(accent.rawValue)
     }
 }

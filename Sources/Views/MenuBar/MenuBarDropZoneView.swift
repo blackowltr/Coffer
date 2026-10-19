@@ -1,10 +1,16 @@
 import SwiftUI
 import AppKit
 
+@MainActor
+private final class MenuBarDropZoneState: ObservableObject {
+    @Published var isHovering: Bool = false
+}
+
 /// macOS Menü Çubuğu için Liquid Glass / Akrilik Mini Drop-Zone Widget'ı
+@MainActor
 public struct MenuBarDropZoneView: View {
     @ObservedObject private var settings = AppSettings.shared
-    @State private var isHovering: Bool = false
+    @StateObject private var state = MenuBarDropZoneState()
     public let onFileDropped: (URL) -> Void
     public let onOpenMainWindow: () -> Void
     public let onOpenArchivePicker: () -> Void
@@ -48,20 +54,20 @@ public struct MenuBarDropZoneView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .strokeBorder(
-                        isHovering ? settings.accentColorChoice.color : Color.secondary.opacity(0.3),
-                        style: StrokeStyle(lineWidth: isHovering ? 2 : 1.5, dash: isHovering ? [] : [6, 4])
+                        state.isHovering ? settings.accentColorChoice.color : Color.secondary.opacity(0.3),
+                        style: StrokeStyle(lineWidth: state.isHovering ? 2 : 1.5, dash: state.isHovering ? [] : [6, 4])
                     )
                     .background(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(isHovering ? settings.accentColorChoice.color.opacity(0.12) : Color.secondary.opacity(0.06))
+                            .fill(state.isHovering ? settings.accentColorChoice.color.opacity(0.12) : Color.secondary.opacity(0.06))
                     )
 
                 VStack(spacing: 6) {
-                    Image(systemName: isHovering ? "arrow.down.doc.fill" : "archivebox.fill")
+                    Image(systemName: state.isHovering ? "arrow.down.doc.fill" : "archivebox.fill")
                         .font(.system(size: 24))
-                        .foregroundColor(isHovering ? settings.accentColorChoice.color : .secondary)
+                        .foregroundColor(state.isHovering ? settings.accentColorChoice.color : .secondary)
 
-                    Text(isHovering ? "Buraya Bırakın" : "Hızlı Bırakma Alanı")
+                    Text(state.isHovering ? "Buraya Bırakın" : "Hızlı Bırakma Alanı")
                         .font(.system(size: 11, weight: .semibold))
 
                     Text("Arşivleri çıkartır veya yeni arşiv oluşturur")
@@ -71,7 +77,7 @@ public struct MenuBarDropZoneView: View {
                 .padding(.vertical, 14)
             }
             .frame(height: 90)
-            .onDrop(of: [.fileURL], isTargeted: $isHovering) { providers in
+            .onDrop(of: [.fileURL], isTargeted: $state.isHovering) { providers in
                 if let provider = providers.first {
                     _ = provider.loadObject(ofClass: URL.self) { url, _ in
                         if let url = url {
