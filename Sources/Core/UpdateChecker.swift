@@ -102,22 +102,47 @@ public final class UpdateChecker: ObservableObject {
                let tagName = json["tag_name"] as? String {
                 let cleanTag = tagName.replacingOccurrences(of: "v", with: "").trimmingCharacters(in: .whitespaces)
                 let htmlUrlStr = json["html_url"] as? String ?? "https://github.com/\(repoSlug)/releases"
+                let releaseName = json["name"] as? String ?? "Coffer v\(cleanTag)"
+                let releaseBody = json["body"] as? String ?? ""
 
-                if isNewerVersion(cleanTag, than: currentVersion) {
+                var dmgURL: URL? = nil
+                var dmgSize: Int64 = 0
+
+                if let assets = json["assets"] as? [[String: Any]] {
+                    if let dmgAsset = assets.first(where: { ($0["name"] as? String)?.lowercased().hasSuffix(".dmg") == true }) {
+                        if let downloadUrlStr = dmgAsset["browser_download_url"] as? String {
+                            dmgURL = URL(string: downloadUrlStr)
+                        }
+                        dmgSize = (dmgAsset["size"] as? NSNumber)?.int64Value ?? 0
+                    }
+                }
+
+                let releaseInfo = GitHubReleaseInfo(
+                    tagName: tagName,
+                    version: cleanTag,
+                    name: releaseName,
+                    body: releaseBody,
+                    dmgDownloadURL: dmgURL,
+                    dmgSize: dmgSize,
+                    htmlURL: URL(string: htmlUrlStr) ?? URL(string: "https://github.com/\(repoSlug)/releases")!
+                )
+
+                let isNewer = isNewerVersion(cleanTag, than: currentVersion)
+
+                if isNewer {
                     latestVersion = cleanTag
-                    downloadURL = URL(string: htmlUrlStr)
+                    downloadURL = releaseInfo.dmgDownloadURL ?? releaseInfo.htmlURL
                     updateAvailable = true
                     lastCheckStatus = "Yeni sürüm v\(cleanTag) mevcut!"
-                    showUpdateFoundAlert(newVersion: cleanTag, url: downloadURL)
+                    UpdateDialogManager.shared.show(
+                        release: releaseInfo,
+                        currentVersion: currentVersion,
+                        isReinstall: false
+                    )
                 } else {
                     lastCheckStatus = "Coffer güncel (v\(currentVersion))."
                     if manual {
-                        showUpToDateAlert(
-                            title: "Coffer Güncel",
-                            message: LocalizationManager.shared.isTurkish
-                                ? "Harika! En son Coffer sürümünü (\(currentVersion)) kullanıyorsunuz."
-                                : "Coffer is up to date! You are using version \(currentVersion)."
-                        )
+                        showUpToDateDialog(release: releaseInfo)
                     }
                 }
             }
@@ -133,29 +158,22 @@ public final class UpdateChecker: ObservableObject {
         newVer.compare(current, options: .numeric) == .orderedDescending
     }
 
-    private func showUpdateFoundAlert(newVersion: String, url: URL?) {
+    private func showUpToDateDialog(release: GitHubReleaseInfo) {
         let alert = NSAlert()
-        let isTR = LocalizationManager.shared.isTurkish
-        alert.messageText = isTR ? "Yeni Coffer Sürümü Mevcut!" : "New Coffer Version Available!"
-        alert.informativeText = isTR
-            ? "Coffer \(newVersion) yayınlandı (Mevcut: \(currentVersion)). İndirmek ister misiniz?"
-            : "Coffer \(newVersion) is available (Current: \(currentVersion)). Would you like to download it?"
-        alert.addButton(withTitle: isTR ? "İndir ve Güncelle" : "Download Update")
-        alert.addButton(withTitle: isTR ? "Daha Sonra" : "Later")
+        alert.messageText = "Coffer Güncel (v\(currentVersion))"
+        alert.informativeText = "Harika! Şu anda en son Coffer sürümünü kullanıyorsunuz.\n\nİsterseniz GitHub'da bulunan en son sürümü (v\(release.version)) indirip yeniden kurabilirsiniz."
+        alert.addButton(withTitle: "Tamam")
+        alert.addButton(withTitle: "Yeniden İndir ve Kur")
         alert.alertStyle = .informational
 
-        if alert.runModal() == .alertFirstButtonReturn, let dl = url {
-            NSWorkspace.shared.open(dl)
+        let response = alert.runModal()
+        if response == .alertSecondButtonReturn {
+            UpdateDialogManager.shared.show(
+                release: release,
+                currentVersion: currentVersion,
+                isReinstall: true
+            )
         }
-    }
-
-    private func showUpToDateAlert(title: String, message: String) {
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = message
-        alert.addButton(withTitle: LocalizationManager.shared.isTurkish ? "Tamam" : "OK")
-        alert.alertStyle = .informational
-        alert.runModal()
     }
 
     private func showGitHubPendingAlert() {
