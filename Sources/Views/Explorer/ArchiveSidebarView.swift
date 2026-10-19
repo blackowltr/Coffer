@@ -46,15 +46,9 @@ public struct ArchiveSidebarView: View {
     }
 
     private func isDirectoryVisible(_ dir: ArchiveDirectoryItem) -> Bool {
-        // En üst seviye (kök altı doğrudan) klasörler her zaman görünür
         if dir.depth == 0 { return true }
-
-        // Alt klasörler yalnızca ebeveynlerinin tümü genişletilmişse görünür
-        let parts = dir.parentPath.split(separator: "/").map(String.init)
-        var current = ""
-        for part in parts {
-            current = current.isEmpty ? part : "\(current)/\(part)"
-            if !expandedFolderPaths.contains(current) {
+        for ancestor in dir.ancestorPaths {
+            if !expandedFolderPaths.contains(ancestor) {
                 return false
             }
         }

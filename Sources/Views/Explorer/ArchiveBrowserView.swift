@@ -81,53 +81,32 @@ public struct ArchiveBrowserView: View {
     @State private var activeCategoryFilter: ArchiveCategoryFilter? = nil
     @State private var multiPartInfo: MultiPartVolumeInfo? = nil
 
-    private var junkItemsCount: Int {
-        items.filter { AppleJunkSanitizer.shared.isJunk(path: $0.path) }.count
-    }
+    // Yüksek Performanslı İndeksler (O(1) Gezinme ve Sıfır Takılma)
+    @State private var cleanItems: [ArchiveItem] = []
+    @State private var itemsByParentPath: [String: [ArchiveItem]] = [:]
+    @State private var itemsByCategory: [ArchiveCategoryFilter: [ArchiveItem]] = [:]
+    @State private var itemsByID: [UUID: ArchiveItem] = [:]
+    @State private var junkItemsCount: Int = 0
 
     private var selectedSize: Int64 {
-        items.filter { selectedItemIDs.contains($0.id) }
-            .reduce(0) { $0 + $1.uncompressedSize }
+        selectedItemIDs.reduce(0) { total, id in
+            total + (itemsByID[id]?.uncompressedSize ?? 0)
+        }
     }
 
     private var visibleItems: [ArchiveItem] {
-        let baseItems = AppSettings.shared.stripMacJunkFiles ? items.filter { !AppleJunkSanitizer.shared.isJunk(path: $0.path) } : items
-
         if !searchText.isEmpty {
-            return baseItems.filter {
-                $0.path.localizedCaseInsensitiveContains(searchText) ||
-                $0.name.localizedCaseInsensitiveContains(searchText)
+            return cleanItems.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.path.localizedCaseInsensitiveContains(searchText)
             }
         }
 
         if let filter = activeCategoryFilter {
-            let imageExts: Set<String> = ["png", "jpg", "jpeg", "heic", "webp", "gif", "svg", "bmp", "tiff", "ico"]
-            let docExts: Set<String> = ["pdf", "doc", "docx", "pages", "txt", "rtf", "md", "xls", "xlsx", "numbers", "csv", "ppt", "pptx", "key"]
-            let mediaExts: Set<String> = ["mp4", "mov", "mkv", "avi", "webm", "m4v", "mp3", "m4a", "flac", "wav", "aac", "ogg"]
-            let codeExts: Set<String> = ["swift", "c", "cpp", "h", "hpp", "py", "js", "ts", "html", "css", "json", "xml", "sh", "yaml", "yml", "sql"]
-
-            return baseItems.filter { item in
-                guard !item.isDirectory else { return false }
-                let ext = item.fileExtension
-                switch filter {
-                case .images: return imageExts.contains(ext)
-                case .documents: return docExts.contains(ext)
-                case .media: return mediaExts.contains(ext)
-                case .code: return codeExts.contains(ext)
-                }
-            }
+            return itemsByCategory[filter] ?? []
         }
 
-        if currentPath.isEmpty {
-            return baseItems.filter { !$0.path.contains("/") }
-        } else {
-            let prefix = currentPath + "/"
-            return baseItems.filter { item in
-                guard item.path.hasPrefix(prefix) else { return false }
-                let remainder = item.path.dropFirst(prefix.count)
-                return !remainder.contains("/")
-            }
-        }
+        return itemsByParentPath[currentPath] ?? []
     }
 
     public var body: some View {
@@ -346,17 +325,65 @@ public struct ArchiveBrowserView: View {
                 multiPartInfo = MultiPartVolumeManager.shared.analyzeArchive(at: url)
             }
         }
-        .onChange(of: items.count) { _, _ in
+        .onChange(of: items) { _, _ in
             rebuildDirectoryCache()
             if let url = archiveURL {
                 multiPartInfo = MultiPartVolumeManager.shared.analyzeArchive(at: url)
             }
         }
+        .onChange(of: settings.stripMacJunkFiles) { _, _ in
+            rebuildDirectoryCache()
+        }
     }
 
     private func rebuildDirectoryCache() {
-        let cleanItems = AppSettings.shared.stripMacJunkFiles ? items.filter { !AppleJunkSanitizer.shared.isJunk(path: $0.path) } : items
-        cachedDirectories = ArchiveDirectoryItem.buildDirectoryList(from: cleanItems)
-        cachedCategoryCounts = ArchiveDirectoryItem.calculateCategoryCounts(from: cleanItems)
+        let isStrip = settings.stripMacJunkFiles
+        var clean: [ArchiveItem] = []
+        clean.reserveCapacity(items.count)
+        var junkCount = 0
+        var byParent: [String: [ArchiveItem]] = [:]
+        var byID: [UUID: ArchiveItem] = [:]
+        byID.reserveCapacity(items.count)
+
+        let imageExts: Set<String> = ["png", "jpg", "jpeg", "heic", "webp", "gif", "svg", "bmp", "tiff", "ico"]
+        let docExts: Set<String> = ["pdf", "doc", "docx", "pages", "txt", "rtf", "md", "xls", "xlsx", "numbers", "csv", "ppt", "pptx", "key"]
+        let mediaExts: Set<String> = ["mp4", "mov", "mkv", "avi", "webm", "m4v", "mp3", "m4a", "flac", "wav", "aac", "ogg"]
+        let codeExts: Set<String> = ["swift", "c", "cpp", "h", "hpp", "py", "js", "ts", "html", "css", "json", "xml", "sh", "yaml", "yml", "sql"]
+
+        var byCat: [ArchiveCategoryFilter: [ArchiveItem]] = [
+            .images: [], .documents: [], .media: [], .code: []
+        ]
+
+        for item in items {
+            byID[item.id] = item
+            if isStrip && AppleJunkSanitizer.shared.isJunk(path: item.path) {
+                junkCount += 1
+                continue
+            }
+            clean.append(item)
+            byParent[item.parentPath, default: []].append(item)
+
+            if !item.isDirectory {
+                let ext = item.fileExtension
+                if imageExts.contains(ext) { byCat[.images]?.append(item) }
+                else if docExts.contains(ext) { byCat[.documents]?.append(item) }
+                else if mediaExts.contains(ext) { byCat[.media]?.append(item) }
+                else if codeExts.contains(ext) { byCat[.code]?.append(item) }
+            }
+        }
+
+        self.cleanItems = clean
+        self.junkItemsCount = junkCount
+        self.itemsByParentPath = byParent
+        self.itemsByCategory = byCat
+        self.itemsByID = byID
+
+        self.cachedDirectories = ArchiveDirectoryItem.buildDirectoryList(from: clean)
+        self.cachedCategoryCounts = [
+            .images: byCat[.images]?.count ?? 0,
+            .documents: byCat[.documents]?.count ?? 0,
+            .media: byCat[.media]?.count ?? 0,
+            .code: byCat[.code]?.count ?? 0
+        ]
     }
 }

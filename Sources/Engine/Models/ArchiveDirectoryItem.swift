@@ -6,6 +6,7 @@ public struct ArchiveDirectoryItem: Identifiable, Hashable, Sendable {
     public let path: String               // Örn: "Belgeler/Raporlar"
     public let name: String               // Örn: "Raporlar"
     public let parentPath: String         // Örn: "Belgeler" (veya kök için "")
+    public let ancestorPaths: [String]    // Örn: ["Belgeler"]
     public let depth: Int                 // Derinlik (0 = Kök altı, 1 = 1. seviye alt vb.)
     public let directItemCount: Int       // Doğrudan bu klasörün içindeki öğe sayısı
     public let totalItemCount: Int        // Tüm alt klasörlerle birlikte toplam öğe sayısı
@@ -15,6 +16,7 @@ public struct ArchiveDirectoryItem: Identifiable, Hashable, Sendable {
         path: String,
         name: String,
         parentPath: String,
+        ancestorPaths: [String] = [],
         depth: Int,
         directItemCount: Int,
         totalItemCount: Int,
@@ -23,6 +25,7 @@ public struct ArchiveDirectoryItem: Identifiable, Hashable, Sendable {
         self.path = path
         self.name = name
         self.parentPath = parentPath
+        self.ancestorPaths = ancestorPaths
         self.depth = depth
         self.directItemCount = directItemCount
         self.totalItemCount = totalItemCount
@@ -124,10 +127,18 @@ extension ArchiveDirectoryItem {
             let total = totalCounts[path, default: direct]
             let hasSubs = !(childrenMap[path]?.isEmpty ?? true)
 
+            var ancestors: [String] = []
+            var cur = ""
+            for part in components.dropLast() {
+                cur = cur.isEmpty ? part : "\(cur)/\(part)"
+                ancestors.append(cur)
+            }
+
             return ArchiveDirectoryItem(
                 path: path,
                 name: name,
                 parentPath: parent,
+                ancestorPaths: ancestors,
                 depth: depth,
                 directItemCount: direct,
                 totalItemCount: total,

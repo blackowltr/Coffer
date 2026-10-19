@@ -18,6 +18,7 @@ public struct ArchiveTableView: View {
     @SceneStorage("macrar.table.sortAscending") private var sortAscending: Bool = true
 
     @State private var sortOrder = [KeyPathComparator(\ArchiveItem.name)]
+    @State private var sortedItems: [ArchiveItem] = []
 
     public init(
         items: [ArchiveItem],
@@ -35,10 +36,11 @@ public struct ArchiveTableView: View {
         self.onPreviewItem = onPreviewItem
         self.onExtractSelected = onExtractSelected
         self.onDragItem = onDragItem
+        self._sortedItems = State(initialValue: items)
     }
 
-    private var sortedItems: [ArchiveItem] {
-        return items.sorted(using: sortOrder)
+    private func recalculateSortedItems() {
+        sortedItems = items.sorted(using: sortOrder)
     }
 
     public var body: some View {
@@ -185,6 +187,15 @@ public struct ArchiveTableView: View {
                 }
             }
             return .ignored
+        }
+        .onAppear {
+            recalculateSortedItems()
+        }
+        .onChange(of: items) { _, _ in
+            recalculateSortedItems()
+        }
+        .onChange(of: sortOrder) { _, _ in
+            recalculateSortedItems()
         }
     }
 }

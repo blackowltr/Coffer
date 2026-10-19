@@ -62,6 +62,14 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
         self.crc32 = crc32
     }
 
+    public static func == (lhs: ArchiveItem, rhs: ArchiveItem) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
     /// Sıralama için güvenli karşılaştırılabilir tarih
     public var modificationDateComparable: Date {
         modificationDate ?? Date.distantPast
