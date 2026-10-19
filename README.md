@@ -2,6 +2,13 @@
 
 **macOS için modern, akıllı ve zarif arşiv yöneticisi.**
 
+[![Web Sitesi](https://img.shields.io/badge/Web_Sitesi-blackowltr.github.io%2FCoffer-3b82f6?style=for-the-badge&logo=safari&logoColor=white)](https://blackowltr.github.io/Coffer/)
+[![Son Sürüm](https://img.shields.io/github/v/release/blackowltr/Coffer?style=for-the-badge&color=8b5cf6&label=S%C3%BCr%C3%BCm)](https://github.com/blackowltr/Coffer/releases)
+[![Platform](https://img.shields.io/badge/Platform-macOS%2014%2B%20(Sonoma%20%26%20Sequoia)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/blackowltr/Coffer)
+[![Lisans](https://img.shields.io/badge/Lisans-MIT-green?style=for-the-badge)](LICENSE)
+
+> 🌐 **Canlı Tanıtım Sitesi:** Coffer'ın arayüz vitrini, özellikler tablosu ve detaylı bilgilerine web sitemizden göz atabilirsiniz: **[blackowltr.github.io/Coffer](https://blackowltr.github.io/Coffer/)**
+
 Coffer; hafif, hızlı ve macOS tasarım standartlarına sadık kalınarak saf Swift ve SwiftUI ile geliştirilmiş bir arşiv yönetim uygulamasıdır.
 
 Apple Silicon (M1–M4) ve Intel işlemcileri evrensel (Universal Binary) olarak yerel hızda destekler; arka planda sistem kaynaklarını yormadan güvenli ve akıcı bir arşivleme deneyimi sunar.
@@ -62,9 +69,9 @@ Apple Silicon (M1–M4) ve Intel işlemcileri evrensel (Universal Binary) olarak
 
 ## 🚀 Kurulum
 
-1. En güncel sürümü [Releases](https://github.com/blackowltr/Coffer/releases) sayfasından edinin.
-2. `Coffer.app` dosyasını `Uygulamalar` (Applications) klasörünüze taşıyın.
-3. Coffer'ı ilk kez çalıştırdığınızda karşılama sihirbazı gerekli tercihleri kolayca yapılandırmanıza yardımcı olur.
+1. En güncel `.dmg` kurulum kalıbını **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** veya doğrudan **[GitHub Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından indirin (`Coffer-1.0.0.dmg`).
+2. İndirilen DMG dosyasını açıp `Coffer.app` uygulamasını `Uygulamalar` (Applications) klasörünüze sürükleyin.
+3. Coffer'ı ilk kez çalıştırdığınızda karşılama sihirbazı gerekli sistem izinlerini otomatik olarak yapılandırır ve sonrasında arka planda sessizce çalışır.
 
 ---
 
