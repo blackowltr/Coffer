@@ -50,6 +50,10 @@ public final class DefaultAppManager: Sendable {
 
     /// DMG veya İndirilenler klasöründen çalışıyorsa Uygulamalar klasörüne taşımayı teklif eder
     public func offerMoveToApplicationsIfNeeded() {
+        if AppSettings.shared.hasCompletedOnboarding || UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
+            return
+        }
+
         let bundleURL = Bundle.main.bundleURL
         let path = bundleURL.path
 

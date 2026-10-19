@@ -473,6 +473,21 @@ public struct OnboardingWizardView: View {
             }
             .padding(.top, 8)
 
+            Button(action: grantAllPermissions) {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.shield.fill")
+                    Text("Tüm İzinleri Otomatik Tanımla")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .padding(.horizontal, 20)
+            .padding(.top, 4)
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 9) {
                     // 1. Dosya ve Disk Erişimi
@@ -611,6 +626,26 @@ public struct OnboardingWizardView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
         )
+    }
+
+    private func grantAllPermissions() {
+        Task {
+            let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
+            process.arguments = ["-e", "use", "-i", "com.coffer.app.FinderSync"]
+            try? process.run()
+            process.waitUntilExit()
+
+            let desktop = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+            let canReadDesktop = FileManager.default.isReadableFile(atPath: desktop.path)
+
+            await MainActor.run {
+                self.hasNotificationPermission = granted
+                self.isFinderExtensionActive = true
+                self.hasDiskAccessPermission = canReadDesktop
+            }
+        }
     }
 
     private func checkPermissionsStatus() {
@@ -794,6 +829,9 @@ public struct OnboardingWizardView: View {
                 .disabled(isApplying)
             } else {
                 Button("Coffer'ı Başlat") {
+                    settings.hasCompletedOnboarding = true
+                    UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+                    UserDefaults.standard.synchronize()
                     withAnimation(.spring(response: 0.35)) {
                         isPresented = false
                     }
@@ -860,6 +898,8 @@ public struct OnboardingWizardView: View {
                 self.settings.stripMacJunkFiles = self.isCleanJunkSelected
                 self.settings.enableSmartExtraction = self.isCleanJunkSelected
                 self.settings.hasCompletedOnboarding = true
+                UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+                UserDefaults.standard.synchronize()
                 self.isApplying = false
 
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.75)) {
