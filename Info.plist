@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>tr</string>
+    <key>CFBundleExecutable</key>
+    <string>Coffer</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.coffer.app</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Coffer</string>
+    <key>CFBundleDisplayName</key>
+    <string>Coffer</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>Telif Hakkı © 2026 Coffer. Apple Silicon için Optimize Edilmiştir.</string>
+
+    <!-- Finder Belge Türü İlişkilendirmeleri & İkonları -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <!-- 1. RAR Arşivi -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>WinRAR / Coffer Arşivi</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>RarDocIcon</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>rar</string>
+                <string>cbr</string>
+                <string>rev</string>
+                <string>r00</string>
+                <string>r01</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.rarlab.rar-archive</string>
+                <string>public.rar</string>
+                <string>com.coffer.rar</string>
+            </array>
+        </dict>
+        <!-- 2. ZIP Arşivi -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>ZIP Arşivi</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>ZipDocIcon</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>zip</string>
+                <string>zipx</string>
+                <string>cbz</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.zip-archive</string>
+                <string>com.pkware.zip-archive</string>
+            </array>
+        </dict>
+        <!-- 3. 7-Zip Arşivi -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>7-Zip Arşivi</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>SevenZipDocIcon</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>7z</string>
+                <string>cb7</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>org.7-zip.7-zip-archive</string>
+            </array>
+        </dict>
+        <!-- 4. TAR / GZIP / BZ2 / XZ Arşivi -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Tar / Gzip / XZ Arşivi</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>TarDocIcon</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>tar</string>
+                <string>gz</string>
+                <string>tgz</string>
+                <string>bz2</string>
+                <string>tbz2</string>
+                <string>xz</string>
+                <string>txz</string>
+                <string>zst</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.tar-archive</string>
+                <string>org.gnu.gnu-zip-archive</string>
+                <string>public.bzip2-archive</string>
+                <string>org.tukaani.xz-archive</string>
+            </array>
+        </dict>
+        <!-- 5. Diğer Arşiv Formatları -->
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Sıkıştırılmış Arşiv</string>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>ArchiveDocIcon</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>iso</string>
+                <string>cab</string>
+                <string>arj</string>
+                <string>lzh</string>
+                <string>cpio</string>
+                <string>wim</string>
+                <string>deb</string>
+                <string>rpm</string>
+            </array>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.iso-image</string>
+                <string>public.archive</string>
+            </array>
+        </dict>
+    </array>
+
+    <!-- Tanımlayıcı UTI Tipleri & İkonları -->
+    <key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>com.rarlab.rar-archive</string>
+            <key>UTTypeDescription</key>
+            <string>WinRAR Arşivi</string>
+            <key>UTTypeIconFile</key>
+            <string>RarDocIcon</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+                <string>public.archive</string>
+            </array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>rar</string>
+                    <string>cbr</string>
+                </array>
+                <key>public.mime-type</key>
+                <array>
+                    <string>application/x-rar-compressed</string>
+                    <string>application/vnd.rar</string>
+                </array>
+            </dict>
+        </dict>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>org.7-zip.7-zip-archive</string>
+            <key>UTTypeDescription</key>
+            <string>7-Zip Arşivi</string>
+            <key>UTTypeIconFile</key>
+            <string>SevenZipDocIcon</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+                <string>public.archive</string>
+            </array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>7z</string>
+                    <string>cb7</string>
+                </array>
+                <key>public.mime-type</key>
+                <array>
+                    <string>application/x-7z-compressed</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeIdentifier</key>
+            <string>com.coffer.rar</string>
+            <key>UTTypeDescription</key>
+            <string>Coffer Arşivi</string>
+            <key>UTTypeIconFile</key>
+            <string>RarDocIcon</string>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+                <string>public.archive</string>
+            </array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>rar</string>
+                    <string>cbr</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+
+    <!-- macOS Finder Sağ Tık Servisleri & Hızlı Eylemler (NSServices: 'Coffer > Coffer ile ...' Hiyerarşisi) -->
+    <key>NSServices</key>
+    <array>
+        <!-- 1. Buraya Çıkart -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Buraya Çıkart</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>extractHereService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 2. Klasöre Çıkart -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Klasöre Çıkart</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>extractToFolderService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 3. Belirtilen Yere Çıkart... -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Belirtilen Yere Çıkart...</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>extractToChosenService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 4. Coffer ile Aç ve İncele -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Aç ve İncele</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>openInCofferService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 5. Güvenlik & Akıllı Analiz... -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Güvenlik &amp; Akıllı Analiz...</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>analyzeSecurityService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 6. Hasarlı Arşivi Onar... -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Hasarlı Arşivi Onar...</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>repairArchiveService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 7. Arşivle... (Format, Düzey, Parola) -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Arşivle...</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>compressDialogService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 8. Hızlı .ZIP Sıkıştır -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Hızlı .ZIP Sıkıştır</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>compressToZipService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 9. Hızlı .RAR Sıkıştır -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Hızlı .RAR Sıkıştır</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>compressToRarService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 10. Hızlı .7Z Sıkıştır -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile Hızlı .7Z Sıkıştır</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>compressTo7zService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+        <!-- 11. macOS Artıklarını Temizle -->
+        <dict>
+            <key>NSMenuItem</key>
+            <dict>
+                <key>default</key>
+                <string>Coffer/Coffer ile macOS Artıklarını Temizle</string>
+            </dict>
+            <key>NSMessage</key>
+            <string>cleanMacJunkService</string>
+            <key>NSPortName</key>
+            <string>Coffer</string>
+            <key>NSRequiredContext</key>
+            <dict/>
+            <key>NSSendTypes</key>
+            <array>
+                <string>NSFilenamesPboardType</string>
+                <string>public.file-url</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

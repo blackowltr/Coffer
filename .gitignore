@@ -1,0 +1,17 @@
+.DS_Store
+.build/
+build/
+scratch/
+*.swp
+*~
+main
+scratch_test.swift
+
+# Diğer projeler (Coffer deposuna dahil edilmez)
+Archon/
+Cask/
+Flick/
+FocusMac/
+FormatCevirici/
+Giderim/
+MacUpdate/
