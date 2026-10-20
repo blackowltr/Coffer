@@ -90,7 +90,7 @@ Apple Silicon (M1–M4) ve Intel işlemcileri evrensel (Universal Binary) olarak
 
 ## 🚀 Kurulum
 
-1. En güncel `.dmg` kurulum kalıbını **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** veya doğrudan **[GitHub Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından indirin (`Coffer-1.0.0.dmg`).
+1. En güncel `.dmg` kurulum kalıbını **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** veya doğrudan **[GitHub Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından indirin (`Coffer-1.1.0.dmg`).
 2. İndirilen DMG dosyasını açıp `Coffer.app` uygulamasını `Uygulamalar` (Applications) klasörünüze sürükleyin.
 3. Coffer'ı ilk kez çalıştırdığınızda karşılama sihirbazı gerekli sistem izinlerini otomatik olarak yapılandırır ve sonrasında arka planda sessizce çalışır.
 

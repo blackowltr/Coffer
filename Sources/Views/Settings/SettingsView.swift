@@ -70,7 +70,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.0.0")
+                    Text("Coffer v1.1.0")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")

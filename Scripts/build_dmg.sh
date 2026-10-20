@@ -4,10 +4,11 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${PROJECT_DIR}/build"
 APP_NAME="Coffer"
-VERSION="1.0.0"
+VERSION="1.1.0"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="${BUILD_DIR}/${DMG_NAME}"
 DESKTOP_DIR="${HOME}/Desktop/Coffer"
+DESKTOP_KURULUM_DIR="${HOME}/Desktop/Coffer-Kurulum"
 STAGING_DIR="${BUILD_DIR}/dmg_staging"
 
 echo "==> Packaging professional ${DMG_NAME}..."
@@ -153,7 +154,7 @@ xattr -cr "${DESKTOP_DIR}/Coffer.app" 2>/dev/null || true
 
 # Add detailed Readme for End Users
 cat << 'EOF' > "${DESKTOP_DIR}/BENİ_OKU_VE_KURULUM.md"
-# Coffer 1.0 - macOS Arşiv Yöneticisi
+# Coffer 1.1 - macOS Arşiv Yöneticisi
 
 Coffer, macOS ekosistemi için sıfırdan geliştirilmiş, Liquid Glass tasarım diliyle harmanlanmış yeni nesil arşivleme ve dosya yönetim aracıdır.
 
@@ -166,7 +167,7 @@ Son kullanıcılar için 2 kolay yöntem sunulmuştur:
 - Coffer otomatik olarak `/Applications` (Uygulamalar) klasörünüze kopyalanır, macOS Gatekeeper izinleri verilir ve uygulama başlatılır.
 
 ### 2. Yöntem: DMG Kalıbı ile Klasik Kurulum
-- **`Coffer-1.0.0.dmg`** veya **`Coffer.dmg`** dosyasına çift tıklayarak disk kalıbını açın.
+- **`Coffer-1.1.0.dmg`** veya **`Coffer.dmg`** dosyasına çift tıklayarak disk kalıbını açın.
 - Coffer simgesini **Applications** klasörüne sürükleyip bırakın.
 - Uygulamalar klasöründen Coffer'ı başlatın.
 
@@ -182,6 +183,7 @@ Son kullanıcılar için 2 kolay yöntem sunulmuştur:
 - **Tam Güvenlik:** AES-256 Şifreleme, Dosya Adı Gizleme (-hp/-mhe), Bütünlük Denetimi (CRC32/BLAKE2sp).
 - **Akıllı macOS Temizleyici:** Arşivlerden `.DS_Store`, `__MACOSX` ve `._*` kalıntılarını otomatik filtreleme.
 - **Finder Entegrasyonu:** Sağ tık içerik menüsünden doğrudan çıkarma ve sıkıştırma.
+- **Dahili Güncelleyici:** Uygulama içerisinden GitHub güncellemelerini tek tıkla indirip kurma.
 EOF
 
 # Also sync installed app to /Applications
@@ -197,18 +199,33 @@ ZIP_SHA256=$(shasum -a 256 "${DESKTOP_DIR}/Coffer-${VERSION}.zip" | cut -d ' ' -
 
 cat << EOF > "${DESKTOP_DIR}/SHA256_KONTROL.txt"
 =====================================================
-          Coffer 1.0.0 - SHA-256 Doğrulama Kodları
+          Coffer ${VERSION} - SHA-256 Doğrulama Kodları
 =====================================================
 
-Coffer-1.0.0.dmg:
+Coffer-${VERSION}.dmg:
 ${DMG_SHA256}
 
-Coffer-1.0.0.zip:
+Coffer-${VERSION}.zip:
 ${ZIP_SHA256}
 
 Doğrulamak için Terminal'de çalıştırın:
-shasum -a 256 Coffer-1.0.0.dmg
+shasum -a 256 Coffer-${VERSION}.dmg
 EOF
+
+# Sync to DESKTOP_KURULUM_DIR
+if [ -d "${DESKTOP_KURULUM_DIR}" ]; then
+    echo "==> Syncing to ${DESKTOP_KURULUM_DIR}..."
+    cp -f "${DESKTOP_DIR}/${DMG_NAME}" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/${APP_NAME}.dmg" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/Coffer-${VERSION}.zip" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/Hızlı_Kurulum.command" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/Kurulum_Rehberi.txt" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/BENİ_OKU_VE_KURULUM.md" "${DESKTOP_KURULUM_DIR}/"
+    cp -f "${DESKTOP_DIR}/SHA256_KONTROL.txt" "${DESKTOP_KURULUM_DIR}/"
+    rm -rf "${DESKTOP_KURULUM_DIR}/Coffer.app"
+    cp -R "${BUILD_DIR}/Coffer.app" "${DESKTOP_KURULUM_DIR}/Coffer.app"
+    xattr -cr "${DESKTOP_KURULUM_DIR}" 2>/dev/null || true
+fi
 
 # Clean temporary files & strip quarantine from desktop distribution
 rm -f "${DESKTOP_DIR}/.DS_Store" 2>/dev/null || true

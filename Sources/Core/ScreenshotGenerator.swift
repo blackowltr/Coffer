@@ -87,7 +87,7 @@ public final class ScreenshotGenerator {
 
         let meta = ArchiveMetadata(
             format: .rar,
-            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.0.0.rar"),
+            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.1.0.rar"),
             totalFileCount: 6,
             totalDirectoryCount: 2,
             totalUncompressedSize: 1_774_400,
@@ -99,11 +99,11 @@ public final class ScreenshotGenerator {
             volumeCount: 1,
             hasRecoveryRecord: true,
             recoveryRecordPercentage: 3,
-            comment: "Coffer Production Release Package v1.0.0"
+            comment: "Coffer Production Release Package v1.1.0"
         )
 
         let explorerView = ArchiveBrowserView(
-            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.0.0.rar"),
+            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.1.0.rar"),
             items: sampleItems,
             metadata: meta,
             currentPath: .constant(""),
@@ -125,7 +125,7 @@ public final class ScreenshotGenerator {
         )
 
         let framed = MacWindowFrame(
-            title: "Coffer — Coffer_Source_v1.0.0.rar (WinRAR Archive)",
+            title: "Coffer — Coffer_Source_v1.1.0.rar (WinRAR Archive)",
             content: { explorerView }
         )
 
@@ -160,7 +160,7 @@ public final class ScreenshotGenerator {
             htmlURL: URL(string: "https://github.com/blackowltr/Coffer/releases")!
         )
 
-        UpdateDownloadManager.shared.configure(release: release, currentVersion: "1.0.0", isReinstall: false)
+        UpdateDownloadManager.shared.configure(release: release, currentVersion: "1.1.0", isReinstall: false)
         UpdateDownloadManager.shared.state = .downloading(progress: 0.74, downloaded: 11_565_082, total: 15_628_490)
 
         let dialog = UpdateDownloadDialog(onDismiss: {})
