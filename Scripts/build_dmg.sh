@@ -4,7 +4,7 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${PROJECT_DIR}/build"
 APP_NAME="Coffer"
-VERSION="1.1.0"
+VERSION="1.2.0"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="${BUILD_DIR}/${DMG_NAME}"
 DESKTOP_DIR="${HOME}/Desktop/Coffer"

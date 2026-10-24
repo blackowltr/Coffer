@@ -70,7 +70,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.1.0")
+                    Text("Coffer v1.2.0")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")
@@ -890,7 +890,7 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
-        ## 🚀 Coffer v1.1.0 (En Son Sürüm)
+        ## 🚀 Coffer v1.2.0 (En Son Sürüm)
 
         Coffer'ın yeni sürümü; arşiv içi gezinme performans optimizasyonları, dahili otomatik güncelleme sistemi, Apple HIG uyumlu Retina ikonlar ve yenilenmiş görsel vitrin ile yayında!
 
