@@ -70,7 +70,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.2.0")
+                    Text("Coffer v1.3.0")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")
@@ -890,23 +890,22 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
-        ## 🚀 Coffer v1.2.0 (En Son Sürüm)
+        ## 🚀 Coffer v1.3.0 (En Son Sürüm)
 
-        Coffer'ın yeni sürümü; arşiv içi gezinme performans optimizasyonları, dahili otomatik güncelleme sistemi, Apple HIG uyumlu Retina ikonlar ve yenilenmiş görsel vitrin ile yayında!
+        Coffer'ın yeni sürümü; yenilenen sol kenar çubuğu tasarımı, yüksek performans optimizasyonları ve Apple standartlarında görsel geliştirmelerle kullanıma sunuldu.
 
         ### ✨ Yenilikler ve İyileştirmeler
 
-        - ⚡ **O(1) Hızında Arşiv Gezgini:** Çok sayıda dosya ve klasör barındıran büyük arşivlerde gezinirken yaşanan takılmalar giderildi. Hiyerarşik simgeler ve tablo sıralama mekanizması önbelleğe alınarak akıcı gezinme sağlandı.
-        - 🔄 **Dahili Otomatik Güncelleyici (In-App Updater):** Ayarlar > Hakkında menüsünden doğrudan GitHub API üzerinden güncelleme denetimi yapabilir; tek tıkla yeni sürümü indirip arka planda dikişsiz şekilde kurabilirsiniz.
-        - 🎨 **Retina & Hiyerarşik SF Semboller:** Arşiv gezgini araç çubuğu ve dosya listesi simgeleri en yüksek çözünürlüklü Apple tasarım standartlarına yükseltildi.
-        - 🛡️ **Akıllı İzin Sihirbazı:** İlk kurulumda tek tıkla gerekli tüm macOS disk ve Finder erişim izinleri yapılandırılır; son kullanıcıya bir daha onay penceresi sorulmaz.
-        - 🪟 **Apple Tasarım Dili & Sade HUD:** Arşiv oluşturma ve çıkarma pencereleri Apple HIG standartlarında zarif ve sade animasyonlarla yenilendi.
-        - 🌐 **60fps.design & Saaspo İlhamlı Web Sitesi:** Tanıtım vitrini interaktif ekran görüntüsü galerisi, Lightbox modalı ve mikro-etkileşimlerle modernize edildi.
-        - 🖥️ **Masaüstü Dağıtım Paketi:** Kaynak kodlar (`Coffer-Kaynak-Kod`) ve kurulum araçları (`Coffer-Kurulum`) masaüstünde tamamen birbirinden ayrıştırıldı.
+        - 📂 **Yenilenen Sol Kenar Çubuğu:** Sıkıştırılmış arşiv açıldığında sol tarafta yer alan klasör konumu, akıllı filtreler ve klasör ağacı Apple tasarım çizgilerine uygun şekilde baştan tasarlandı.
+        - ⚡ **Yüksek Hız ve Sıfır Takılma:** Çok sayıda dosya ve klasör içeren büyük arşivlerde gezinirken yaşanan bekleme ve donmalar tamamen giderildi. Önbellekleme mimarisi sayesinde tüm klasör geçişleri anında gerçekleşir.
+        - 🎯 **Akıllı Kategori Filtreleri:** Arşiv içindeki görseller, belgeler, medya dosyaları ve kodlar renkli Apple simgeleriyle gruplandırıldı. Aradığınız dosya türüne tek bir tıklamayla ulaşabilirsiniz.
+        - 🌀 **Animasyonlu İlerleme Ekranı:** Arşiv oluşturma ve çıkarma ekranları; dönen yörünge halkası, canlı hız göstergesi ve kalan süre sayacı ile donatıldı.
+        - 📝 **Zengin Sürüm Notları:** Yeni özellikler ve değişiklikler, tüm detaylarıyla anlaşılır kartlar halinde sunulmaktadır.
+        - 🛡️ **Kolay Kurulum Sihirbazı:** Uygulama ilk kez açıldığında gerekli macOS sistem izinleri tek tıkla otomatik olarak tanımlanır.
 
-        ### 📦 Sistem Desteği
-        - **Evrensel Destek:** Apple Silicon (M1/M2/M3/M4) + Intel (x86_64) Universal Binary.
-        - **Uyumlu Sürümler:** macOS Sonoma (14.0) ve macOS Sequoia (15.0+).
+        ### 📦 Sistem Uyumluluğu
+        - **Evrensel Destek:** Apple Silicon (M1, M2, M3, M4) ve Intel (x86_64) işlemcili Mac bilgisayarlarla tam uyumludur.
+        - **İşletim Sistemi:** macOS Sonoma (14.0) ve macOS Sequoia (15.0) sürümlerini destekler.
         """
     }
 }

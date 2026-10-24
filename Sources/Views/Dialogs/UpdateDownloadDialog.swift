@@ -225,7 +225,11 @@ public struct UpdateDownloadDialog: View {
     private var cleanReleaseNotes: String {
         let body = downloadManager.releaseInfo?.body ?? ""
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "### Genel Güncelleme\n* Bu sürüm genel performans iyileştirmeleri, bellek optimizasyonları ve kararlılık düzeltmeleri içerir.\n* Apple Silicon M1-M4 çipleri için uyumluluk güncellendi."
+            return """
+            ### ✨ Genel Güncelleme
+            - ⚡ **Performans ve Kararlılık:** Bu sürüm bellek optimizasyonları, arayüz geliştirmeleri ve genel kararlılık düzeltmeleri içerir.
+            - 💻 **Evrensel Uyumluluk:** Apple Silicon M1–M4 ve Intel işlemcili tüm Mac bilgisayarlarla tam uyumludur.
+            """
         }
         return body
     }
