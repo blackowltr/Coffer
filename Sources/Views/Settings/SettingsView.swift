@@ -717,6 +717,7 @@ private struct FinderSettingsPane: View {
 private struct AboutSettingsPane: View {
     @Binding var isPresented: Bool
     @ObservedObject private var updateChecker = UpdateChecker.shared
+    @State private var showReleaseNotesSheet: Bool = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -800,6 +801,21 @@ private struct AboutSettingsPane: View {
                         .buttonStyle(.bordered)
                         .controlSize(.regular)
                     }
+
+                    CardRowDivider()
+
+                    SettingsRow(
+                        icon: "sparkles",
+                        iconColor: .orange,
+                        title: "Sürüm Notları & Yenilikler",
+                        subtitle: "v\(updateChecker.currentVersion) ile gelen tüm yeni özellik ve optimizasyonlar"
+                    ) {
+                        Button("Yenilikleri Gör") {
+                            showReleaseNotesSheet = true
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.regular)
+                    }
                 }
             }
 
@@ -826,6 +842,72 @@ private struct AboutSettingsPane: View {
             }
             .padding(.top, 4)
         }
+        .sheet(isPresented: $showReleaseNotesSheet) {
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.orange.gradient)
+                            .frame(width: 36, height: 36)
+
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Coffer Yenilikler & Sürüm Notları")
+                            .font(.system(size: 15, weight: .bold))
+                        Text("Coffer v\(updateChecker.currentVersion) Sürüm Detayları")
+                            .font(.system(size: 11.5))
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    Button("Tamam") {
+                        showReleaseNotesSheet = false
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+
+                Divider()
+
+                ReleaseNotesMarkdownView(markdown: currentReleaseNotes)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+            }
+            .frame(width: 540, height: 480)
+            .background(Color(NSColor.windowBackgroundColor))
+        }
+    }
+
+    private var currentReleaseNotes: String {
+        if let body = UpdateDownloadManager.shared.releaseInfo?.body, !body.isEmpty {
+            return body
+        }
+        return """
+        ## 🚀 Coffer v1.1.0 (En Son Sürüm)
+
+        Coffer'ın yeni sürümü; arşiv içi gezinme performans optimizasyonları, dahili otomatik güncelleme sistemi, Apple HIG uyumlu Retina ikonlar ve yenilenmiş görsel vitrin ile yayında!
+
+        ### ✨ Yenilikler ve İyileştirmeler
+
+        - ⚡ **O(1) Hızında Arşiv Gezgini:** Çok sayıda dosya ve klasör barındıran büyük arşivlerde gezinirken yaşanan takılmalar giderildi. Hiyerarşik simgeler ve tablo sıralama mekanizması önbelleğe alınarak akıcı gezinme sağlandı.
+        - 🔄 **Dahili Otomatik Güncelleyici (In-App Updater):** Ayarlar > Hakkında menüsünden doğrudan GitHub API üzerinden güncelleme denetimi yapabilir; tek tıkla yeni sürümü indirip arka planda dikişsiz şekilde kurabilirsiniz.
+        - 🎨 **Retina & Hiyerarşik SF Semboller:** Arşiv gezgini araç çubuğu ve dosya listesi simgeleri en yüksek çözünürlüklü Apple tasarım standartlarına yükseltildi.
+        - 🛡️ **Akıllı İzin Sihirbazı:** İlk kurulumda tek tıkla gerekli tüm macOS disk ve Finder erişim izinleri yapılandırılır; son kullanıcıya bir daha onay penceresi sorulmaz.
+        - 🪟 **Apple Tasarım Dili & Sade HUD:** Arşiv oluşturma ve çıkarma pencereleri Apple HIG standartlarında zarif ve sade animasyonlarla yenilendi.
+        - 🌐 **60fps.design & Saaspo İlhamlı Web Sitesi:** Tanıtım vitrini interaktif ekran görüntüsü galerisi, Lightbox modalı ve mikro-etkileşimlerle modernize edildi.
+        - 🖥️ **Masaüstü Dağıtım Paketi:** Kaynak kodlar (`Coffer-Kaynak-Kod`) ve kurulum araçları (`Coffer-Kurulum`) masaüstünde tamamen birbirinden ayrıştırıldı.
+
+        ### 📦 Sistem Desteği
+        - **Evrensel Destek:** Apple Silicon (M1/M2/M3/M4) + Intel (x86_64) Universal Binary.
+        - **Uyumlu Sürümler:** macOS Sonoma (14.0) ve macOS Sequoia (15.0+).
+        """
     }
 }
 

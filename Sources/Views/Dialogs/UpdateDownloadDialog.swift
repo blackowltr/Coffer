@@ -22,11 +22,11 @@ public struct UpdateDownloadDialog: View {
             // Başlık ve Rozet Bölümü
             headerSection
                 .padding(.top, 22)
-                .padding(.horizontal, 22)
+                .padding(.horizontal, 24)
 
             Divider()
                 .padding(.top, 16)
-                .padding(.bottom, 14)
+                .padding(.bottom, 16)
 
             // Dinamik İçerik (Duruma Göre Değişen Aşama)
             VStack(spacing: 16) {
@@ -45,11 +45,11 @@ public struct UpdateDownloadDialog: View {
                     failedContentView(error: error)
                 }
             }
-            .padding(.horizontal, 22)
-            .padding(.bottom, 20)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 22)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(width: 460, height: 350)
+        .frame(width: 560, height: 490)
         .background(Color(NSColor.windowBackgroundColor))
         .onAppear {
             if settings.enableAnimations {
@@ -62,7 +62,7 @@ public struct UpdateDownloadDialog: View {
 
     // MARK: - 1. Üst Başlık Bölümü
     private var headerSection: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 16) {
             // Apple Tasarımlı Yuvarlatılmış Kare Simge
             ZStack {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -73,22 +73,22 @@ public struct UpdateDownloadDialog: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 48, height: 48)
+                    .frame(width: 52, height: 52)
                     .shadow(color: accentColor.opacity(0.3), radius: 6, y: 3)
 
                 Image(systemName: iconForCurrentState)
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(.white)
                     .scaleEffect(isPulsing && isDownloadingState ? 1.08 : 1.0)
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(titleForCurrentState)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.primary)
 
                 Text(subtitleForCurrentState)
-                    .font(.system(size: 11.5))
+                    .font(.system(size: 12))
                     .foregroundColor(.secondary)
                     .lineLimit(2)
             }
@@ -156,40 +156,49 @@ public struct UpdateDownloadDialog: View {
 
     // MARK: - 2. Sürüm Onayı ve Değişiklik Notları Görünümü (.prompt)
     private var promptContentView: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Sürüm Notları Kutusu
-            VStack(alignment: .leading, spacing: 6) {
-                Text("SÜRÜM NOTLARI & YENİLİKLER")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.secondary)
-
-                ScrollView(.vertical) {
-                    Text(cleanReleaseNotes)
-                        .font(.system(size: 11.5))
-                        .foregroundColor(.primary.opacity(0.88))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(10)
+        VStack(alignment: .leading, spacing: 14) {
+            // Sürüm Notları Başlığı ve GitHub Bağlantısı
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "doc.text.magnifyingglass")
+                        .foregroundColor(accentColor)
+                    Text("SÜRÜM NOTLARI & YENİLİKLER")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.secondary)
                 }
-                .frame(height: 110)
-                .background(Color(NSColor.controlBackgroundColor))
-                .cornerRadius(8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color(NSColor.separatorColor).opacity(0.6), lineWidth: 1)
-                )
+
+                Spacer()
+
+                if let url = downloadManager.releaseInfo?.htmlURL {
+                    Link(destination: url) {
+                        HStack(spacing: 4) {
+                            Text("GitHub'da İncele")
+                            Image(systemName: "arrow.up.right")
+                        }
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(accentColor)
+                    }
+                }
             }
+
+            // Gelişmiş Apple Tarzı Markdown Sürüm Notları
+            ReleaseNotesMarkdownView(markdown: cleanReleaseNotes)
+                .frame(maxWidth: .infinity)
+                .frame(height: 270)
 
             Spacer()
 
-            // Butonlar
+            // Alt Butonlar
             HStack {
                 Button("Daha Sonra") {
                     onDismiss()
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.secondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Color.primary.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
 
                 Spacer()
 
@@ -198,16 +207,17 @@ public struct UpdateDownloadDialog: View {
                         await downloadManager.startDownloadAndInstall()
                     }
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Image(systemName: "arrow.down.circle.fill")
                         Text(downloadManager.isReinstall ? "Yeniden İndir ve Kur" : "Şimdi Güncelle ve Kur")
                     }
-                    .font(.system(size: 12, weight: .semibold))
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 7)
+                    .font(.system(size: 13, weight: .semibold))
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 8)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(accentColor)
+                .keyboardShortcut(.defaultAction)
             }
         }
     }
@@ -215,18 +225,18 @@ public struct UpdateDownloadDialog: View {
     private var cleanReleaseNotes: String {
         let body = downloadManager.releaseInfo?.body ?? ""
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Bu sürüm için özel sürüm notu girilmedi. Genel performans iyileştirmeleri ve hata düzeltmeleri içerir."
+            return "### Genel Güncelleme\n* Bu sürüm genel performans iyileştirmeleri, bellek optimizasyonları ve kararlılık düzeltmeleri içerir.\n* Apple Silicon M1-M4 çipleri için uyumluluk güncellendi."
         }
         return body
     }
 
     // MARK: - 3. İndirme İlerleme Görünümü (.downloading)
     private func downloadingContentView(progress: Double, downloaded: Int64, total: Int64) -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Spacer()
 
             // Özel Apple Tarzı İlerleme Çubuğu
-            VStack(spacing: 8) {
+            VStack(spacing: 10) {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Capsule()
@@ -250,19 +260,20 @@ public struct UpdateDownloadDialog: View {
                 // İstatistik Satırı (Boyut ve Yüzde)
                 HStack {
                     Text("\(ByteCountFormatter.string(fromByteCount: downloaded, countStyle: .file)) / \(ByteCountFormatter.string(fromByteCount: total > 0 ? total : downloaded, countStyle: .file))")
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(.system(size: 11.5, design: .monospaced))
                         .foregroundColor(.secondary)
 
                     Spacer()
 
                     Text("%\(Int(progress * 100))")
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .font(.system(size: 13, weight: .bold, design: .monospaced))
                         .foregroundColor(accentColor)
                 }
             }
+            .padding(.horizontal, 10)
 
             Text("İndirme devam ederken uygulamayı kullanmaya devam edebilirsiniz.")
-                .font(.system(size: 11))
+                .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
 
@@ -282,45 +293,47 @@ public struct UpdateDownloadDialog: View {
 
     // MARK: - 4. Doğrulama ve Kurulum Aşamaları
     private var verifyingContentView: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Spacer()
             ProgressView()
                 .scaleEffect(1.2)
             Text("İndirilen disk kalıbı sağlama toplamı doğrulanıyor...")
-                .font(.system(size: 12))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.secondary)
             Spacer()
         }
     }
 
     private var installingContentView: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Spacer()
             ProgressView()
                 .scaleEffect(1.2)
-            Text("Coffer güncelleniyor ve kurulum tamamlanıyor...")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.primary)
-            Text("Lütfen bekleyin, işlem birkaç saniye sürecektir.")
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
+            VStack(spacing: 6) {
+                Text("Coffer güncelleniyor ve kurulum tamamlanıyor...")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.primary)
+                Text("Lütfen bekleyin, işlem birkaç saniye sürecektir.")
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+            }
             Spacer()
         }
     }
 
     // MARK: - 5. Tamamlandı Görünümü
     private var completedContentView: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Spacer()
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 42))
+                .font(.system(size: 46))
                 .foregroundColor(.green)
 
             Text("Güncelleme Başarıyla Tamamlandı!")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
 
             Text("Coffer yeni sürümle yeniden başlatılıyor...")
-                .font(.system(size: 11.5))
+                .font(.system(size: 12.5))
                 .foregroundColor(.secondary)
             Spacer()
         }
@@ -328,20 +341,20 @@ public struct UpdateDownloadDialog: View {
 
     // MARK: - 6. Hata Görünümü
     private func failedContentView(error: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Spacer()
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 38))
+                .font(.system(size: 42))
                 .foregroundColor(.red)
 
             Text("Güncelleme Başarısız")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 16, weight: .bold))
 
             Text(error)
-                .font(.system(size: 11.5))
+                .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 24)
 
             Spacer()
 
