@@ -376,15 +376,16 @@ public final class TarZipEngine: Sendable {
                             lastYieldTime = now
                             let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
 
-                            // Yazılan dosya boyutu ve zamana göre adaptif akıcı oran:
+                            // Yazılan dosya boyutu ve zamana göre dengeli, akıcı oran:
                             let writtenBytes = (try? FileManager.default.attributesOfItem(atPath: destinationURL.path)[.size] as? Int64) ?? 0
-                            let estimatedCompressedTotal = max(Int64(1024), Int64(Double(totalSourceSize) * 0.6))
-                            let byteRatio = Double(writtenBytes) / Double(estimatedCompressedTotal)
+                            let estimatedCompressedTotal = max(Int64(2048), Int64(Double(totalSourceSize) * 0.55))
+                            let rawRatio = min(Double(writtenBytes) / Double(estimatedCompressedTotal), 0.98)
 
-                            let expectedDuration = max(1.8, Double(totalSourceSize) / 25_000_000.0)
-                            let timeRatio = 1.0 - exp(-elapsed / expectedDuration * 1.3)
+                            let expectedDuration = max(2.5, Double(totalSourceSize) / 20_000_000.0)
+                            let timeRatio = min(0.96, elapsed / expectedDuration)
 
-                            let targetFraction = min(0.985, max(byteRatio * 0.92, timeRatio * 0.90))
+                            // Gerçek yazılan veriyi önceliklendir, takılmayı önleyen doğrusal yumuşatma uygula
+                            let targetFraction = min(0.98, max(rawRatio * 0.95, timeRatio * 0.85))
                             currentFraction = max(currentFraction, targetFraction)
 
                             let processed = Int64(Double(totalSourceSize) * currentFraction)

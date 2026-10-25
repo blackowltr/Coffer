@@ -7,8 +7,8 @@ public final class SevenZipEngine: Sendable {
 
     public init() {}
 
-    /// Sistemde veya uygulama paketinde 7zz ikilisini bulur
-    public static var available7zPath: String? {
+    /// Sistemde veya uygulama paketinde 7zz ikilisini bulur (performans için statik önbelleklenir)
+    private static let _cached7zPath: String? = {
         var candidates: [String] = []
 
         if let res = Bundle.main.resourcePath {
@@ -30,6 +30,10 @@ public final class SevenZipEngine: Sendable {
             }
         }
         return nil
+    }()
+
+    public static var available7zPath: String? {
+        _cached7zPath
     }
 
     // MARK: - Arşiv Listeleme (7zz l -slt)

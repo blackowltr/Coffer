@@ -48,7 +48,7 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
 
     @Published public var state: State = .prompt
     @Published public var releaseInfo: GitHubReleaseInfo?
-    @Published public var currentVersion: String = "1.7.0"
+    @Published public var currentVersion: String = "1.7.1"
     @Published public var isReinstall: Bool = false
 
     private var session: URLSession?

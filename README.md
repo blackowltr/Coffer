@@ -101,7 +101,7 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 
 ## Kurulum
 
-1. En son sürüm yükleyicisini (`UnPack-1.7.0.dmg`) **[Releases](https://github.com/blackowltr/UnPack/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/UnPack/)** indirin.
+1. En son sürüm yükleyicisini (`UnPack-1.7.1.dmg`) **[Releases](https://github.com/blackowltr/UnPack/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/UnPack/)** indirin.
 2. DMG dosyasını açıp `UnPack` simgesini `Uygulamalar` (Applications) klasörüne sürükleyin.
 3. Uygulamayı ilk kez açtığınızda gerekli sistem izinleri onaylanır; ardından UnPack arka planda sessizce ve kesintisiz şekilde çalışmaya devam eder.
 

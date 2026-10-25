@@ -59,11 +59,14 @@ public final class DefaultAppManager: Sendable {
             _ = LSSetDefaultRoleHandlerForContentType(dmgType.identifier as CFString, .all, mounterBundleID)
         }
 
-        // QuickLook ve ikon önbelleğini sıfırlama
-        let qlProcess = Process()
-        qlProcess.executableURL = URL(fileURLWithPath: "/usr/bin/qlmanage")
-        qlProcess.arguments = ["-r", "cache"]
-        try? qlProcess.run()
+        // QuickLook ve ikon önbelleğini arka planda sıfırlama (ana iş parçacığını bloke etmez)
+        DispatchQueue.global(qos: .utility).async {
+            let qlProcess = Process()
+            qlProcess.executableURL = URL(fileURLWithPath: "/usr/bin/qlmanage")
+            qlProcess.arguments = ["-r", "cache"]
+            try? qlProcess.run()
+            qlProcess.waitUntilExit()
+        }
     }
 
     /// İlk kurulumda veya doğrudan açılışta kullanıcıya TEK SEFER sorarak tüm arşiv formatlarını topluca UnPack ile açmayı teklif eder.

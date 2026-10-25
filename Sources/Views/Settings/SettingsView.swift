@@ -891,6 +891,16 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
+        ## 🚀 UnPack v1.7.1
+
+        Performans, verimlilik ve dosya ilişkilendirme süreçlerini optimize eden bu güncelleme; macOS sistem uyumluluğunu en üst düzeye taşır.
+
+        ### ⚡ Performans ve Verimlilik İyileştirmeleri
+        - 📂 **Toplu Dosya Eşitleme:** İlk kurulumda ve açılışta arşiv formatları artık tek tek sormak yerine tek bir onayla arka planda topluca UnPack ile eşleştirilir.
+        - 🏎️ **Motor Önbellekleme:** Arşiv motoru ikili yol aramaları ve dosya kontrol çağrıları optimize edilerek her işlemdeki disk I/O yükü azaltıldı.
+        - 📊 **Akıcı İlerleme Eğrisi:** Sıkıştırma ve arşivleme ekranındaki yüzde hesaplamaları yumuşatılarak %95 seviyesinde yaşanan yapay duraklamalar giderildi.
+        - 🧹 **Arka Plan Önbellek Tazeleme:** Finder simge önbelleği ve QuickLook yenileme işlemleri ana iş parçacığını bloke etmeden asenkron çalışacak şekilde uyarlandı.
+
         ## 🚀 UnPack v1.7.0
 
         UnPack; sadeleştirilmiş yeni kimliği, modern Apple standartlarında arşiv oluşturma arayüzü, sessiz arka plan güncelleme sistemi ve doğrudan Finder sağ tık entegrasyonuyla güncellendi.

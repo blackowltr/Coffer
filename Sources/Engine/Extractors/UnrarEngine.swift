@@ -7,8 +7,8 @@ public final class UnrarEngine: Sendable {
 
     public init() {}
 
-    /// Sistemde veya UnPack içinde mevcut bir unrar ikilisini bulur
-    public static var availableUnrarPath: String? {
+    /// Sistemde veya UnPack içinde mevcut bir unrar ikilisini bulur (statik önbelleklenir)
+    private static let _cachedUnrarPath: String? = {
         var candidates: [String] = []
         if let res = Bundle.main.resourcePath {
             candidates.append("\(res)/bin/unrar")
@@ -28,10 +28,14 @@ public final class UnrarEngine: Sendable {
             }
         }
         return nil
+    }()
+
+    public static var availableUnrarPath: String? {
+        _cachedUnrarPath
     }
 
-    /// Sistemde veya UnPack içinde mevcut bir rar ikilisini bulur
-    public static var availableRarPath: String? {
+    /// Sistemde veya UnPack içinde mevcut bir rar ikilisini bulur (statik önbelleklenir)
+    private static let _cachedRarPath: String? = {
         var candidates: [String] = []
         if let res = Bundle.main.resourcePath {
             candidates.append("\(res)/bin/rar")
@@ -49,6 +53,10 @@ public final class UnrarEngine: Sendable {
             }
         }
         return nil
+    }()
+
+    public static var availableRarPath: String? {
+        _cachedRarPath
     }
 
     /// RAR arşivini Swift Native Parser ile doğrudan okur (sıfır harici bağımlılık)
