@@ -7,8 +7,6 @@ APP_NAME="UnPack"
 VERSION="1.7.0"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="${BUILD_DIR}/${DMG_NAME}"
-DESKTOP_DIR="${HOME}/Desktop/UnPack"
-DESKTOP_KURULUM_DIR="${HOME}/Desktop/UnPack-Kurulum"
 STAGING_DIR="${BUILD_DIR}/dmg_staging"
 
 echo "==> Packaging professional ${DMG_NAME}..."
@@ -137,101 +135,16 @@ hdiutil create \
 # Cleanup staging
 rm -rf "${STAGING_DIR}"
 
-echo "==> Copying to Desktop distribution directory: ${DESKTOP_DIR}..."
-mkdir -p "${DESKTOP_DIR}"
-cp -f "${DMG_PATH}" "${DESKTOP_DIR}/${DMG_NAME}"
-cp -f "${DMG_PATH}" "${DESKTOP_DIR}/${APP_NAME}.dmg"
-cp -f "${BUILD_DIR}/Kurulum_Rehberi.txt" "${DESKTOP_DIR}/Kurulum_Rehberi.txt" 2>/dev/null || true
-cp -f "${BUILD_DIR}/Hızlı_Kurulum.command" "${DESKTOP_DIR}/Hızlı_Kurulum.command" 2>/dev/null || true
-chmod +x "${DESKTOP_DIR}/Hızlı_Kurulum.command"
-
-# Also place clean UnPack.app and ZIP in Desktop directory
-echo "==> Mirroring UnPack.app and ZIP to ${DESKTOP_DIR}..."
-rm -rf "${DESKTOP_DIR}/UnPack.app"
-cp -R "${BUILD_DIR}/UnPack.app" "${DESKTOP_DIR}/UnPack.app"
-xattr -cr "${DESKTOP_DIR}/UnPack.app" 2>/dev/null || true
-(cd "${BUILD_DIR}" && zip -rq "${DESKTOP_DIR}/UnPack-${VERSION}.zip" "UnPack.app")
-
-# Add detailed Readme for End Users
-cat << 'EOF' > "${DESKTOP_DIR}/BENİ_OKU_VE_KURULUM.md"
-# UnPack 1.7 - macOS Arşiv Yöneticisi
-
-UnPack, macOS ekosistemi için sıfırdan geliştirilmiş, Liquid Glass tasarım diliyle harmanlanmış yeni nesil arşivleme ve dosya yönetim aracıdır.
-
-## 🚀 Hızlı Kurulum Seçenekleri
-
-Son kullanıcılar için 2 kolay yöntem sunulmuştur:
-
-### 1. Yöntem: Otomatik Tek Tıkla Kurulum (Önerilen)
-- Klasördeki **`Hızlı_Kurulum.command`** dosyasına çift tıklayın.
-- UnPack otomatik olarak `/Applications` (Uygulamalar) klasörünüze kopyalanır, macOS Gatekeeper izinleri verilir ve uygulama başlatılır.
-
-### 2. Yöntem: DMG Kalıbı ile Klasik Kurulum
-- **`UnPack-1.7.0.dmg`** veya **`UnPack.dmg`** dosyasına çift tıklayarak disk kalıbını açın.
-- UnPack simgesini **Applications** klasörüne sürükleyip bırakın.
-- Uygulamalar klasöründen UnPack'i başlatın.
-
-> **Apple Güvenlik Uyarısı (Gatekeeper):**
-> macOS ilk açılışta *"Geliştirici doğrulanamadı"* uyarısı verirse:
-> Uygulamaya **Sağ Tıklayın (veya Control tuşuyla tıklayın) > "Aç"** deyin ve onaylayın.
-
----
-
-## 💎 Temel Özellikler
-- **Desteklenen Formatlar:** RAR, RAR5, ZIP, 7Z, TAR, TAR.GZ, TAR.XZ, TAR.BZ2, BZ2, GZ, XZ
-- **Çift Mod:** WinRAR tarzı detaylı **Gezgin Modu** ve sürükle-bırak **Hızlı Mod**.
-- **Tam Güvenlik:** AES-256 Şifreleme, Dosya Adı Gizleme (-hp/-mhe), Bütünlük Denetimi (CRC32/BLAKE2sp).
-- **Akıllı macOS Temizleyici:** Arşivlerden `.DS_Store`, `__MACOSX` ve `._*` kalıntılarını otomatik filtreleme.
-- **Finder Entegrasyonu:** Sağ tık içerik menüsünden doğrudan çıkarma ve sıkıştırma.
-- **Dahili Güncelleyici:** Uygulama içerisinden GitHub güncellemelerini tek tıkla indirip kurma.
-EOF
-
-# Also sync installed app to /Applications
-echo "==> Updating /Applications/UnPack.app..."
-rm -rf "/Applications/UnPack.app"
-cp -R "${BUILD_DIR}/UnPack.app" "/Applications/UnPack.app"
-xattr -cr "/Applications/UnPack.app" 2>/dev/null || true
+# Create release ZIP inside build directory
+echo "==> Packaging ${APP_NAME}-${VERSION}.zip..."
+(cd "${BUILD_DIR}" && zip -rq "${BUILD_DIR}/${APP_NAME}-${VERSION}.zip" "${APP_NAME}.app")
 
 # Compute SHA256 Checksums
 echo "==> Computing SHA-256 Checksums..."
-DMG_SHA256=$(shasum -a 256 "${DESKTOP_DIR}/${DMG_NAME}" | cut -d ' ' -f 1)
-ZIP_SHA256=$(shasum -a 256 "${DESKTOP_DIR}/UnPack-${VERSION}.zip" | cut -d ' ' -f 1)
+DMG_SHA256=$(shasum -a 256 "${DMG_PATH}" | cut -d ' ' -f 1)
+ZIP_SHA256=$(shasum -a 256 "${BUILD_DIR}/${APP_NAME}-${VERSION}.zip" | cut -d ' ' -f 1)
 
-cat << EOF > "${DESKTOP_DIR}/SHA256_KONTROL.txt"
-=====================================================
-          UnPack ${VERSION} - SHA-256 Doğrulama Kodları
-=====================================================
-
-UnPack-${VERSION}.dmg:
-${DMG_SHA256}
-
-UnPack-${VERSION}.zip:
-${ZIP_SHA256}
-
-Doğrulamak için Terminal'de çalıştırın:
-shasum -a 256 UnPack-${VERSION}.dmg
-EOF
-
-# Sync to DESKTOP_KURULUM_DIR
-if [ -d "${DESKTOP_KURULUM_DIR}" ]; then
-    echo "==> Syncing to ${DESKTOP_KURULUM_DIR}..."
-    cp -f "${DESKTOP_DIR}/${DMG_NAME}" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/${APP_NAME}.dmg" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/UnPack-${VERSION}.zip" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/Hızlı_Kurulum.command" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/Kurulum_Rehberi.txt" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/BENİ_OKU_VE_KURULUM.md" "${DESKTOP_KURULUM_DIR}/"
-    cp -f "${DESKTOP_DIR}/SHA256_KONTROL.txt" "${DESKTOP_KURULUM_DIR}/"
-    rm -rf "${DESKTOP_KURULUM_DIR}/UnPack.app"
-    cp -R "${BUILD_DIR}/UnPack.app" "${DESKTOP_KURULUM_DIR}/UnPack.app"
-    xattr -cr "${DESKTOP_KURULUM_DIR}" 2>/dev/null || true
-fi
-
-# Clean temporary files & strip quarantine from desktop distribution
-rm -f "${DESKTOP_DIR}/.DS_Store" 2>/dev/null || true
-xattr -cr "${DESKTOP_DIR}" 2>/dev/null || true
-
-echo "==> DMG created successfully at: ${DMG_PATH}"
-echo "==> Desktop distribution updated at: ${DESKTOP_DIR}"
+echo "==> DMG created successfully at: ${DMG_PATH} (${DMG_SHA256})"
+echo "==> ZIP created successfully at: ${BUILD_DIR}/${APP_NAME}-${VERSION}.zip (${ZIP_SHA256})"
 echo "==> DMG File Size: $(du -sh "${DMG_PATH}" | cut -f1)"
-echo "==> SHA-256 Checksum: ${DMG_SHA256}"
+echo "==> Build complete! Ready for GitHub release."
