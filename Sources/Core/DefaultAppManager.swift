@@ -2,7 +2,7 @@ import AppKit
 import UniformTypeIdentifiers
 import CoreServices
 
-/// Coffer'ı macOS Finder'da varsayılan arşiv açıcı olarak kaydeden,
+/// UnPack'i macOS Finder'da varsayılan arşiv açıcı olarak kaydeden,
 /// Finder Quick Actions (Hızlı Eylemler) kurulumunu yapan ve
 /// DMG/Downloads üzerinden çalıştırıldığında Uygulamalar klasörüne taşımayı öneren yönetici.
 public final class DefaultAppManager: Sendable {
@@ -10,7 +10,7 @@ public final class DefaultAppManager: Sendable {
 
     private init() {}
 
-    /// Desteklenen tüm arşiv uzantılarını Coffer ile ilişkilendirir ve Finder ikonlarını yeniler
+    /// Desteklenen tüm arşiv uzantılarını UnPack ile ilişkilendirir ve Finder ikonlarını yeniler
     public func registerAsDefaultArchiveHandler(extensions: [String]? = nil) {
         let appURL = Bundle.main.bundleURL
         _ = LSRegisterURL(appURL as CFURL, true)
@@ -33,7 +33,7 @@ public final class DefaultAppManager: Sendable {
             }
         }
 
-        // DMG uzantısını asla Coffer'a zorlama; macOS'un yerleşik DiskImageMounter uygulamasına bırak/geri yükle
+        // DMG uzantısını asla UnPack'e zorlama; macOS'un yerleşik DiskImageMounter uygulamasına bırak/geri yükle
         if let dmgType = UTType(filenameExtension: "dmg") {
             let mounterURL = URL(fileURLWithPath: "/System/Library/CoreServices/DiskImageMounter.app")
             if FileManager.default.fileExists(atPath: mounterURL.path) {
@@ -71,13 +71,13 @@ public final class DefaultAppManager: Sendable {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             let alert = NSAlert()
             alert.messageText = "Uygulamalar Klasörüne Taşı"
-            alert.informativeText = "Coffer'ın Finder sağ tık menüsünün, hızlı eylemlerinin ve dosya ilişkilendirmelerinin sorunsuz çalışabilmesi için uygulamanın Uygulamalar klasöründe bulunması gerekir. Uygulama otomatik olarak Uygulamalar (/Applications) dizinine taşınsın mı?"
+            alert.informativeText = "UnPack'in Finder sağ tık menüsünün, hızlı eylemlerinin ve dosya ilişkilendirmelerinin sorunsuz çalışabilmesi için uygulamanın Uygulamalar klasöründe bulunması gerekir. Uygulama otomatik olarak Uygulamalar (/Applications) dizinine taşınsın mı?"
             alert.alertStyle = .informational
             alert.addButton(withTitle: "Uygulamalar'a Taşı")
             alert.addButton(withTitle: "Şimdi Değil")
 
             if alert.runModal() == .alertFirstButtonReturn {
-                let targetURL = URL(fileURLWithPath: "/Applications/Coffer.app")
+                let targetURL = URL(fileURLWithPath: "/Applications/UnPack.app")
                 do {
                     if FileManager.default.fileExists(atPath: targetURL.path) {
                         try FileManager.default.removeItem(at: targetURL)
@@ -99,7 +99,7 @@ public final class DefaultAppManager: Sendable {
 
     /// Finder Quick Actions (Hızlı Eylemler) kurulumunu gerçekleştirir veya onarır
     public func installQuickActions() {
-        CofferServicesProvider.shared.registerFinderServices()
+        UnPackServicesProvider.shared.registerFinderServices()
         _ = LSRegisterURL(Bundle.main.bundleURL as CFURL, true)
     }
 }

@@ -16,7 +16,7 @@ public final class ArchiveConverter: Sendable {
         return AsyncThrowingStream { continuation in
             Task.detached(priority: .userInitiated) {
                 let tempDir = FileManager.default.temporaryDirectory
-                    .appendingPathComponent("Coffer_Convert")
+                    .appendingPathComponent("UnPack_Convert")
                     .appendingPathComponent(UUID().uuidString)
 
                 do {

@@ -1,12 +1,12 @@
 import Foundation
 import AppKit
 
-/// GitHub Releases üzerinden günlük veya manuel güncelleme denetleyicisi (COFFER_NO_UPDATE_CHECK=1 ile devre dışı bırakılabilir)
+/// GitHub Releases üzerinden günlük veya manuel güncelleme denetleyicisi (UNPACK_NO_UPDATE_CHECK=1 ile devre dışı bırakılabilir)
 @MainActor
 public final class UpdateChecker: ObservableObject {
     public static let shared = UpdateChecker()
 
-    public let currentVersion = "1.6.0"
+    public let currentVersion = "1.7.0"
     
     /// GitHub kullanıcı adı ve depo adı (GitHub'a deploy ettiğinizde burayı veya UserDefaults'u güncelleyebilirsiniz)
     @Published public var repoSlug: String {
@@ -25,15 +25,16 @@ public final class UpdateChecker: ObservableObject {
     @Published public var lastCheckDate: Date? = nil
 
     private init() {
-        self.repoSlug = UserDefaults.standard.string(forKey: "gitHubRepoSlug") ?? "blackowltr/Coffer"
+        self.repoSlug = UserDefaults.standard.string(forKey: "gitHubRepoSlug") ?? "blackowltr/UnPack"
     }
 
     private var isCheckDisabled: Bool {
+        ProcessInfo.processInfo.environment["UNPACK_NO_UPDATE_CHECK"] == "1" ||
         ProcessInfo.processInfo.environment["COFFER_NO_UPDATE_CHECK"] == "1" ||
         ProcessInfo.processInfo.environment["MACRAR_NO_UPDATE_CHECK"] == "1"
     }
 
-    /// Arka planda sessiz güncelleme denetimi (Coffer açıkken sessizce denetler, güncelleme varsa pencereyi açar)
+    /// Arka planda sessiz güncelleme denetimi (UnPack açıkken sessizce denetler, güncelleme varsa pencereyi açar)
     public func performSilentBackgroundCheck() {
         if isCheckDisabled {
             return
@@ -64,7 +65,7 @@ public final class UpdateChecker: ObservableObject {
 
         var request = URLRequest(url: apiURL)
         request.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-        request.setValue("Coffer-App/\(currentVersion)", forHTTPHeaderField: "User-Agent")
+        request.setValue("UnPack-App/\(currentVersion)", forHTTPHeaderField: "User-Agent")
         request.timeoutInterval = 8
 
         do {
@@ -100,7 +101,7 @@ public final class UpdateChecker: ObservableObject {
                let tagName = json["tag_name"] as? String {
                 let cleanTag = tagName.replacingOccurrences(of: "v", with: "").trimmingCharacters(in: .whitespaces)
                 let htmlUrlStr = json["html_url"] as? String ?? "https://github.com/\(repoSlug)/releases"
-                let releaseName = json["name"] as? String ?? "Coffer v\(cleanTag)"
+                let releaseName = json["name"] as? String ?? "UnPack v\(cleanTag)"
                 let releaseBody = json["body"] as? String ?? ""
 
                 var dmgURL: URL? = nil
@@ -138,7 +139,7 @@ public final class UpdateChecker: ObservableObject {
                         isReinstall: false
                     )
                 } else {
-                    lastCheckStatus = "Coffer güncel (v\(currentVersion))."
+                    lastCheckStatus = "UnPack güncel (v\(currentVersion))."
                     if manual {
                         showUpToDateDialog(release: releaseInfo)
                     }
@@ -158,8 +159,8 @@ public final class UpdateChecker: ObservableObject {
 
     private func showUpToDateDialog(release: GitHubReleaseInfo) {
         let alert = NSAlert()
-        alert.messageText = "Coffer Güncel (v\(currentVersion))"
-        alert.informativeText = "Harika! Şu anda en son Coffer sürümünü kullanıyorsunuz.\n\nİsterseniz GitHub'da bulunan en son sürümü (v\(release.version)) indirip yeniden kurabilirsiniz."
+        alert.messageText = "UnPack Güncel (v\(currentVersion))"
+        alert.informativeText = "Harika! Şu anda en son UnPack sürümünü kullanıyorsunuz.\n\nİsterseniz GitHub'da bulunan en son sürümü (v\(release.version)) indirip yeniden kurabilirsiniz."
         alert.addButton(withTitle: "Tamam")
         alert.addButton(withTitle: "Yeniden İndir ve Kur")
         alert.alertStyle = .informational
@@ -177,7 +178,7 @@ public final class UpdateChecker: ObservableObject {
     private func showGitHubPendingAlert() {
         let alert = NSAlert()
         alert.messageText = "GitHub Güncelleme Altyapısı Hazır"
-        alert.informativeText = "Coffer otomatik güncelleme altyapısı hazırlandı!\n\nProjenizi GitHub hesabınıza deploy edip Releases kısmından yeni bir sürüm yayınladığınızda, kullanıcılar tek tıkla doğrudan son sürüme erişebilecektir.\n\nHedef Depo: https://github.com/\(repoSlug)"
+        alert.informativeText = "UnPack otomatik güncelleme altyapısı hazırlandı!\n\nProjenizi GitHub hesabınıza deploy edip Releases kısmından yeni bir sürüm yayınladığınızda, kullanıcılar tek tıkla doğrudan son sürüme erişebilecektir.\n\nHedef Depo: https://github.com/\(repoSlug)"
         alert.addButton(withTitle: "GitHub Deposu")
         alert.addButton(withTitle: "Tamam")
         alert.alertStyle = .informational

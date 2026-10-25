@@ -5,23 +5,23 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>tr</string>
     <key>CFBundleExecutable</key>
-    <string>Coffer</string>
+    <string>UnPack</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
-    <string>com.coffer.app</string>
+    <string>com.unpack.app</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Coffer</string>
+    <string>UnPack</string>
     <key>CFBundleDisplayName</key>
-    <string>Coffer</string>
+    <string>UnPack</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.6.0</string>
+    <string>1.7.0</string>
     <key>CFBundleVersion</key>
-    <string>1.6.0</string>
+    <string>1.7.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSApplicationCategoryType</key>
@@ -31,7 +31,7 @@
     <key>NSSupportsAutomaticGraphicsSwitching</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>Telif Hakkı © 2026 Coffer. Apple Silicon için Optimize Edilmiştir.</string>
+    <string>Telif Hakkı © 2026 UnPack. Apple Silicon için Optimize Edilmiştir.</string>
 
     <!-- Finder Belge Türü İlişkilendirmeleri & İkonları -->
     <key>CFBundleDocumentTypes</key>
@@ -39,7 +39,7 @@
         <!-- 1. RAR Arşivi -->
         <dict>
             <key>CFBundleTypeName</key>
-            <string>WinRAR / Coffer Arşivi</string>
+            <string>WinRAR / UnPack Arşivi</string>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>LSHandlerRank</key>
@@ -221,9 +221,9 @@
     <array>
         <dict>
             <key>UTTypeIdentifier</key>
-            <string>com.coffer.rar</string>
+            <string>com.unpack.rar</string>
             <key>UTTypeDescription</key>
-            <string>Coffer Arşivi</string>
+            <string>UnPack Arşivi</string>
             <key>UTTypeIconFile</key>
             <string>RarDocIcon</string>
             <key>UTTypeConformsTo</key>
@@ -242,7 +242,7 @@
         </dict>
     </array>
 
-    <!-- macOS Finder Sağ Tık Servisleri & Hızlı Eylemler (NSServices: 'Coffer > Coffer ile ...' Hiyerarşisi) -->
+    <!-- macOS Finder Sağ Tık Servisleri & Hızlı Eylemler (NSServices: 'UnPack > UnPack ile ...' Hiyerarşisi) -->
     <key>NSServices</key>
     <array>
         <!-- 1. Buraya Çıkart -->
@@ -250,12 +250,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Buraya Çıkart</string>
+                <string>UnPack/UnPack ile Buraya Çıkart</string>
             </dict>
             <key>NSMessage</key>
             <string>extractHereService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -269,12 +269,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Klasöre Çıkart</string>
+                <string>UnPack/UnPack ile Klasöre Çıkart</string>
             </dict>
             <key>NSMessage</key>
             <string>extractToFolderService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -288,12 +288,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Belirtilen Yere Çıkart...</string>
+                <string>UnPack/UnPack ile Belirtilen Yere Çıkart...</string>
             </dict>
             <key>NSMessage</key>
             <string>extractToChosenService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -302,17 +302,17 @@
                 <string>public.file-url</string>
             </array>
         </dict>
-        <!-- 4. Coffer ile Aç ve İncele -->
+        <!-- 4. UnPack ile Aç ve İncele -->
         <dict>
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Aç ve İncele</string>
+                <string>UnPack/UnPack ile Aç ve İncele</string>
             </dict>
             <key>NSMessage</key>
-            <string>openInCofferService</string>
+            <string>openInUnPackService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -326,12 +326,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Güvenlik &amp; Akıllı Analiz...</string>
+                <string>UnPack/UnPack ile Güvenlik &amp; Akıllı Analiz...</string>
             </dict>
             <key>NSMessage</key>
             <string>analyzeSecurityService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -345,12 +345,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Hasarlı Arşivi Onar...</string>
+                <string>UnPack/UnPack ile Hasarlı Arşivi Onar...</string>
             </dict>
             <key>NSMessage</key>
             <string>repairArchiveService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -364,12 +364,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Arşivle...</string>
+                <string>UnPack/UnPack ile Arşivle...</string>
             </dict>
             <key>NSMessage</key>
             <string>compressDialogService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -383,12 +383,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Hızlı .ZIP Sıkıştır</string>
+                <string>UnPack/UnPack ile Hızlı .ZIP Sıkıştır</string>
             </dict>
             <key>NSMessage</key>
             <string>compressToZipService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -402,12 +402,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Hızlı .RAR Sıkıştır</string>
+                <string>UnPack/UnPack ile Hızlı .RAR Sıkıştır</string>
             </dict>
             <key>NSMessage</key>
             <string>compressToRarService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -421,12 +421,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile Hızlı .7Z Sıkıştır</string>
+                <string>UnPack/UnPack ile Hızlı .7Z Sıkıştır</string>
             </dict>
             <key>NSMessage</key>
             <string>compressTo7zService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>
@@ -440,12 +440,12 @@
             <key>NSMenuItem</key>
             <dict>
                 <key>default</key>
-                <string>Coffer/Coffer ile macOS Artıklarını Temizle</string>
+                <string>UnPack/UnPack ile macOS Artıklarını Temizle</string>
             </dict>
             <key>NSMessage</key>
             <string>cleanMacJunkService</string>
             <key>NSPortName</key>
-            <string>Coffer</string>
+            <string>UnPack</string>
             <key>NSRequiredContext</key>
             <dict/>
             <key>NSSendTypes</key>

@@ -1,19 +1,19 @@
 <div align="center">
-  <img src="docs/assets/app-icon.png" width="112" height="112" alt="Coffer Logo" />
-  <h1>Coffer</h1>
+  <img src="docs/assets/app-icon.png" width="112" height="112" alt="UnPack Logo" />
+  <h1>UnPack</h1>
   <p><strong>macOS için hızlı, sade ve güvenli arşiv yöneticisi.</strong></p>
 
   <p>
-    <a href="https://blackowltr.github.io/Coffer/"><img src="https://img.shields.io/badge/Web_Sitesi-blackowltr.github.io%2FCoffer-007AFF?style=flat-square&logo=safari&logoColor=white" alt="Web Sitesi" /></a>
-    <a href="https://github.com/blackowltr/Coffer/releases"><img src="https://img.shields.io/github/v/release/blackowltr/Coffer?style=flat-square&color=34C759&label=S%C3%BCr%C3%BCm" alt="Sürüm" /></a>
-    <a href="https://github.com/blackowltr/Coffer"><img src="https://img.shields.io/badge/Platform-macOS%2014%2B%20(Sonoma%20%26%20Sequoia)-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform" /></a>
+    <a href="https://blackowltr.github.io/UnPack/"><img src="https://img.shields.io/badge/Web_Sitesi-blackowltr.github.io%2FUnPack-007AFF?style=flat-square&logo=safari&logoColor=white" alt="Web Sitesi" /></a>
+    <a href="https://github.com/blackowltr/UnPack/releases"><img src="https://img.shields.io/github/v/release/blackowltr/UnPack?style=flat-square&color=34C759&label=S%C3%BCr%C3%BCm" alt="Sürüm" /></a>
+    <a href="https://github.com/blackowltr/UnPack"><img src="https://img.shields.io/badge/Platform-macOS%2014%2B%20(Sonoma%20%26%20Sequoia)-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-grey?style=flat-square" alt="Lisans" /></a>
   </p>
 </div>
 
 ---
 
-Coffer; macOS işletim sisteminin modern tasarım diline sadık kalınarak saf Swift ve SwiftUI ile geliştirilmiş bir arşiv yönetim aracıdır. 
+UnPack; macOS işletim sisteminin modern tasarım diline sadık kalınarak saf Swift ve SwiftUI ile geliştirilmiş bir arşiv yönetim aracıdır. 
 
 ZIP, RAR, 7Z ve TAR arşivlerini diske çıkarmadan incelemenizi, aradığınız dosyaları Quick Look ile anında önizlemenizi, masaüstünüzü dağıtmadan dosyalarınızı ayıklamanızı ve güvenli yeni arşivler oluşturmanızı sağlar.
 
@@ -30,15 +30,15 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 * **Anında Arama:** `⌘F` kısayoluyla arşiv içindeki yüzlerce dosya arasında gecikmesiz filtreleme yapın.
 
 ### 🖱️ Doğrudan Finder Entegrasyonu
-* Finder üzerinde herhangi bir dosyaya veya arşive sağ tıkladığınızda Coffer eylemleri doğrudan ana menüde listelenir:
+* Finder üzerinde herhangi bir dosyaya veya arşive sağ tıkladığınızda UnPack eylemleri doğrudan ana menüde listelenir:
   * **Buraya Çıkart**
   * **Klasöre Çıkart**
-  * **Coffer ile Aç ve İncele**
+  * **UnPack ile Aç ve İncele**
   * **Hızlı .ZIP / .RAR / .7Z Sıkıştır**
-  * **Coffer ile Arşivle...** (Gelişmiş seçenekler)
+  * **UnPack ile Arşivle...** (Gelişmiş seçenekler)
 
 ### 🛡️ Otomatik Klasörleme (Dağılma Koruması)
-* Arşivin içinde tek bir ana klasör yoksa ve dosyalar kök dizine yayılmışsa, Coffer masaüstünüzün dağılmasını engellemek için otomatik olarak arşiv adında bir klasör oluşturur ve dosyaları içine yerleştirir.
+* Arşivin içinde tek bir ana klasör yoksa ve dosyalar kök dizine yayılmışsa, UnPack masaüstünüzün dağılmasını engellemek için otomatik olarak arşiv adında bir klasör oluşturur ve dosyaları içine yerleştirir.
 * Arşiv zaten tek bir klasör içeriyorsa fazladan iç içe klasör yaratmaz.
 
 ### 🔒 Güvenlik ve Şifreleme
@@ -62,18 +62,18 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 
 <div align="center">
   <p><strong>Arşiv Gezgini (Finder Tasarımlı Liste ve Hızlı Önizleme)</strong></p>
-  <img src="docs/assets/screenshot-explorer.png" width="880" alt="Coffer Arşiv Gezgini" />
+  <img src="docs/assets/screenshot-explorer.png" width="880" alt="UnPack Arşiv Gezgini" />
   <br><br>
 </div>
 
 | Ayarlar ve Tercihler | Canlı Sürüm Güncelleyici |
 | :---: | :---: |
-| <img src="docs/assets/screenshot-settings.png" width="430" alt="Coffer Ayarlar Paneli" /> | <img src="docs/assets/screenshot-updater.png" width="430" alt="Coffer Güncelleyici" /> |
+| <img src="docs/assets/screenshot-settings.png" width="430" alt="UnPack Ayarlar Paneli" /> | <img src="docs/assets/screenshot-updater.png" width="430" alt="UnPack Güncelleyici" /> |
 
 <div align="center">
   <br>
   <p><strong>Hızlı Dosya Bırakma Alanı</strong></p>
-  <img src="docs/assets/screenshot-quickdrop.png" width="680" alt="Coffer Hızlı Mod" />
+  <img src="docs/assets/screenshot-quickdrop.png" width="680" alt="UnPack Hızlı Mod" />
   <br>
 </div>
 
@@ -101,15 +101,15 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 
 ## Kurulum
 
-1. En son sürüm yükleyicisini (`Coffer-1.6.0.dmg`) **[Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** indirin.
-2. DMG dosyasını açıp `Coffer` simgesini `Uygulamalar` (Applications) klasörüne sürükleyin.
-3. Uygulamayı ilk kez açtığınızda gerekli sistem izinleri onaylanır; ardından Coffer arka planda sessizce ve kesintisiz şekilde çalışmaya devam eder.
+1. En son sürüm yükleyicisini (`UnPack-1.7.0.dmg`) **[Releases](https://github.com/blackowltr/UnPack/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/UnPack/)** indirin.
+2. DMG dosyasını açıp `UnPack` simgesini `Uygulamalar` (Applications) klasörüne sürükleyin.
+3. Uygulamayı ilk kez açtığınızda gerekli sistem izinleri onaylanır; ardından UnPack arka planda sessizce ve kesintisiz şekilde çalışmaya devam eder.
 
 ---
 
 ## Gizlilik ve Güvenlik
 
-Coffer tamamen yerel olarak çalışır:
+UnPack tamamen yerel olarak çalışır:
 * Telemetri, analiz veya kullanıcı davranışı takibi yapmaz.
 * Dosyalarınız hiçbir zaman harici bir sunucuya iletilmez; tüm arşivleme ve şifreleme işlemleri kendi bilgisayarınızda gerçekleşir.
 * Açık kaynak kodludur ve MIT lisansı ile korunur.

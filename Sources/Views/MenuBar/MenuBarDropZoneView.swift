@@ -36,7 +36,7 @@ public struct MenuBarDropZoneView: View {
                     Image(systemName: "doc.zipper")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(settings.accentColorChoice.color)
-                    Text("Coffer")
+                    Text("UnPack")
                         .font(.system(size: 13, weight: .bold))
                 }
 
@@ -103,7 +103,7 @@ public struct MenuBarDropZoneView: View {
                     onOpenArchivePicker()
                 }
 
-                menuButton("Coffer Uygulamasını Aç", icon: "macwindow") {
+                menuButton("UnPack Uygulamasını Aç", icon: "macwindow") {
                     onOpenMainWindow()
                 }
 

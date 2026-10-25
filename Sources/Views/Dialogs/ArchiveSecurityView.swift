@@ -108,7 +108,7 @@ public struct ArchiveSecurityView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
-                    Text("Coffer Güvenlik & Risk Analizi")
+                    Text("UnPack Güvenlik & Risk Analizi")
                         .font(.system(size: 15, weight: .bold))
 
                     Text(report.riskLevel.rawValue)

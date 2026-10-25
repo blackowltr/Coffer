@@ -53,7 +53,7 @@ public final class LocalizationManager: ObservableObject {
 
     private let translations: [String: Entry] = [
         // Menüler & Genel
-        "app.name": Entry(tr: "Coffer", en: "Coffer"),
+        "app.name": Entry(tr: "UnPack", en: "UnPack"),
         "menu.file": Entry(tr: "Dosya", en: "File"),
         "menu.openRecent": Entry(tr: "Son Kullanılanları Aç", en: "Open Recent"),
         "menu.clearRecent": Entry(tr: "Son Kullanılanları Temizle", en: "Clear Recent"),

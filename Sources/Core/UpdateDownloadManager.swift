@@ -132,7 +132,7 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
             self.session = sess
 
             var request = URLRequest(url: url)
-            request.setValue("Coffer-App/\(currentVersion)", forHTTPHeaderField: "User-Agent")
+            request.setValue("UnPack-App/\(currentVersion)", forHTTPHeaderField: "User-Agent")
 
             let task = sess.downloadTask(with: request)
             self.downloadTask = task
@@ -162,7 +162,7 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
         didFinishDownloadingTo location: URL
     ) {
         let tempDir = FileManager.default.temporaryDirectory
-        let destinationURL = tempDir.appendingPathComponent("Coffer_Update_\(UUID().uuidString).dmg")
+        let destinationURL = tempDir.appendingPathComponent("UnPack_Update_\(UUID().uuidString).dmg")
 
         do {
             try? FileManager.default.removeItem(at: destinationURL)
@@ -195,7 +195,7 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
     // MARK: - Disk Kalıbını Bağlama ve Yeniden Başlatma
 
     private func installAndRelaunch(dmgURL: URL) async throws {
-        let mountPoint = FileManager.default.temporaryDirectory.appendingPathComponent("CofferMount_\(UUID().uuidString)")
+        let mountPoint = FileManager.default.temporaryDirectory.appendingPathComponent("UnPackMount_\(UUID().uuidString)")
         try? FileManager.default.createDirectory(at: mountPoint, withIntermediateDirectories: true)
         self.activeMountPoint = mountPoint
 
@@ -217,14 +217,14 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
 
         guard attachProcess.terminationStatus == 0 else {
             throw NSError(
-                domain: "CofferUpdate",
+                domain: "UnPackUpdate",
                 code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "İndirilen disk kalıbı (DMG) sisteme bağlanamadı."]
             )
         }
 
-        // 2. Bağlanan diskteki Coffer.app'i bul
-        let directAppURL = mountPoint.appendingPathComponent("Coffer.app")
+        // 2. Bağlanan diskteki UnPack.app'i bul
+        let directAppURL = mountPoint.appendingPathComponent("UnPack.app")
         var sourceAppPath = directAppURL.path
 
         if !FileManager.default.fileExists(atPath: sourceAppPath) {
@@ -234,9 +234,9 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
             } else {
                 _ = detachDMG(at: mountPoint.path)
                 throw NSError(
-                    domain: "CofferUpdate",
+                    domain: "UnPackUpdate",
                     code: 2,
-                    userInfo: [NSLocalizedDescriptionKey: "Disk kalıbı içerisinde Coffer uygulaması bulunamadı."]
+                    userInfo: [NSLocalizedDescriptionKey: "Disk kalıbı içerisinde UnPack uygulaması bulunamadı."]
                 )
             }
         }
@@ -248,18 +248,15 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
         if currentBundlePath.hasSuffix(".app") && !currentBundlePath.contains("/build/") {
             targetAppPath = currentBundlePath
         } else {
-            let desktopAppPath = NSHomeDirectory() + "/Desktop/Coffer/Coffer.app"
-            if FileManager.default.fileExists(atPath: desktopAppPath) {
-                targetAppPath = desktopAppPath
-            } else if FileManager.default.fileExists(atPath: "/Applications/Coffer.app") {
-                targetAppPath = "/Applications/Coffer.app"
+            if FileManager.default.fileExists(atPath: "/Applications/UnPack.app") {
+                targetAppPath = "/Applications/UnPack.app"
             } else {
                 targetAppPath = currentBundlePath
             }
         }
 
         // 4. Yeniden başlatma ve değiştirme betiğini oluştur
-        let scriptPath = FileManager.default.temporaryDirectory.appendingPathComponent("coffer_updater_\(UUID().uuidString).sh")
+        let scriptPath = FileManager.default.temporaryDirectory.appendingPathComponent("unpack_updater_\(UUID().uuidString).sh")
         let currentPID = ProcessInfo.processInfo.processIdentifier
 
         let updaterScript = """
@@ -270,7 +267,7 @@ public final class UpdateDownloadManager: NSObject, ObservableObject, URLSession
         DST="\(targetAppPath)"
         DMG="\(dmgURL.path)"
 
-        # Coffer uygulamasının kapanmasını bekle (en fazla 10 saniye)
+        # UnPack uygulamasının kapanmasını bekle (en fazla 10 saniye)
         for i in {1..50}; do
             if ! kill -0 "$PID" 2>/dev/null; then
                 break
@@ -363,7 +360,7 @@ public final class UpdateDialogManager: ObservableObject {
         let hosting = NSHostingController(rootView: dialogView)
         let win = NSWindow(contentViewController: hosting)
         win.styleMask = [.titled, .closable, .miniaturizable]
-        win.title = "Coffer Güncelleme"
+        win.title = "UnPack Güncelleme"
         win.isReleasedWhenClosed = false
         win.center()
         win.titlebarAppearsTransparent = true

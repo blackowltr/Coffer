@@ -6,7 +6,7 @@ import LocalAuthentication
 public final class KeychainManager: @unchecked Sendable {
     public static let shared = KeychainManager()
 
-    private let serviceName = "com.coffer.passwords"
+    private let serviceName = "com.unpack.passwords"
 
     private init() {}
 
@@ -17,7 +17,7 @@ public final class KeychainManager: @unchecked Sendable {
             var error: NSError?
 
             if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-                let reason = "Coffer: '\(archiveName)' şifreli arşivinin parolasını çözmek için Touch ID kullanın."
+                let reason = "UnPack: '\(archiveName)' şifreli arşivinin parolasını çözmek için Touch ID kullanın."
                 do {
                     let success = try await context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason)
                     guard success else { return nil }

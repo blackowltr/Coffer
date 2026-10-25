@@ -24,7 +24,7 @@ private final class OnboardingStepState: ObservableObject {
     @Published var checkmarkOpacity: Double = 0.0
 }
 
-/// macOS standartlarına uygun, ölçeklenebilir, 3D derinlik eğim efektli ve çoklu sahne renkli Coffer Kurulum Sihirbazı
+/// macOS standartlarına uygun UnPack İlk Kurulum ve İzin Yönetimi
 @MainActor
 public struct OnboardingWizardView: View {
     @ObservedObject private var settings = AppSettings.shared
@@ -256,7 +256,7 @@ public struct OnboardingWizardView: View {
 
                 // Başlık ve Açıklama
                 VStack(spacing: 4) {
-                    Text("Coffer")
+                    Text("UnPack")
                         .font(.system(size: 22, weight: .bold))
 
                     Text("macOS için hızlı, sade ve güvenilir arşiv yöneticisi.")
@@ -356,7 +356,7 @@ public struct OnboardingWizardView: View {
                             title: "Uygulamalar Klasörüne Yükle",
                             badge: "Önerilen",
                             badgeColor: settings.accentColorChoice.color,
-                            description: "Coffer'ı kalıcı olarak /Applications dizinine kopyalar ve Launchpad'e ekler.",
+                            description: "UnPack'i kalıcı olarak /Applications dizinine kopyalar ve Launchpad'e ekler.",
                             isOn: $stepState.isInstallToApplicationsSelected
                         )
                     }
@@ -369,7 +369,7 @@ public struct OnboardingWizardView: View {
                         title: "Saptanmış Arşiv Yöneticisi Yap",
                         badge: "Önerilen",
                         badgeColor: .blue,
-                        description: ".rar, .zip, .7z ve .tar dosyaları Finder'da otomatik olarak Coffer ile açılır.",
+                        description: ".rar, .zip, .7z ve .tar dosyaları Finder'da otomatik olarak UnPack ile açılır.",
                         isOn: $stepState.isDefaultAppSelected
                     )
 
@@ -381,7 +381,7 @@ public struct OnboardingWizardView: View {
                         title: "Finder Sağ Tık Entegrasyonu",
                         badge: "Kısayol",
                         badgeColor: .indigo,
-                        description: "Finder bağlam menüsüne 'Coffer ile Sıkıştır' ve 'Buraya Çıkart' seçeneklerini ekler.",
+                        description: "Finder bağlam menüsüne 'UnPack ile Sıkıştır' ve 'Buraya Çıkart' seçeneklerini ekler.",
                         isOn: $stepState.isFinderIntegrationSelected
                     )
 
@@ -522,7 +522,7 @@ public struct OnboardingWizardView: View {
                 Text("Sistem ve Güvenlik İzinleri")
                     .font(.system(size: 18, weight: .bold))
 
-                Text("Coffer'ın arşivleri güvenle yönetebilmesi ve Finder ile bütünleşmesi için gerekli izinler.")
+                Text("UnPack'in arşivleri güvenle yönetebilmesi ve Finder ile bütünleşmesi için gerekli izinler.")
                     .font(.system(size: 11.5))
                     .foregroundColor(.secondary)
             }
@@ -569,7 +569,7 @@ public struct OnboardingWizardView: View {
                         title: "Finder Sağ Tık Menü Uzantısı",
                         badge: "Kısayol",
                         badgeColor: .indigo,
-                        description: "Finder bağlam menüsünde 'Coffer ile Sıkıştır' ve 'Buraya Çıkart' seçeneklerini doğrudan kullanabilmenizi sağlar.",
+                        description: "Finder bağlam menüsünde 'UnPack ile Sıkıştır' ve 'Buraya Çıkart' seçeneklerini doğrudan kullanabilmenizi sağlar.",
                         actionTitle: isFinderExtensionActive ? "Etkinleştirildi" : "Uzantıyı Aç",
                         isGranted: isFinderExtensionActive,
                         action: {
@@ -688,7 +688,7 @@ public struct OnboardingWizardView: View {
             let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
-            process.arguments = ["-e", "use", "-i", "com.coffer.app.FinderSync"]
+            process.arguments = ["-e", "use", "-i", "com.unpack.app.FinderSync"]
             try? process.run()
             process.waitUntilExit()
 
@@ -738,7 +738,7 @@ public struct OnboardingWizardView: View {
                     Text("Kurulum Başarıyla Tamamlandı")
                         .font(.system(size: 20, weight: .bold))
 
-                    Text("Coffer artık sisteminizle tam uyumlu ve kullanıma hazır.")
+                    Text("UnPack artık sisteminizle tam uyumlu ve kullanıma hazır.")
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
@@ -749,7 +749,7 @@ public struct OnboardingWizardView: View {
                         completionBadgeRow(title: "Uygulama /Applications dizinine kalıcı olarak kuruldu")
                     }
                     if isDefaultAppSelected {
-                        completionBadgeRow(title: "Coffer saptanmış arşiv yöneticisi olarak atandı")
+                        completionBadgeRow(title: "UnPack saptanmış arşiv yöneticisi olarak atandı")
                     }
                     if isFinderIntegrationSelected {
                         completionBadgeRow(title: "Finder sağ tık menüleri ve servisleri kaydedildi")
@@ -774,7 +774,7 @@ public struct OnboardingWizardView: View {
                 .padding(.horizontal, 24)
 
                 if isRunningOutsideApplications {
-                    Text("İpucu: Yükleyici penceresini (DMG) kapatabilir ve Coffer'ı doğrudan Uygulamalar klasöründen başlatabilirsiniz.")
+                    Text("İpucu: Yükleyici penceresini (DMG) kapatabilir ve UnPack'i doğrudan Uygulamalar klasöründen başlatabilirsiniz.")
                         .font(.system(size: 10.5))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -883,7 +883,7 @@ public struct OnboardingWizardView: View {
                 .controlSize(.regular)
                 .disabled(isApplying)
             } else {
-                Button("Coffer'ı Başlat") {
+                Button("UnPack'i Başlat") {
                     settings.hasCompletedOnboarding = true
                     UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
                     UserDefaults.standard.synchronize()
@@ -909,7 +909,7 @@ public struct OnboardingWizardView: View {
             if isInstallToApplicationsSelected && isRunningOutsideApplications {
                 await MainActor.run { self.stepState.progressMessage = "Uygulamalar klasörüne kuruluyor..." }
                 let currentAppURL = Bundle.main.bundleURL
-                let applicationsURL = URL(fileURLWithPath: "/Applications/Coffer.app")
+                let applicationsURL = URL(fileURLWithPath: "/Applications/UnPack.app")
                 do {
                     if FileManager.default.fileExists(atPath: applicationsURL.path) {
                         try FileManager.default.removeItem(at: applicationsURL)
@@ -929,13 +929,13 @@ public struct OnboardingWizardView: View {
             // 3. Finder sağ tık servisleri
             if isFinderIntegrationSelected {
                 await MainActor.run { self.stepState.progressMessage = "Finder servisleri etkinleştiriliyor..." }
-                NSApp.servicesProvider = CofferServicesProvider.shared
+                NSApp.servicesProvider = UnPackServicesProvider.shared
                 NSUpdateDynamicServices()
-                CofferServicesProvider.shared.registerFinderServices()
+                UnPackServicesProvider.shared.registerFinderServices()
 
                 let process = Process()
                 process.executableURL = URL(fileURLWithPath: "/usr/bin/pluginkit")
-                process.arguments = ["-e", "use", "-i", "com.coffer.app.FinderSync"]
+                process.arguments = ["-e", "use", "-i", "com.unpack.app.FinderSync"]
                 try? process.run()
                 process.waitUntilExit()
             }

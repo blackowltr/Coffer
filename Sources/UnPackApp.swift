@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct CofferApp: App {
+struct UnPackApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @ObservedObject private var settings = AppSettings.shared
     @ObservedObject private var loc = LocalizationManager.shared
@@ -26,7 +26,7 @@ struct CofferApp: App {
                     DefaultAppManager.shared.registerAsDefaultArchiveHandler()
                     let alert = NSAlert()
                     alert.messageText = "Dosya İlişkilendirmeleri Güncellendi"
-                    alert.informativeText = "Coffer; desteklenen tüm arşiv türleri (.rar, .zip, .7z, .tar, .gz, .xz, .bz2 vb.) için saptanmış arşiv uygulaması olarak ayarlandı."
+                    alert.informativeText = "UnPack; desteklenen tüm arşiv türleri (.rar, .zip, .7z, .tar, .gz, .xz, .bz2 vb.) için saptanmış arşiv uygulaması olarak ayarlandı."
                     alert.runModal()
                 }
 
@@ -50,11 +50,13 @@ struct CofferApp: App {
             // Dosya Menüsü (Yeni, Aç, Son Kullanılanlar)
             CommandGroup(replacing: .newItem) {
                 Button("menu.newArchive".loc) {
+                    NotificationCenter.default.post(name: .unpackNewArchive, object: nil)
                     NotificationCenter.default.post(name: .cofferNewArchive, object: nil)
                 }
                 .keyboardShortcut("n", modifiers: .command)
 
                 Button("menu.openArchive".loc) {
+                    NotificationCenter.default.post(name: .unpackOpenArchive, object: nil)
                     NotificationCenter.default.post(name: .cofferOpenArchive, object: nil)
                 }
                 .keyboardShortcut("o", modifiers: .command)
@@ -67,6 +69,7 @@ struct CofferApp: App {
                     } else {
                         ForEach(recents.prefix(10), id: \.self) { url in
                             Button(url.lastPathComponent) {
+                                NotificationCenter.default.post(name: .unpackFileDropped, object: url)
                                 NotificationCenter.default.post(name: .cofferFileDropped, object: url)
                             }
                         }
@@ -81,21 +84,25 @@ struct CofferApp: App {
             // Görüntü Menüsü (Genişlet, Daralt, Yenile, Finder'da Göster)
             CommandMenu("menu.view".loc) {
                 Button("menu.expandAll".loc) {
+                    NotificationCenter.default.post(name: .unpackExpandAll, object: nil)
                     NotificationCenter.default.post(name: .cofferExpandAll, object: nil)
                 }
 
                 Button("menu.collapseAll".loc) {
+                    NotificationCenter.default.post(name: .unpackCollapseAll, object: nil)
                     NotificationCenter.default.post(name: .cofferCollapseAll, object: nil)
                 }
 
                 Divider()
 
                 Button("menu.refresh".loc) {
+                    NotificationCenter.default.post(name: .unpackRefresh, object: nil)
                     NotificationCenter.default.post(name: .cofferRefresh, object: nil)
                 }
                 .keyboardShortcut("r", modifiers: .command)
 
                 Button("menu.showInFinder".loc) {
+                    NotificationCenter.default.post(name: .unpackShowInFinder, object: nil)
                     NotificationCenter.default.post(name: .cofferShowInFinder, object: nil)
                 }
             }
@@ -103,16 +110,19 @@ struct CofferApp: App {
             // Arşiv İşlemleri Menüsü (Çıkar, Ekle, Sil, Test, Onar)
             CommandMenu("menu.archive".loc) {
                 Button("menu.extractHere".loc) {
+                    NotificationCenter.default.post(name: .unpackExtractHere, object: nil)
                     NotificationCenter.default.post(name: .cofferExtractHere, object: nil)
                 }
                 .keyboardShortcut("e", modifiers: .command)
 
                 Button("menu.extractToFolder".loc) {
+                    NotificationCenter.default.post(name: .unpackExtractToFolder, object: nil)
                     NotificationCenter.default.post(name: .cofferExtractToFolder, object: nil)
                 }
                 .keyboardShortcut("e", modifiers: [.command, .option])
 
                 Button("menu.extractToChosen".loc) {
+                    NotificationCenter.default.post(name: .unpackExtractToChosen, object: nil)
                     NotificationCenter.default.post(name: .cofferExtractToChosen, object: nil)
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
@@ -120,17 +130,20 @@ struct CofferApp: App {
                 Divider()
 
                 Button("menu.extractSelected".loc) {
+                    NotificationCenter.default.post(name: .unpackExtractSelected, object: nil)
                     NotificationCenter.default.post(name: .cofferExtractSelected, object: nil)
                 }
 
                 Divider()
 
                 Button("menu.addFiles".loc) {
+                    NotificationCenter.default.post(name: .unpackAddFiles, object: nil)
                     NotificationCenter.default.post(name: .cofferAddFiles, object: nil)
                 }
                 .keyboardShortcut("a", modifiers: [.command, .shift])
 
                 Button("menu.deleteSelected".loc) {
+                    NotificationCenter.default.post(name: .unpackDeleteSelected, object: nil)
                     NotificationCenter.default.post(name: .cofferDeleteSelected, object: nil)
                 }
                 .keyboardShortcut(.delete, modifiers: .command)
@@ -138,11 +151,13 @@ struct CofferApp: App {
                 Divider()
 
                 Button("menu.testArchive".loc) {
+                    NotificationCenter.default.post(name: .unpackTest, object: nil)
                     NotificationCenter.default.post(name: .cofferTest, object: nil)
                 }
                 .keyboardShortcut("t", modifiers: .command)
 
                 Button("menu.archiveInfo".loc) {
+                    NotificationCenter.default.post(name: .unpackInfo, object: nil)
                     NotificationCenter.default.post(name: .cofferInfo, object: nil)
                 }
                 .keyboardShortcut("i", modifiers: .command)
@@ -150,24 +165,27 @@ struct CofferApp: App {
                 Divider()
 
                 Button("Güvenlik ve Risk Analizi...") {
+                    NotificationCenter.default.post(name: .unpackSecurity, object: nil)
                     NotificationCenter.default.post(name: .cofferSecurity, object: nil)
                 }
                 .keyboardShortcut("s", modifiers: [.command, .shift])
 
                 Button("menu.repairArchive".loc) {
+                    NotificationCenter.default.post(name: .unpackRepair, object: nil)
                     NotificationCenter.default.post(name: .cofferRepair, object: nil)
                 }
             }
 
             // Yardım Menüsü
             CommandGroup(replacing: .help) {
-                Button("Coffer Yardım ve Kısayollar") {
-                    if let url = URL(string: "https://github.com/blackowltr/Coffer") {
+                Button("UnPack Yardım ve Kısayollar") {
+                    if let url = URL(string: "https://github.com/blackowltr/UnPack") {
                         NSWorkspace.shared.open(url)
                     }
                 }
 
                 Button("Kurulum ve İzinler...") {
+                    NotificationCenter.default.post(name: .unpackShowOnboarding, object: nil)
                     NotificationCenter.default.post(name: .cofferShowOnboarding, object: nil)
                 }
             }
@@ -179,9 +197,10 @@ struct CofferApp: App {
         }
 
         // macOS Menü Çubuğu (Menu Bar) Widget'ı
-        MenuBarExtra("Coffer", systemImage: "archivebox.fill") {
+        MenuBarExtra("UnPack", systemImage: "archivebox.fill") {
             MenuBarDropZoneView(
                 onFileDropped: { url in
+                    NotificationCenter.default.post(name: .unpackFileDropped, object: url)
                     NotificationCenter.default.post(name: .cofferFileDropped, object: url)
                     NSApp.activate(ignoringOtherApps: true)
                 },
@@ -192,10 +211,12 @@ struct CofferApp: App {
                     }
                 },
                 onOpenArchivePicker: {
+                    NotificationCenter.default.post(name: .unpackOpenArchive, object: nil)
                     NotificationCenter.default.post(name: .cofferOpenArchive, object: nil)
                     NSApp.activate(ignoringOtherApps: true)
                 },
                 onBrowseCompress: {
+                    NotificationCenter.default.post(name: .unpackNewArchive, object: nil)
                     NotificationCenter.default.post(name: .cofferNewArchive, object: nil)
                     NSApp.activate(ignoringOtherApps: true)
                 }
@@ -205,22 +226,20 @@ struct CofferApp: App {
     }
 }
 
-// Notifications are defined in Core/NotificationNames.swift
-
 // MARK: - App Delegate
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.servicesProvider = CofferServicesProvider.shared
+        NSApp.servicesProvider = UnPackServicesProvider.shared
         NSUpdateDynamicServices()
 
-        // macOS LaunchServices ve dosya ikonlarını Coffer logosuyla eşitle
+        // macOS LaunchServices ve dosya ikonlarını UnPack logosuyla eşitle
         DefaultAppManager.shared.registerAsDefaultArchiveHandler()
 
         // DMG veya Downloads'tan açılmışsa Uygulamalar klasörüne taşımayı öner
         DefaultAppManager.shared.offerMoveToApplicationsIfNeeded()
 
-        // Coffer açıkken arka planda sessizce yeni sürüm denetimi yap
+        // UnPack açıkken arka planda sessizce yeni sürüm denetimi yap
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             UpdateChecker.shared.performSilentBackgroundCheck()
         }
@@ -238,6 +257,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
         guard let firstURL = urls.first else { return }
         NSDocumentController.shared.noteNewRecentDocumentURL(firstURL)
+        NotificationCenter.default.post(name: .unpackFileDropped, object: firstURL)
         NotificationCenter.default.post(name: .cofferFileDropped, object: firstURL)
     }
 
@@ -257,9 +277,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             exit(0)
         }
 
-        // Durum 1: Doğrudan dosya açma (Örnek: Coffer /path/to/archive.zip)
+        // Durum 1: Doğrudan dosya açma (Örnek: UnPack /path/to/archive.zip)
         if args.count == 2 && !args[1].hasPrefix("--") {
             let fileURL = URL(fileURLWithPath: args[1])
+            NotificationCenter.default.post(name: .unpackFileDropped, object: fileURL)
             NotificationCenter.default.post(name: .cofferFileDropped, object: fileURL)
             return
         }
@@ -276,27 +297,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         switch flag {
         case "--extract-here":
-            CofferServicesProvider.shared.extractHereService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.extractHereService(pboard, userData: "", error: &err)
         case "--extract-to-folder":
-            CofferServicesProvider.shared.extractToFolderService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.extractToFolderService(pboard, userData: "", error: &err)
         case "--extract-to-chosen":
-            CofferServicesProvider.shared.extractToChosenService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.extractToChosenService(pboard, userData: "", error: &err)
         case "--open":
-            CofferServicesProvider.shared.openInCofferService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.openInUnPackService(pboard, userData: "", error: &err)
         case "--analyze", "--security":
-            CofferServicesProvider.shared.analyzeSecurityService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.analyzeSecurityService(pboard, userData: "", error: &err)
         case "--repair":
-            CofferServicesProvider.shared.repairArchiveService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.repairArchiveService(pboard, userData: "", error: &err)
         case "--compress-dialog":
-            CofferServicesProvider.shared.compressDialogService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.compressDialogService(pboard, userData: "", error: &err)
         case "--compress-zip":
-            CofferServicesProvider.shared.compressToZipService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.compressToZipService(pboard, userData: "", error: &err)
         case "--compress-rar":
-            CofferServicesProvider.shared.compressToRarService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.compressToRarService(pboard, userData: "", error: &err)
         case "--compress-7z":
-            CofferServicesProvider.shared.compressTo7zService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.compressTo7zService(pboard, userData: "", error: &err)
         case "--clean-junk":
-            CofferServicesProvider.shared.cleanMacJunkService(pboard, userData: "", error: &err)
+            UnPackServicesProvider.shared.cleanMacJunkService(pboard, userData: "", error: &err)
         default:
             break
         }

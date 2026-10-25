@@ -121,15 +121,15 @@ public struct UpdateDownloadDialog: View {
         switch downloadManager.state {
         case .prompt:
             if downloadManager.isReinstall {
-                return "Coffer Yeniden Kurulum"
+                return "UnPack Yeniden Kurulum"
             }
             return "Yeni Sürüm Mevcut: v\(downloadManager.releaseInfo?.version ?? "")"
         case .downloading:
-            return "Coffer İndiriliyor..."
+            return "UnPack İndiriliyor..."
         case .verifying:
             return "Paket Doğrulanıyor..."
         case .installing:
-            return "Coffer Güncelleniyor..."
+            return "UnPack Güncelleniyor..."
         case .readyToRelaunch:
             return "Kurulum Başarılı!"
         case .failed:
@@ -148,7 +148,7 @@ public struct UpdateDownloadDialog: View {
         case .installing:
             return "Yeni sürüm yerel uygulamayla değiştiriliyor ve kod imzası kontrol ediliyor."
         case .readyToRelaunch:
-            return "Coffer yeni sürümle otomatik olarak yeniden başlatılacak."
+            return "UnPack yeni sürümle otomatik olarak yeniden başlatılacak."
         case .failed:
             return "Güncelleme paketi alınırken veya kurulurken bir sorun oluştu."
         }
@@ -314,7 +314,7 @@ public struct UpdateDownloadDialog: View {
             ProgressView()
                 .scaleEffect(1.2)
             VStack(spacing: 6) {
-                Text("Coffer güncelleniyor ve kurulum tamamlanıyor...")
+                Text("UnPack güncelleniyor ve kurulum tamamlanıyor...")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.primary)
                 Text("Lütfen bekleyin, işlem birkaç saniye sürecektir.")
@@ -336,7 +336,7 @@ public struct UpdateDownloadDialog: View {
             Text("Güncelleme Başarıyla Tamamlandı!")
                 .font(.system(size: 16, weight: .bold))
 
-            Text("Coffer yeni sürümle yeniden başlatılıyor...")
+            Text("UnPack yeni sürümle yeniden başlatılıyor...")
                 .font(.system(size: 12.5))
                 .foregroundColor(.secondary)
             Spacer()

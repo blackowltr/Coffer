@@ -243,7 +243,7 @@ public actor ArchiveManager {
 
     public func lockArchiveWithPassword(archiveURL: URL, password: String) async throws -> URL {
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Coffer_Lock")
+            .appendingPathComponent("UnPack_Lock")
             .appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
@@ -281,7 +281,7 @@ public actor ArchiveManager {
 
     public func extractItemForPreview(archiveURL: URL, item: ArchiveItem, password: String? = nil) async throws -> URL {
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Coffer_Preview")
+            .appendingPathComponent("UnPack_Preview")
             .appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
@@ -317,7 +317,7 @@ public actor ArchiveManager {
 
     nonisolated public func extractItemSynchronouslyForDrag(archiveURL: URL, item: ArchiveItem) -> URL? {
         let dragDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Coffer_DragOut")
+            .appendingPathComponent("UnPack_DragOut")
             .appendingPathComponent(UUID().uuidString)
         try? FileManager.default.createDirectory(at: dragDir, withIntermediateDirectories: true)
 

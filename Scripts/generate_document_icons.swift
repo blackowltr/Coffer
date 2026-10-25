@@ -366,7 +366,7 @@ func drawLargeDocumentIcon(config: DocIconConfig, canvasSize: CGFloat = 1024) ->
     let subY = pillY + (pillH - subSize.height) / 2
     subString.draw(in: CGRect(x: pillX, y: subY, width: pillW, height: subSize.height))
 
-    // 9. Belge Alt Taban Marka İmzası (Coffer)
+    // 9. Belge Alt Taban Marka İmzası (UnPack)
     let brandStyle = NSMutableParagraphStyle()
     brandStyle.alignment = .center
     let brandAttrs: [NSAttributedString.Key: Any] = [
@@ -375,7 +375,7 @@ func drawLargeDocumentIcon(config: DocIconConfig, canvasSize: CGFloat = 1024) ->
         .paragraphStyle: brandStyle,
         .kern: 4.0
     ]
-    let brandString = NSAttributedString(string: "COFFER", attributes: brandAttrs)
+    let brandString = NSAttributedString(string: "UNPACK", attributes: brandAttrs)
     brandString.draw(in: CGRect(x: docX, y: docY + 36, width: docW, height: 26))
 
     image.unlockFocus()

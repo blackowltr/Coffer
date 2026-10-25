@@ -28,7 +28,7 @@ public struct DropZoneView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "bolt.shield.fill")
                         .foregroundColor(settings.accentColorChoice.color)
-                    Text("Coffer Hızlı Mod")
+                    Text("UnPack Hızlı Mod")
                         .font(.headline)
                 }
 

@@ -1,7 +1,7 @@
 import Cocoa
 import FinderSync
 
-/// macOS Finder Sağ Tık Entegrasyonu (Doğrudan Ana Menüde 'Coffer >' Alt Menüsü Sunan FinderSync Uzantısı)
+/// macOS Finder Sağ Tık Entegrasyonu (Doğrudan Ana Menüde 'UnPack >' Alt Menüsü Sunan FinderSync Uzantısı)
 @objc(FinderSync)
 public class FinderSync: FIFinderSync {
 
@@ -30,11 +30,11 @@ public class FinderSync: FIFinderSync {
 
         let menu = NSMenu(title: "")
 
-        // Ana Sağ Tık Menüsünde Doğrudan 'Coffer' Seçeneği
-        let cofferItem = NSMenuItem(title: "Coffer", action: nil, keyEquivalent: "")
-        cofferItem.image = NSImage(systemSymbolName: "archivebox.fill", accessibilityDescription: "Coffer")
+        // Ana Sağ Tık Menüsünde Doğrudan 'UnPack' Seçeneği
+        let unpackItem = NSMenuItem(title: "UnPack", action: nil, keyEquivalent: "")
+        unpackItem.image = NSImage(systemSymbolName: "archivebox.fill", accessibilityDescription: "UnPack")
 
-        let subMenu = NSMenu(title: "Coffer")
+        let subMenu = NSMenu(title: "UnPack")
 
         let isSingle = targetURLs.count == 1
         let firstURL = targetURLs[0]
@@ -43,9 +43,9 @@ public class FinderSync: FIFinderSync {
         if isArchive && isSingle {
             let archiveName = firstURL.deletingPathExtension().lastPathComponent
 
-            // 1. Coffer ile Buraya Çıkart
+            // 1. UnPack ile Buraya Çıkart
             let extractHereItem = NSMenuItem(
-                title: "Coffer ile Buraya Çıkart",
+                title: "UnPack ile Buraya Çıkart",
                 action: #selector(extractHereAction(_:)),
                 keyEquivalent: ""
             )
@@ -53,9 +53,9 @@ public class FinderSync: FIFinderSync {
             extractHereItem.image = NSImage(systemSymbolName: "arrow.down.doc.fill", accessibilityDescription: nil)
             subMenu.addItem(extractHereItem)
 
-            // 2. Coffer ile Klasöre Çıkart
+            // 2. UnPack ile Klasöre Çıkart
             let extractToFolderItem = NSMenuItem(
-                title: "Coffer ile Klasöre Çıkart (\"\(archiveName)\")",
+                title: "UnPack ile Klasöre Çıkart (\"\(archiveName)\")",
                 action: #selector(extractToFolderAction(_:)),
                 keyEquivalent: ""
             )
@@ -63,9 +63,9 @@ public class FinderSync: FIFinderSync {
             extractToFolderItem.image = NSImage(systemSymbolName: "folder.badge.plus", accessibilityDescription: nil)
             subMenu.addItem(extractToFolderItem)
 
-            // 3. Coffer ile Belirtilen Yere Çıkart...
+            // 3. UnPack ile Belirtilen Yere Çıkart...
             let extractToChosenItem = NSMenuItem(
-                title: "Coffer ile Belirtilen Yere Çıkart...",
+                title: "UnPack ile Belirtilen Yere Çıkart...",
                 action: #selector(extractToChosenAction(_:)),
                 keyEquivalent: ""
             )
@@ -75,19 +75,19 @@ public class FinderSync: FIFinderSync {
 
             subMenu.addItem(NSMenuItem.separator())
 
-            // 4. Coffer ile Aç ve İncele
+            // 4. UnPack ile Aç ve İncele
             let openItem = NSMenuItem(
-                title: "Coffer ile Aç ve İncele",
-                action: #selector(openInCofferAction(_:)),
+                title: "UnPack ile Aç ve İncele",
+                action: #selector(openInUnPackAction(_:)),
                 keyEquivalent: ""
             )
             openItem.target = self
             openItem.image = NSImage(systemSymbolName: "macwindow.on.rectangle", accessibilityDescription: nil)
             subMenu.addItem(openItem)
 
-            // 5. Coffer ile Güvenlik Analizi...
+            // 5. UnPack ile Güvenlik Analizi...
             let securityItem = NSMenuItem(
-                title: "Coffer ile Güvenlik Analizi...",
+                title: "UnPack ile Güvenlik Analizi...",
                 action: #selector(analyzeSecurityAction(_:)),
                 keyEquivalent: ""
             )
@@ -95,9 +95,9 @@ public class FinderSync: FIFinderSync {
             securityItem.image = NSImage(systemSymbolName: "shield.lefthalf.filled", accessibilityDescription: nil)
             subMenu.addItem(securityItem)
 
-            // 6. Coffer ile Hasarlı Arşivi Onar...
+            // 6. UnPack ile Hasarlı Arşivi Onar...
             let repairItem = NSMenuItem(
-                title: "Coffer ile Hasarlı Arşivi Onar...",
+                title: "UnPack ile Hasarlı Arşivi Onar...",
                 action: #selector(repairArchiveAction(_:)),
                 keyEquivalent: ""
             )
@@ -107,9 +107,9 @@ public class FinderSync: FIFinderSync {
 
             subMenu.addItem(NSMenuItem.separator())
 
-            // 7. Coffer ile macOS Artıklarını Temizle
+            // 7. UnPack ile macOS Artıklarını Temizle
             let cleanItem = NSMenuItem(
-                title: "Coffer ile macOS Artıklarını Temizle",
+                title: "UnPack ile macOS Artıklarını Temizle",
                 action: #selector(cleanMacJunkAction(_:)),
                 keyEquivalent: ""
             )
@@ -120,9 +120,9 @@ public class FinderSync: FIFinderSync {
         } else {
             // Sıkıştırma & Temizlik Seçenekleri
 
-            // 1. Coffer ile Arşivle... (Format, Düzey, Parola)
+            // 1. UnPack ile Arşivle... (Format, Düzey, Parola)
             let compressDialogItem = NSMenuItem(
-                title: "Coffer ile Arşivle... (Format, Düzey, Parola)",
+                title: "UnPack ile Arşivle... (Format, Düzey, Parola)",
                 action: #selector(compressDialogAction(_:)),
                 keyEquivalent: ""
             )
@@ -132,9 +132,9 @@ public class FinderSync: FIFinderSync {
 
             subMenu.addItem(NSMenuItem.separator())
 
-            // 2. Coffer ile Hızlı .ZIP Sıkıştır
+            // 2. UnPack ile Hızlı .ZIP Sıkıştır
             let compressZipItem = NSMenuItem(
-                title: "Coffer ile Hızlı .ZIP Sıkıştır",
+                title: "UnPack ile Hızlı .ZIP Sıkıştır",
                 action: #selector(compressToZipAction(_:)),
                 keyEquivalent: ""
             )
@@ -142,9 +142,9 @@ public class FinderSync: FIFinderSync {
             compressZipItem.image = NSImage(systemSymbolName: "doc.zipper", accessibilityDescription: nil)
             subMenu.addItem(compressZipItem)
 
-            // 3. Coffer ile Hızlı .RAR Sıkıştır
+            // 3. UnPack ile Hızlı .RAR Sıkıştır
             let compressRarItem = NSMenuItem(
-                title: "Coffer ile Hızlı .RAR Sıkıştır",
+                title: "UnPack ile Hızlı .RAR Sıkıştır",
                 action: #selector(compressToRarAction(_:)),
                 keyEquivalent: ""
             )
@@ -152,9 +152,9 @@ public class FinderSync: FIFinderSync {
             compressRarItem.image = NSImage(systemSymbolName: "archivebox.circle.fill", accessibilityDescription: nil)
             subMenu.addItem(compressRarItem)
 
-            // 4. Coffer ile Hızlı .7Z Sıkıştır
+            // 4. UnPack ile Hızlı .7Z Sıkıştır
             let compress7zItem = NSMenuItem(
-                title: "Coffer ile Hızlı .7Z Sıkıştır",
+                title: "UnPack ile Hızlı .7Z Sıkıştır",
                 action: #selector(compressTo7zAction(_:)),
                 keyEquivalent: ""
             )
@@ -164,9 +164,9 @@ public class FinderSync: FIFinderSync {
 
             subMenu.addItem(NSMenuItem.separator())
 
-            // 5. Coffer ile macOS Artıklarını Temizle (.DS_Store vb.)
+            // 5. UnPack ile macOS Artıklarını Temizle (.DS_Store vb.)
             let cleanItem = NSMenuItem(
-                title: "Coffer ile macOS Artıklarını Temizle (.DS_Store vb.)",
+                title: "UnPack ile macOS Artıklarını Temizle (.DS_Store vb.)",
                 action: #selector(cleanMacJunkAction(_:)),
                 keyEquivalent: ""
             )
@@ -175,8 +175,8 @@ public class FinderSync: FIFinderSync {
             subMenu.addItem(cleanItem)
         }
 
-        cofferItem.submenu = subMenu
-        menu.addItem(cofferItem)
+        unpackItem.submenu = subMenu
+        menu.addItem(unpackItem)
 
         return menu
     }
@@ -192,11 +192,11 @@ public class FinderSync: FIFinderSync {
         return []
     }
 
-    private func executeCoffer(arguments: [String]) {
+    private func executeUnPack(arguments: [String]) {
         let pluginURL = Bundle.main.bundleURL
-        // pluginURL: .../Contents/PlugIns/CofferFinderSync.appex -> Coffer.app
+        // pluginURL: .../Contents/PlugIns/UnPackFinderSync.appex -> UnPack.app
         let appBundleURL = pluginURL.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-        let fallbackBundleURL = URL(fileURLWithPath: "/Applications/Coffer.app")
+        let fallbackBundleURL = URL(fileURLWithPath: "/Applications/UnPack.app")
         let targetBundleURL = FileManager.default.fileExists(atPath: appBundleURL.path) ? appBundleURL : fallbackBundleURL
 
         let config = NSWorkspace.OpenConfiguration()
@@ -206,7 +206,7 @@ public class FinderSync: FIFinderSync {
         NSWorkspace.shared.openApplication(at: targetBundleURL, configuration: config) { _, error in
             if error != nil {
                 // Yedek: Process ile doğrudan ikiliyi çalıştırmayı dene
-                let binaryURL = targetBundleURL.appendingPathComponent("Contents/MacOS/Coffer")
+                let binaryURL = targetBundleURL.appendingPathComponent("Contents/MacOS/UnPack")
                 if FileManager.default.fileExists(atPath: binaryURL.path) {
                     _ = try? Process.run(binaryURL, arguments: arguments)
                 }
@@ -217,67 +217,67 @@ public class FinderSync: FIFinderSync {
     @objc func extractHereAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--extract-here"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--extract-here"] + urls.map { $0.path })
     }
 
     @objc func extractToFolderAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--extract-to-folder"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--extract-to-folder"] + urls.map { $0.path })
     }
 
     @objc func extractToChosenAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--extract-to-chosen"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--extract-to-chosen"] + urls.map { $0.path })
     }
 
-    @objc func openInCofferAction(_ sender: AnyObject?) {
+    @objc func openInUnPackAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard let first = urls.first else { return }
-        executeCoffer(arguments: ["--open", first.path])
+        executeUnPack(arguments: ["--open", first.path])
     }
 
     @objc func analyzeSecurityAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard let first = urls.first else { return }
-        executeCoffer(arguments: ["--analyze", first.path])
+        executeUnPack(arguments: ["--analyze", first.path])
     }
 
     @objc func repairArchiveAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard let first = urls.first else { return }
-        executeCoffer(arguments: ["--repair", first.path])
+        executeUnPack(arguments: ["--repair", first.path])
     }
 
     @objc func compressDialogAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--compress-dialog"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--compress-dialog"] + urls.map { $0.path })
     }
 
     @objc func compressToZipAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--compress-zip"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--compress-zip"] + urls.map { $0.path })
     }
 
     @objc func compressToRarAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--compress-rar"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--compress-rar"] + urls.map { $0.path })
     }
 
     @objc func compressTo7zAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--compress-7z"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--compress-7z"] + urls.map { $0.path })
     }
 
     @objc func cleanMacJunkAction(_ sender: AnyObject?) {
         let urls = getSelectedURLs()
         guard !urls.isEmpty else { return }
-        executeCoffer(arguments: ["--clean-junk"] + urls.map { $0.path })
+        executeUnPack(arguments: ["--clean-junk"] + urls.map { $0.path })
     }
 
     private func isArchiveFile(_ url: URL) -> Bool {

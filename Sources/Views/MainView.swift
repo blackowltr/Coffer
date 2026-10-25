@@ -86,7 +86,7 @@ public struct MainView: View {
                             .font(.system(size: 18, weight: .bold))
                             .foregroundColor(settings.accentColorChoice.color)
 
-                        Text("Coffer")
+                        Text("UnPack")
                             .font(.system(size: 15, weight: .bold))
                     }
 
@@ -134,7 +134,7 @@ public struct MainView: View {
                                 .font(.system(size: 13))
                         }
                         .buttonStyle(.plain)
-                        .help("Coffer Ayarları (Cmd+,)")
+                        .help("UnPack Ayarları (Cmd+,)")
                     }
                 }
                 .padding(.horizontal, 16)
@@ -246,7 +246,7 @@ public struct MainView: View {
             return true
         }
         .onAppear(perform: handleOnAppear)
-        .alert("Coffer Bildirimi", isPresented: $showErrorAlert) {
+        .alert("UnPack Bildirimi", isPresented: $showErrorAlert) {
             Button("Tamam", role: .cancel) {}
         } message: {
             Text(errorMessage ?? "Bir hata meydana geldi.")
@@ -533,7 +533,7 @@ public struct MainView: View {
 
             // 2. Başlık ve Açıklama
             VStack(spacing: 6) {
-                Text("Coffer Arşiv Gezgini")
+                Text("UnPack Arşiv Gezgini")
                     .font(.system(size: 22, weight: .bold))
 
                 Text("Açmak istediğiniz bir arşivi buraya sürükleyin veya dosyalara göz atın.")

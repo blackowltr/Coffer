@@ -51,7 +51,7 @@ public enum ArchiveFormat: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Coffer tarafından yeni arşiv olarak oluşturulabilir mi?
+    /// UnPack tarafından yeni arşiv olarak oluşturulabilir mi?
     public var canCompress: Bool {
         switch self {
         case .rar, .zip, .tar, .tarGz, .tarBz2, .tarXz, .sevenZip:

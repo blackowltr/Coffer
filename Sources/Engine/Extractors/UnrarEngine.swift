@@ -7,7 +7,7 @@ public final class UnrarEngine: Sendable {
 
     public init() {}
 
-    /// Sistemde veya Coffer içinde mevcut bir unrar ikilisini bulur
+    /// Sistemde veya UnPack içinde mevcut bir unrar ikilisini bulur
     public static var availableUnrarPath: String? {
         var candidates: [String] = []
         if let res = Bundle.main.resourcePath {
@@ -30,7 +30,7 @@ public final class UnrarEngine: Sendable {
         return nil
     }
 
-    /// Sistemde veya Coffer içinde mevcut bir rar ikilisini bulur
+    /// Sistemde veya UnPack içinde mevcut bir rar ikilisini bulur
     public static var availableRarPath: String? {
         var candidates: [String] = []
         if let res = Bundle.main.resourcePath {

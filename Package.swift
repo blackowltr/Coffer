@@ -2,20 +2,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "Coffer",
+    name: "UnPack",
     platforms: [
         .macOS(.v14)
     ],
     products: [
         .executable(
-            name: "Coffer",
-            targets: ["Coffer"]
+            name: "UnPack",
+            targets: ["UnPack"]
         )
     ],
     targets: [
         .executableTarget(
-            name: "Coffer",
-            path: "Sources"
+            name: "UnPack",
+            path: "Sources",
+            exclude: ["FinderSync/Info.plist"]
         )
     ]
 )

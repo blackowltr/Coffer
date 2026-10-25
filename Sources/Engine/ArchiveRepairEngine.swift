@@ -173,7 +173,7 @@ public final class ArchiveRepairEngine: Sendable {
                 }
             } else {
                 // Tar / Gzip / RAR için güvenli onarım
-                let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("Coffer_Repair_\(UUID().uuidString)")
+                let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("UnPack_Repair_\(UUID().uuidString)")
                 try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
                 let extractProc = Process()
@@ -242,7 +242,7 @@ public final class ArchiveRepairEngine: Sendable {
 
         case .repackage:
             onProgress("Sağlam dosyalar ayıklanıp sıfırdan paketleniyor...", 0.3)
-            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("Coffer_Repack_\(UUID().uuidString)")
+            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("UnPack_Repack_\(UUID().uuidString)")
             try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
             let extractProc = Process()

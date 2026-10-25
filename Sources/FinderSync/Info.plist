@@ -5,19 +5,19 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>tr</string>
     <key>CFBundleExecutable</key>
-    <string>CofferFinderSync</string>
+    <string>UnPackFinderSync</string>
     <key>CFBundleIdentifier</key>
-    <string>com.coffer.app.FinderSync</string>
+    <string>com.unpack.app.FinderSync</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>CofferFinderSync</string>
+    <string>UnPackFinderSync</string>
     <key>CFBundlePackageType</key>
     <string>XPC!</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.6.0</string>
+    <string>1.7.0</string>
     <key>CFBundleVersion</key>
-    <string>1.6.0</string>
+    <string>1.7.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>NSExtension</key>

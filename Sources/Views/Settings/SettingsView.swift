@@ -7,10 +7,11 @@ private final class SettingsViewState: ObservableObject {
     @Published var feedbackMessage: String? = nil
 }
 
-/// Modernize edilmiş Coffer Ayarlar Penceresi
+/// Modernize edilmiş UnPack Ayarlar Penceresi
 @MainActor
 public struct SettingsView: View {
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var updateChecker = UpdateChecker.shared
     @StateObject private var viewState = SettingsViewState()
     @Binding public var isPresented: Bool
 
@@ -36,7 +37,7 @@ public struct SettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("Coffer")
+                        Text("UnPack")
                             .font(.system(size: 15, weight: .bold))
                         Text("Tercihler")
                             .font(.system(size: 11))
@@ -70,7 +71,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.5.0")
+                    Text("UnPack v\(updateChecker.currentVersion)")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")
@@ -213,7 +214,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
         case .finder:
             return "macOS Finder sağ tık doğrudan menü entegrasyonu ve dosya uzantısı eşlemeleri."
         case .about:
-            return "Coffer sürüm detayları, motor mimarisi ve lisans bilgileri."
+            return "UnPack sürüm detayları, motor mimarisi ve lisans bilgileri."
         }
     }
 
@@ -459,7 +460,7 @@ private struct AppearanceSettingsPane: View {
                         icon: "menubar.rectangle",
                         iconColor: .blue,
                         title: "Menü Çubuğu (Menu Bar) Hızlı Sürükle-Bırak Alanı",
-                        subtitle: "macOS üst menü çubuğuna doğrudan arşiv oluşturup açabileceğiniz Coffer simgesi ekler."
+                        subtitle: "macOS üst menü çubuğuna doğrudan arşiv oluşturup açabileceğiniz UnPack simgesi ekler."
                     ) {
                         Toggle("", isOn: $settings.enableMenuBarDropZone)
                             .toggleStyle(.switch)
@@ -545,7 +546,7 @@ private struct CompressionSettingsPane: View {
                             Spacer()
                         }
 
-                        Text("Coffer ile oluşturulan arşivlerde gizli macOS sistem çöpleri (.DS_Store, __MACOSX meta verileri) otomatik elenir. Böylece arşivleriniz Windows ve Linux ortamlarında tertemiz açılır.")
+                        Text("UnPack ile oluşturulan arşivlerde gizli macOS sistem çöpleri (.DS_Store, __MACOSX meta verileri) otomatik elenir. Böylece arşivleriniz Windows ve Linux ortamlarında tertemiz açılır.")
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                             .lineSpacing(2)
@@ -589,7 +590,7 @@ private struct ExtractionSettingsPane: View {
                             Text("Otomatik Klasörleme Nasıl Çalışır?")
                                 .font(.system(size: 12, weight: .semibold))
 
-                            Text("İçerisinde tek bir ana klasör bulunmayan ve doğrudan kök dizine yayılmış çok sayıda dosya barındıran arşivler tespit edildiğinde; Coffer otomatik olarak arşiv adında yeni bir klasör açar ve dosyaları o klasörün içine güvenle çıkartır.")
+                            Text("İçerisinde tek bir ana klasör bulunmayan ve doğrudan kök dizine yayılmış çok sayıda dosya barındıran arşivler tespit edildiğinde; UnPack otomatik olarak arşiv adında yeni bir klasör açar ve dosyaları o klasörün içine güvenle çıkartır.")
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
                                 .lineSpacing(2)
@@ -641,11 +642,11 @@ private struct FinderSettingsPane: View {
 
                     // Finder Menü Önizleme Görseli
                     VStack(alignment: .leading, spacing: 6) {
-                        FinderMockMenuItem(icon: "arrow.down.doc.fill", title: "Coffer ▶ Buraya Çıkart", iconColor: .blue)
-                        FinderMockMenuItem(icon: "folder.badge.plus", title: "Coffer ▶ \"[Arşiv Adı]\" Adıyla Klasöre Çıkart", iconColor: .green)
-                        FinderMockMenuItem(icon: "doc.zipper", title: "Coffer ▶ \"[Dosya Adı].zip\" Olarak Sıkıştır", iconColor: settings.accentColorChoice.color)
-                        FinderMockMenuItem(icon: "slider.horizontal.3", title: "Coffer ▶ Coffer ile Sıkıştır... (Gelişmiş)", iconColor: .purple)
-                        FinderMockMenuItem(icon: "macwindow.on.rectangle", title: "Coffer ▶ Coffer ile Aç ve Gözat", iconColor: .cyan)
+                        FinderMockMenuItem(icon: "arrow.down.doc.fill", title: "UnPack ▶ Buraya Çıkart", iconColor: .blue)
+                        FinderMockMenuItem(icon: "folder.badge.plus", title: "UnPack ▶ \"[Arşiv Adı]\" Adıyla Klasöre Çıkart", iconColor: .green)
+                        FinderMockMenuItem(icon: "doc.zipper", title: "UnPack ▶ \"[Dosya Adı].zip\" Olarak Sıkıştır", iconColor: settings.accentColorChoice.color)
+                        FinderMockMenuItem(icon: "slider.horizontal.3", title: "UnPack ▶ UnPack ile Sıkıştır... (Gelişmiş)", iconColor: .purple)
+                        FinderMockMenuItem(icon: "macwindow.on.rectangle", title: "UnPack ▶ UnPack ile Aç ve Gözat", iconColor: .cyan)
                     }
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -682,7 +683,7 @@ private struct FinderSettingsPane: View {
                         icon: "archivebox.fill",
                         iconColor: settings.accentColorChoice.color,
                         title: "Dosya İkonlarını Eşitle & Yenile",
-                        subtitle: "RAR, ZIP, 7Z, TAR uzantılarını Coffer'a bağlar ve QuickLook önbelleğini temizler."
+                        subtitle: "RAR, ZIP, 7Z, TAR uzantılarını UnPack'e bağlar ve QuickLook önbelleğini temizler."
                     ) {
                         Button("İkonları Eşitle") {
                             DefaultAppManager.shared.registerAsDefaultArchiveHandler()
@@ -701,7 +702,7 @@ private struct FinderSettingsPane: View {
                         subtitle: "macOS dinamik sağ tık servislerini anında yeniden yükler."
                     ) {
                         Button("Servisleri Yenile") {
-                            CofferServicesProvider.shared.registerFinderServices()
+                            UnPackServicesProvider.shared.registerFinderServices()
                             onShowFeedback("Finder servisleri anında tazelendi.")
                         }
                         .buttonStyle(.bordered)
@@ -741,7 +742,7 @@ private struct AboutSettingsPane: View {
                 }
 
                 VStack(spacing: 4) {
-                    Text("Coffer")
+                    Text("UnPack")
                         .font(.system(size: 22, weight: .bold))
                     Text("Sürüm \(updateChecker.currentVersion) (Universal)")
                         .font(.system(size: 12, weight: .semibold))
@@ -856,9 +857,9 @@ private struct AboutSettingsPane: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Coffer Yenilikler & Sürüm Notları")
+                        Text("UnPack Yenilikler & Sürüm Notları")
                             .font(.system(size: 15, weight: .bold))
-                        Text("Coffer v\(updateChecker.currentVersion) Sürüm Detayları")
+                        Text("UnPack v\(updateChecker.currentVersion) Sürüm Detayları")
                             .font(.system(size: 11.5))
                             .foregroundColor(.secondary)
                     }
@@ -890,9 +891,9 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
-        ## 🚀 Coffer v1.5.0 (En Son Sürüm)
+        ## 🚀 UnPack v1.7.0
 
-        Coffer Arşiv Gezgini sayfası; macOS Sequoia ve Sonoma tasarım diline uygun, yarı saydam Apple cam kapsülleri ve yepyeni görsel düzen seçenekleriyle baştan tasarlandı.
+        UnPack; sadeleştirilmiş yeni kimliği, modern Apple standartlarında arşiv oluşturma arayüzü, sessiz arka plan güncelleme sistemi ve doğrudan Finder sağ tık entegrasyonuyla güncellendi.
 
         ### ✨ Tasarım ve Kullanıcı Deneyimi Yenilikleri
 

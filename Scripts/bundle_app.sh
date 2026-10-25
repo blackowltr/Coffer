@@ -3,7 +3,7 @@ set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${PROJECT_DIR}/build"
-APP_NAME="Coffer"
+APP_NAME="UnPack"
 APP_BUNDLE="${BUILD_DIR}/${APP_NAME}.app"
 
 if [ -d "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" ]; then
@@ -58,12 +58,12 @@ done
 echo "APPL????" > "${APP_BUNDLE}/Contents/PkgInfo"
 
 # Bundle FinderSync Extension (.appex) for Top-Level Finder Right-Click Menu
-if [ -f "${BUILD_DIR}/CofferFinderSync" ]; then
-    echo "==> Bundling CofferFinderSync.appex into Contents/PlugIns..."
-    APPEX_DIR="${APP_BUNDLE}/Contents/PlugIns/CofferFinderSync.appex"
+if [ -f "${BUILD_DIR}/UnPackFinderSync" ]; then
+    echo "==> Bundling UnPackFinderSync.appex into Contents/PlugIns..."
+    APPEX_DIR="${APP_BUNDLE}/Contents/PlugIns/UnPackFinderSync.appex"
     mkdir -p "${APPEX_DIR}/Contents/MacOS"
-    cp "${BUILD_DIR}/CofferFinderSync" "${APPEX_DIR}/Contents/MacOS/CofferFinderSync"
-    chmod +x "${APPEX_DIR}/Contents/MacOS/CofferFinderSync"
+    cp "${BUILD_DIR}/UnPackFinderSync" "${APPEX_DIR}/Contents/MacOS/UnPackFinderSync"
+    chmod +x "${APPEX_DIR}/Contents/MacOS/UnPackFinderSync"
     cp "${PROJECT_DIR}/Sources/FinderSync/Info.plist" "${APPEX_DIR}/Contents/Info.plist"
     codesign -s - --force --deep "${APPEX_DIR}"
 fi
@@ -82,7 +82,7 @@ fi
 echo "==> Applying ad-hoc codesign signature..."
 codesign -s - --force --deep "${APP_BUNDLE}"
 
-# Register with macOS LaunchServices so Finder immediately associates .rar, .zip, .7z with Coffer icon
+# Register with macOS LaunchServices so Finder immediately associates .rar, .zip, .7z with UnPack icon
 echo "==> Registering with macOS LaunchServices / Finder..."
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
 if [ -x "${LSREGISTER}" ]; then
@@ -100,7 +100,7 @@ touch "${APP_BUNDLE}" || true
 echo "==> Registering FinderSync Extension with pluginkit..."
 if [ -d "${APPEX_DIR}" ]; then
     pluginkit -a "${APPEX_DIR}" || true
-    pluginkit -e use -i com.coffer.app.FinderSync || true
+    pluginkit -e use -i com.unpack.app.FinderSync || true
 fi
 
 # Update pasteboard services (NSServices / Finder Quick Actions)

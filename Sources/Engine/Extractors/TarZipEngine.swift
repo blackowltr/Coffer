@@ -515,7 +515,7 @@ public final class TarZipEngine: Sendable {
                 }
             } else {
                 let tempDir = FileManager.default.temporaryDirectory
-                    .appendingPathComponent("Coffer_Rebuild")
+                    .appendingPathComponent("UnPack_Rebuild")
                     .appendingPathComponent(UUID().uuidString)
                 try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 
@@ -579,7 +579,7 @@ public final class TarZipEngine: Sendable {
             }
 
             let tempDir = FileManager.default.temporaryDirectory
-                .appendingPathComponent("Coffer_Repair")
+                .appendingPathComponent("UnPack_Repair")
                 .appendingPathComponent(UUID().uuidString)
             try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
 

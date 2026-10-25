@@ -207,7 +207,7 @@ public final class ArchiveSecurityEngine: Sendable {
                 title: "Kritik Dizin Aşımı (Zip Slip Açığı)",
                 details: "\(traversalPaths.count) adet dosya, çıkarma dizininin dışına çıkarak sistem dosyalarına veya kullanıcı ana dizinine erişmeye çalışıyor.",
                 affectedPaths: Array(traversalPaths.prefix(10)),
-                recommendation: "Bu arşivi kesinlikle standart çıkarmayın! Coffer Güvenli Çıkarma modunu kullanarak yolları temizleyin."
+                recommendation: "Bu arşivi kesinlikle standart çıkarmayın! UnPack Güvenli Çıkarma modunu kullanarak yolları temizleyin."
             ))
         }
 

@@ -1,7 +1,7 @@
 import SwiftUI
 import AppKit
 
-/// Coffer uygulamasının gerçek arayüz bileşenlerini 2x Retina kalitesinde PNG olarak çıkaran görsel üretici
+/// UnPack uygulamasının gerçek arayüz bileşenlerini 2x Retina kalitesinde PNG olarak çıkaran görsel üretici
 @MainActor
 public final class ScreenshotGenerator {
 
@@ -9,7 +9,7 @@ public final class ScreenshotGenerator {
         let fileManager = FileManager.default
         try? fileManager.createDirectory(atPath: outputDir, withIntermediateDirectories: true)
 
-        print("==> Gerçek Coffer ekran görüntüleri üretiliyor...")
+        print("==> Gerçek UnPack ekran görüntüleri üretiliyor...")
 
         // 1. Ana Arşiv Gezgini Ekranı (Explorer Window)
         generateExplorerScreenshot(targetPath: "\(outputDir)/screenshot-explorer.png")
@@ -87,7 +87,7 @@ public final class ScreenshotGenerator {
 
         let meta = ArchiveMetadata(
             format: .rar,
-            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.3.0.rar"),
+            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/UnPack_Source_v1.7.0.rar"),
             totalFileCount: 6,
             totalDirectoryCount: 2,
             totalUncompressedSize: 1_774_400,
@@ -99,11 +99,11 @@ public final class ScreenshotGenerator {
             volumeCount: 1,
             hasRecoveryRecord: true,
             recoveryRecordPercentage: 3,
-            comment: "Coffer Production Release Package v1.3.0"
+            comment: "UnPack Production Release Package v1.7.0"
         )
 
         let explorerView = ArchiveBrowserView(
-            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/Coffer_Source_v1.3.0.rar"),
+            archiveURL: URL(fileURLWithPath: "/Users/developer/Downloads/UnPack_Source_v1.7.0.rar"),
             items: sampleItems,
             metadata: meta,
             currentPath: .constant(""),
@@ -125,7 +125,7 @@ public final class ScreenshotGenerator {
         )
 
         let framed = MacWindowFrame(
-            title: "Coffer — Coffer_Source_v1.3.0.rar (WinRAR Archive)",
+            title: "UnPack — UnPack_Source_v1.7.0.rar (WinRAR Archive)",
             content: { explorerView }
         )
 
@@ -136,7 +136,7 @@ public final class ScreenshotGenerator {
     private static func generateSettingsScreenshot(targetPath: String) {
         let settingsView = SettingsView(isPresented: .constant(true))
         let framed = MacWindowFrame(
-            title: "Coffer — Ayarlar",
+            title: "UnPack — Ayarlar",
             content: { settingsView }
         )
         render(view: framed, size: CGSize(width: 740, height: 580), to: targetPath)
@@ -145,9 +145,9 @@ public final class ScreenshotGenerator {
     // MARK: - 3. Canlı Otomatik Güncelleme Penceresi
     private static func generateUpdaterScreenshot(targetPath: String) {
         let release = GitHubReleaseInfo(
-            tagName: "v1.0.1",
-            version: "1.0.1",
-            name: "Coffer v1.0.1 — Performans & İkon Güncellemesi",
+            tagName: "v1.7.0",
+            version: "1.7.0",
+            name: "UnPack v1.7.0 — Performans & İkon Güncellemesi",
             body: """
             ✨ Yenilikler:
             • 60 FPS Retina önbellekleme ve O(1) klasör gezinmesi
@@ -155,17 +155,17 @@ public final class ScreenshotGenerator {
             • Gelişmiş Zip Slip güvenlik kalkanı ve başlık şifreleme denetimi
             • Doğrudan arka planda atomik güncelleme desteği
             """,
-            dmgDownloadURL: URL(string: "https://github.com/blackowltr/Coffer/releases/download/v1.0.0/Coffer-1.0.0.dmg"),
+            dmgDownloadURL: URL(string: "https://github.com/blackowltr/UnPack/releases/download/v1.7.0/UnPack-1.7.0.dmg"),
             dmgSize: 15_628_490,
-            htmlURL: URL(string: "https://github.com/blackowltr/Coffer/releases")!
+            htmlURL: URL(string: "https://github.com/blackowltr/UnPack/releases")!
         )
 
-        UpdateDownloadManager.shared.configure(release: release, currentVersion: "1.3.0", isReinstall: false)
+        UpdateDownloadManager.shared.configure(release: release, currentVersion: "1.7.0", isReinstall: false)
         UpdateDownloadManager.shared.state = .downloading(progress: 0.74, downloaded: 11_565_082, total: 15_628_490)
 
         let dialog = UpdateDownloadDialog(onDismiss: {})
         let framed = MacWindowFrame(
-            title: "Coffer Güncelleme",
+            title: "UnPack Güncelleme",
             content: { dialog }
         )
         render(view: framed, size: CGSize(width: 480, height: 380), to: targetPath)
@@ -180,7 +180,7 @@ public final class ScreenshotGenerator {
             onSwitchToExplorer: {}
         )
         let framed = MacWindowFrame(
-            title: "Coffer — Hızlı Mod",
+            title: "UnPack — Hızlı Mod",
             content: { dropZone }
         )
         render(view: framed, size: CGSize(width: 660, height: 460), to: targetPath)

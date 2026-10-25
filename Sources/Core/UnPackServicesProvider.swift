@@ -2,9 +2,9 @@ import AppKit
 import Foundation
 
 /// macOS Finder Sağ Tık (NSServices / Hızlı Eylemler) Yöneticisi
-@objc(CofferServicesProvider)
-public final class CofferServicesProvider: NSObject {
-    public static let shared = CofferServicesProvider()
+@objc(UnPackServicesProvider)
+public final class UnPackServicesProvider: NSObject {
+    public static let shared = UnPackServicesProvider()
 
     private override init() {
         super.init()
@@ -45,7 +45,7 @@ public final class CofferServicesProvider: NSObject {
         return finalURLs
     }
 
-    // MARK: - 1. Finder Sağ Tık: "Coffer ile Buraya Çıkart"
+    // MARK: - 1. Finder Sağ Tık: "UnPack ile Buraya Çıkart"
 
     @objc public func extractHereService(
         _ pboard: NSPasteboard,
@@ -58,34 +58,26 @@ public final class CofferServicesProvider: NSObject {
 
         Task {
             for archiveURL in urls {
-                let parentFolder = archiveURL.deletingLastPathComponent()
+                let parentDir = archiveURL.deletingLastPathComponent()
                 do {
-                    let (items, _) = try await ArchiveManager.shared.openArchive(at: archiveURL)
-                    let (destURL, _) = SmartExtractor.shared.resolveDestinationPath(
-                        archiveURL: archiveURL,
-                        items: items,
-                        baseDestinationURL: parentFolder,
-                        enableSmartExtraction: AppSettings.shared.enableSmartExtraction
-                    )
-
-                    let stream = await ArchiveManager.shared.extract(archiveURL: archiveURL, destinationURL: destURL)
+                    let stream = await ArchiveManager.shared.extract(archiveURL: archiveURL, destinationURL: parentDir)
                     for try await _ in stream {}
 
                     SmartExtractor.shared.performPostExtractionActions(
                         archiveURL: archiveURL,
-                        destinationURL: destURL,
+                        destinationURL: parentDir,
                         trashOriginal: AppSettings.shared.trashArchiveAfterExtract,
                         revealInFinder: true,
                         playSound: AppSettings.shared.playSoundOnCompletion
                     )
                 } catch {
-                    print("Coffer Buraya Çıkart hatası: \(error.localizedDescription)")
+                    print("UnPack Buraya Çıkart hatası: \(error.localizedDescription)")
                 }
             }
         }
     }
 
-    // MARK: - 2. Finder Sağ Tık: "Coffer ile Klasöre Çıkart"
+    // MARK: - 2. Finder Sağ Tık: "UnPack ile Klasöre Çıkart"
 
     @objc public func extractToFolderService(
         _ pboard: NSPasteboard,
@@ -99,12 +91,10 @@ public final class CofferServicesProvider: NSObject {
         Task {
             for archiveURL in urls {
                 let folderName = archiveURL.deletingPathExtension().lastPathComponent
-                let parentFolder = archiveURL.deletingLastPathComponent()
-                let destFolder = parentFolder.appendingPathComponent(folderName, isDirectory: true)
-
-                try? FileManager.default.createDirectory(at: destFolder, withIntermediateDirectories: true)
+                let destFolder = archiveURL.deletingLastPathComponent().appendingPathComponent(folderName, isDirectory: true)
 
                 do {
+                    try FileManager.default.createDirectory(at: destFolder, withIntermediateDirectories: true)
                     let stream = await ArchiveManager.shared.extract(archiveURL: archiveURL, destinationURL: destFolder)
                     for try await _ in stream {}
 
@@ -116,13 +106,13 @@ public final class CofferServicesProvider: NSObject {
                         playSound: AppSettings.shared.playSoundOnCompletion
                     )
                 } catch {
-                    print("Coffer Klasöre Çıkart hatası: \(error.localizedDescription)")
+                    print("UnPack Klasöre Çıkart hatası: \(error.localizedDescription)")
                 }
             }
         }
     }
 
-    // MARK: - 3. Finder Sağ Tık: "Coffer ile Belirtilen Yere Çıkart..."
+    // MARK: - 3. Finder Sağ Tık: "UnPack ile Belirtilen Yere Çıkart..."
 
     @objc public func extractToChosenService(
         _ pboard: NSPasteboard,
@@ -135,7 +125,7 @@ public final class CofferServicesProvider: NSObject {
 
         DispatchQueue.main.async {
             let panel = NSOpenPanel()
-            panel.title = "Coffer - Arşivin Çıkartılacağı Konumu Seçin"
+            panel.title = "UnPack - Arşivin Çıkartılacağı Konumu Seçin"
             panel.prompt = "Buraya Çıkart"
             panel.canChooseFiles = false
             panel.canChooseDirectories = true
@@ -157,7 +147,7 @@ public final class CofferServicesProvider: NSObject {
                                 playSound: AppSettings.shared.playSoundOnCompletion
                             )
                         } catch {
-                            print("Coffer Belirtilen Yere Çıkart hatası: \(error.localizedDescription)")
+                            print("UnPack Belirtilen Yere Çıkart hatası: \(error.localizedDescription)")
                         }
                     }
                 }
@@ -165,9 +155,9 @@ public final class CofferServicesProvider: NSObject {
         }
     }
 
-    // MARK: - 4. Finder Sağ Tık: "Coffer ile Aç ve İncele"
+    // MARK: - 4. Finder Sağ Tık: "UnPack ile Aç ve İncele"
 
-    @objc public func openInCofferService(
+    @objc public func openInUnPackService(
         _ pboard: NSPasteboard,
         userData: String,
         error: AutoreleasingUnsafeMutablePointer<NSString?>
@@ -177,6 +167,7 @@ public final class CofferServicesProvider: NSObject {
 
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
+            NotificationCenter.default.post(name: .unpackFileDropped, object: first)
             NotificationCenter.default.post(name: .cofferFileDropped, object: first)
             if let window = NSApp.windows.first {
                 window.makeKeyAndOrderFront(nil)
@@ -184,7 +175,15 @@ public final class CofferServicesProvider: NSObject {
         }
     }
 
-    // MARK: - 5. Finder Sağ Tık: "Coffer ile Güvenlik Analizi..."
+    @objc public func openInCofferService(
+        _ pboard: NSPasteboard,
+        userData: String,
+        error: AutoreleasingUnsafeMutablePointer<NSString?>
+    ) {
+        openInUnPackService(pboard, userData: userData, error: error)
+    }
+
+    // MARK: - 5. Finder Sağ Tık: "UnPack ile Güvenlik Analizi..."
 
     @objc public func analyzeSecurityService(
         _ pboard: NSPasteboard,
@@ -196,17 +195,19 @@ public final class CofferServicesProvider: NSObject {
 
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
+            NotificationCenter.default.post(name: .unpackFileDropped, object: first)
             NotificationCenter.default.post(name: .cofferFileDropped, object: first)
             if let window = NSApp.windows.first {
                 window.makeKeyAndOrderFront(nil)
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                NotificationCenter.default.post(name: .unpackSecurity, object: nil)
                 NotificationCenter.default.post(name: .cofferSecurity, object: nil)
             }
         }
     }
 
-    // MARK: - 6. Finder Sağ Tık: "Coffer ile Hasarlı Arşivi Onar..."
+    // MARK: - 6. Finder Sağ Tık: "UnPack ile Hasarlı Arşivi Onar..."
 
     @objc public func repairArchiveService(
         _ pboard: NSPasteboard,
@@ -218,17 +219,19 @@ public final class CofferServicesProvider: NSObject {
 
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
+            NotificationCenter.default.post(name: .unpackFileDropped, object: first)
             NotificationCenter.default.post(name: .cofferFileDropped, object: first)
             if let window = NSApp.windows.first {
                 window.makeKeyAndOrderFront(nil)
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                NotificationCenter.default.post(name: .unpackRepair, object: nil)
                 NotificationCenter.default.post(name: .cofferRepair, object: nil)
             }
         }
     }
 
-    // MARK: - 7. Finder Sağ Tık: "Coffer ile Arşivle..." (Format, Düzey, Parola Seçim Penceresi)
+    // MARK: - 7. Finder Sağ Tık: "UnPack ile Arşivle..." (Format, Düzey, Parola Seçim Penceresi)
 
     @objc public func compressDialogService(
         _ pboard: NSPasteboard,
@@ -240,6 +243,7 @@ public final class CofferServicesProvider: NSObject {
 
         DispatchQueue.main.async {
             NSApp.activate(ignoringOtherApps: true)
+            NotificationCenter.default.post(name: .unpackCompressFilesWithDialog, object: urls)
             NotificationCenter.default.post(name: .cofferCompressFilesWithDialog, object: urls)
         }
     }
@@ -270,12 +274,12 @@ public final class CofferServicesProvider: NSObject {
                     NSSound.beep()
                 }
             } catch {
-                print("Coffer Hızlı Sıkıştırma hatası (\(format.rawValue)): \(error.localizedDescription)")
+                print("UnPack Hızlı Sıkıştırma hatası (\(format.rawValue)): \(error.localizedDescription)")
             }
         }
     }
 
-    // MARK: - 8. Finder Sağ Tık: "Coffer ile Hızlı .ZIP Sıkıştır"
+    // MARK: - 8. Finder Sağ Tık: "UnPack ile Hızlı .ZIP Sıkıştır"
 
     @objc public func compressToZipService(
         _ pboard: NSPasteboard,
@@ -286,7 +290,7 @@ public final class CofferServicesProvider: NSObject {
         compressFiles(urls: urls, format: .zip)
     }
 
-    // MARK: - 9. Finder Sağ Tık: "Coffer ile Hızlı .RAR Sıkıştır"
+    // MARK: - 9. Finder Sağ Tık: "UnPack ile Hızlı .RAR Sıkıştır"
 
     @objc public func compressToRarService(
         _ pboard: NSPasteboard,
@@ -297,7 +301,7 @@ public final class CofferServicesProvider: NSObject {
         compressFiles(urls: urls, format: .rar)
     }
 
-    // MARK: - 10. Finder Sağ Tık: "Coffer ile Hızlı .7Z Sıkıştır"
+    // MARK: - 10. Finder Sağ Tık: "UnPack ile Hızlı .7Z Sıkıştır"
 
     @objc public func compressTo7zService(
         _ pboard: NSPasteboard,
@@ -308,7 +312,7 @@ public final class CofferServicesProvider: NSObject {
         compressFiles(urls: urls, format: .sevenZip)
     }
 
-    // MARK: - 11. Finder Sağ Tık: "Coffer ile macOS Artıklarını Temizle"
+    // MARK: - 11. Finder Sağ Tık: "UnPack ile macOS Artıklarını Temizle"
 
     @objc public func cleanMacJunkService(
         _ pboard: NSPasteboard,
@@ -355,4 +359,5 @@ public final class CofferServicesProvider: NSObject {
     }
 }
 
-public typealias MacRARServicesProvider = CofferServicesProvider
+public typealias CofferServicesProvider = UnPackServicesProvider
+public typealias MacRARServicesProvider = UnPackServicesProvider
