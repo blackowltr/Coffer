@@ -233,11 +233,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.servicesProvider = UnPackServicesProvider.shared
         NSUpdateDynamicServices()
 
-        // macOS LaunchServices ve dosya ikonlarını UnPack logosuyla eşitle
-        DefaultAppManager.shared.registerAsDefaultArchiveHandler()
+        // macOS LaunchServices ve dosya ikonlarını UnPack ile kaydet (yalnızca bundle kaydı)
+        _ = LSRegisterURL(Bundle.main.bundleURL as CFURL, true)
 
         // DMG veya Downloads'tan açılmışsa Uygulamalar klasörüne taşımayı öner
         DefaultAppManager.shared.offerMoveToApplicationsIfNeeded()
+
+        // İlk defa kurulurken/açılırken kullanıcıya tek sefer sorarak tüm arşiv formatlarını UnPack ile aç
+        DefaultAppManager.shared.promptToSetDefaultArchiveHandlerIfNeeded()
 
         // UnPack açıkken arka planda sessizce yeni sürüm denetimi yap
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

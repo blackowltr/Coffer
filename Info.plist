@@ -58,7 +58,7 @@
             <array>
                 <string>com.rarlab.rar-archive</string>
                 <string>public.rar</string>
-                <string>com.coffer.rar</string>
+                <string>com.unpack.rar</string>
             </array>
         </dict>
         <!-- 2. ZIP Arşivi -->

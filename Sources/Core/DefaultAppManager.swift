@@ -10,10 +10,34 @@ public final class DefaultAppManager: Sendable {
 
     private init() {}
 
-    /// Desteklenen tüm arşiv uzantılarını UnPack ile ilişkilendirir ve Finder ikonlarını yeniler
+    /// Desteklenen tüm arşiv uzantılarını UnPack ile ilişkilendirir ve Finder ikonlarını yeniler.
+    /// LaunchServices API kullanılarak tüm uzantılar tek seferde, kullanıcıya tek tek sormadan toplu kaydedilir.
     public func registerAsDefaultArchiveHandler(extensions: [String]? = nil) {
         let appURL = Bundle.main.bundleURL
+        let bundleID = (Bundle.main.bundleIdentifier ?? "com.unpack.app") as CFString
         _ = LSRegisterURL(appURL as CFURL, true)
+
+        let knownUTIs: [String] = [
+            "com.rarlab.rar-archive",
+            "public.rar",
+            "com.unpack.rar",
+            "public.zip-archive",
+            "com.pkware.zip-archive",
+            "org.7-zip.7-zip-archive",
+            "public.tar-archive",
+            "public.tar-bzip2-archive",
+            "org.gnu.gnu-zip-archive",
+            "org.gnu.gnu-zip-tar-archive",
+            "public.bzip2-archive",
+            "org.tukaani.xz-archive",
+            "org.tukaani.tar-xz-archive",
+            "public.iso-image",
+            "public.archive"
+        ]
+
+        for uti in knownUTIs {
+            _ = LSSetDefaultRoleHandlerForContentType(uti as CFString, .all, bundleID)
+        }
 
         let targetExtensions = extensions ?? [
             "rar", "cbr", "rev", "r00", "r01",
@@ -25,20 +49,14 @@ public final class DefaultAppManager: Sendable {
 
         for ext in targetExtensions {
             if let utType = UTType(filenameExtension: ext) {
-                NSWorkspace.shared.setDefaultApplication(at: appURL, toOpen: utType) { error in
-                    if let error = error {
-                        print("Varsayılan uygulama ayarlama (\(ext)): \(error.localizedDescription)")
-                    }
-                }
+                _ = LSSetDefaultRoleHandlerForContentType(utType.identifier as CFString, .all, bundleID)
             }
         }
 
-        // DMG uzantısını asla UnPack'e zorlama; macOS'un yerleşik DiskImageMounter uygulamasına bırak/geri yükle
+        // DMG uzantısını asla UnPack'e zorlama; macOS'un yerleşik DiskImageMounter uygulamasına bırak
         if let dmgType = UTType(filenameExtension: "dmg") {
-            let mounterURL = URL(fileURLWithPath: "/System/Library/CoreServices/DiskImageMounter.app")
-            if FileManager.default.fileExists(atPath: mounterURL.path) {
-                NSWorkspace.shared.setDefaultApplication(at: mounterURL, toOpen: dmgType) { _ in }
-            }
+            let mounterBundleID = "com.apple.DiskImageMounter" as CFString
+            _ = LSSetDefaultRoleHandlerForContentType(dmgType.identifier as CFString, .all, mounterBundleID)
         }
 
         // QuickLook ve ikon önbelleğini sıfırlama
@@ -46,6 +64,37 @@ public final class DefaultAppManager: Sendable {
         qlProcess.executableURL = URL(fileURLWithPath: "/usr/bin/qlmanage")
         qlProcess.arguments = ["-r", "cache"]
         try? qlProcess.run()
+    }
+
+    /// İlk kurulumda veya doğrudan açılışta kullanıcıya TEK SEFER sorarak tüm arşiv formatlarını topluca UnPack ile açmayı teklif eder.
+    public func promptToSetDefaultArchiveHandlerIfNeeded() {
+        let hasPromptedKey = "hasPromptedForDefaultArchiveHandler"
+        if UserDefaults.standard.bool(forKey: hasPromptedKey) {
+            return
+        }
+
+        // İlk kurulum sihirbazı henüz tamamlanmadıysa çakışmayı önlemek için ertele
+        if !AppSettings.shared.hasCompletedOnboarding && !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            if UserDefaults.standard.bool(forKey: hasPromptedKey) { return }
+
+            let alert = NSAlert()
+            alert.messageText = "Saptanmış Arşiv Yöneticisi Yapılsın mı?"
+            alert.informativeText = "UnPack'in tüm arşiv formatlarını (.zip, .rar, .7z, .tar, .gz, .xz vb.) tek dokunuşla açabilmesi için saptanmış arşiv uygulaması olarak ayarlanmasını ister misiniz?"
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "Tümünü UnPack ile Aç")
+            alert.addButton(withTitle: "Daha Sonra")
+
+            let response = alert.runModal()
+            UserDefaults.standard.set(true, forKey: hasPromptedKey)
+
+            if response == .alertFirstButtonReturn {
+                self.registerAsDefaultArchiveHandler()
+            }
+        }
     }
 
     /// DMG veya İndirilenler klasöründen çalışıyorsa Uygulamalar klasörüne taşımayı teklif eder

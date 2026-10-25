@@ -925,6 +925,7 @@ public struct OnboardingWizardView: View {
                 await MainActor.run { self.stepState.progressMessage = "Dosya ilişkilendirmeleri kaydediliyor..." }
                 DefaultAppManager.shared.registerAsDefaultArchiveHandler()
             }
+            UserDefaults.standard.set(true, forKey: "hasPromptedForDefaultArchiveHandler")
 
             // 3. Finder sağ tık servisleri
             if isFinderIntegrationSelected {
