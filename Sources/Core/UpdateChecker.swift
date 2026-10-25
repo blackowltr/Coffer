@@ -6,7 +6,7 @@ import AppKit
 public final class UpdateChecker: ObservableObject {
     public static let shared = UpdateChecker()
 
-    public let currentVersion = "1.5.0"
+    public let currentVersion = "1.6.0"
     
     /// GitHub kullanıcı adı ve depo adı (GitHub'a deploy ettiğinizde burayı veya UserDefaults'u güncelleyebilirsiniz)
     @Published public var repoSlug: String {
@@ -33,21 +33,19 @@ public final class UpdateChecker: ObservableObject {
         ProcessInfo.processInfo.environment["MACRAR_NO_UPDATE_CHECK"] == "1"
     }
 
-    /// Otomatik günlük kontrol (Uygulama başladığında sessizce çalıştırılır)
-    public func performDailyCheckIfDue() {
+    /// Arka planda sessiz güncelleme denetimi (Coffer açıkken sessizce denetler, güncelleme varsa pencereyi açar)
+    public func performSilentBackgroundCheck() {
         if isCheckDisabled {
             return
         }
-
-        let lastCheck = UserDefaults.standard.double(forKey: lastCheckKey)
-        let now = Date().timeIntervalSince1970
-        let oneDaySeconds: Double = 86400
-
-        if now - lastCheck >= oneDaySeconds {
-            Task {
-                await checkForUpdates(manual: false)
-            }
+        Task {
+            await checkForUpdates(manual: false)
         }
+    }
+
+    /// Otomatik kontrol (Geriye dönük uyumluluk)
+    public func performDailyCheckIfDue() {
+        performSilentBackgroundCheck()
     }
 
     /// Manuel veya otomatik güncelleme denetimi

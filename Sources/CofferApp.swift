@@ -167,7 +167,7 @@ struct CofferApp: App {
                     }
                 }
 
-                Button("Kurulum ve İzin Sihirbazı...") {
+                Button("Kurulum ve İzinler...") {
                     NotificationCenter.default.post(name: .cofferShowOnboarding, object: nil)
                 }
             }
@@ -220,8 +220,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // DMG veya Downloads'tan açılmışsa Uygulamalar klasörüne taşımayı öner
         DefaultAppManager.shared.offerMoveToApplicationsIfNeeded()
 
-        // Otomatik günlük güncelleme kontrolünü başlat
-        UpdateChecker.shared.performDailyCheckIfDue()
+        // Coffer açıkken arka planda sessizce yeni sürüm denetimi yap
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            UpdateChecker.shared.performSilentBackgroundCheck()
+        }
+
+        // Uygulama açık kaldığı sürece periyodik (4 saatte bir) sessiz denetim
+        Timer.scheduledTimer(withTimeInterval: 14400, repeats: true) { _ in
+            DispatchQueue.main.async {
+                UpdateChecker.shared.performSilentBackgroundCheck()
+            }
+        }
 
         handleCommandLineArguments()
     }

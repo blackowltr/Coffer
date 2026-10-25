@@ -192,7 +192,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
     case general = "Genel"
     case appearance = "Görünüm"
     case compression = "Sıkıştırma"
-    case extraction = "Akıllı Çıkarma"
+    case extraction = "Çıkarma"
     case finder = "Finder & Servisler"
     case about = "Hakkında"
 
@@ -209,7 +209,7 @@ private enum SettingsTab: String, CaseIterable, Identifiable {
         case .compression:
             return "Varsayılan arşivleme formatı, sıkıştırma oranı ve performans simülatörü."
         case .extraction:
-            return "Klasör bombası koruması, akıllı çıkarma kuralları ve hedef konumlar."
+            return "Otomatik klasörleme, dağılma koruması ve hedef konumlar."
         case .finder:
             return "macOS Finder sağ tık doğrudan menü entegrasyonu ve dosya uzantısı eşlemeleri."
         case .about:
@@ -563,14 +563,14 @@ private struct ExtractionSettingsPane: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Klasör Bombası Koruması
-            SettingsCard(title: "Akıllı Çıkarma (Klasör Bombası Koruması)") {
+            // Klasör Dağılma Koruması
+            SettingsCard(title: "Otomatik Klasörleme (Dağılma Koruması)") {
                 VStack(spacing: 0) {
                     SettingsRow(
                         icon: "shield.lefthalf.filled.badge.checkmark",
                         iconColor: .green,
-                        title: "Klasör Bombası Korumasını Etkinleştir",
-                        subtitle: "Masaüstünüzün ve klasörlerinizin binlerce dağınık dosya ile dolmasını engeller."
+                        title: "Klasör Dağılma Korumasını Etkinleştir",
+                        subtitle: "Masaüstünüzün ve klasörlerinizin çok sayıda dağınık dosya ile dolmasını engeller."
                     ) {
                         Toggle("", isOn: $settings.enableSmartExtraction)
                             .toggleStyle(.switch)
@@ -586,7 +586,7 @@ private struct ExtractionSettingsPane: View {
                             .padding(.top, 2)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Akıllı Çıkarma Nasıl Çalışır?")
+                            Text("Otomatik Klasörleme Nasıl Çalışır?")
                                 .font(.system(size: 12, weight: .semibold))
 
                             Text("İçerisinde tek bir ana klasör bulunmayan ve doğrudan kök dizine yayılmış çok sayıda dosya barındıran arşivler tespit edildiğinde; Coffer otomatik olarak arşiv adında yeni bir klasör açar ve dosyaları o klasörün içine güvenle çıkartır.")
@@ -748,7 +748,7 @@ private struct AboutSettingsPane: View {
                         .foregroundColor(.secondary)
                 }
 
-                Text("macOS için Ultra Hızlı, Güvenli ve Akıllı Arşivleme Yöneticisi")
+                Text("macOS için Hızlı, Güvenli ve Sade Arşiv Yöneticisi")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

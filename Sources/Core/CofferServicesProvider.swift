@@ -184,7 +184,7 @@ public final class CofferServicesProvider: NSObject {
         }
     }
 
-    // MARK: - 5. Finder Sağ Tık: "Coffer ile Güvenlik & Akıllı Analiz..."
+    // MARK: - 5. Finder Sağ Tık: "Coffer ile Güvenlik Analizi..."
 
     @objc public func analyzeSecurityService(
         _ pboard: NSPasteboard,

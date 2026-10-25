@@ -135,17 +135,6 @@ public struct MainView: View {
                         }
                         .buttonStyle(.plain)
                         .help("Coffer Ayarları (Cmd+,)")
-
-                        Button(action: {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                showOnboardingWizard = true
-                            }
-                        }) {
-                            Image(systemName: "wand.and.stars")
-                                .font(.system(size: 13))
-                        }
-                        .buttonStyle(.plain)
-                        .help("Kurulum ve Yapılandırma Sihirbazı")
                     }
                 }
                 .padding(.horizontal, 16)

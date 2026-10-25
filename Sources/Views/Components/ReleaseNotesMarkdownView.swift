@@ -164,7 +164,7 @@ public struct ReleaseFeatureItem: Identifiable {
     public var description: String
 }
 
-// MARK: - Akıllı Release Notes Markdown Ayrıştırıcısı
+// MARK: - Sürüm Notları Markdown Ayrıştırıcısı
 public struct ReleaseNotesParser {
     public static func parse(_ text: String) -> [ReleaseNotesSection] {
         var sections: [ReleaseNotesSection] = []

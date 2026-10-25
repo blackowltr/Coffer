@@ -180,7 +180,7 @@ public struct OnboardingWizardView: View {
                     .foregroundColor(.secondary.opacity(0.6))
             }
             .buttonStyle(.plain)
-            .help("Sihirbazı Kapat")
+            .help("Kapat")
         }
     }
 

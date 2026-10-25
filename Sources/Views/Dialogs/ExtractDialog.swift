@@ -83,8 +83,8 @@ public struct ExtractDialog: View {
                     .padding(6)
                 }
 
-                // Akıllı Çıkarma & Seçenekler
-                GroupBox("Akıllı Çıkarma & Otomasyonlar") {
+                // Çıkarma Seçenekleri
+                GroupBox("Çıkarma Seçenekleri") {
                     VStack(alignment: .leading, spacing: 10) {
                         if selectedItemsCount > 0 {
                             Picker("Kapsam:", selection: $extractSelectedOnly) {
@@ -94,7 +94,7 @@ public struct ExtractDialog: View {
                             .pickerStyle(.radioGroup)
                         }
 
-                        Toggle("Akıllı Çıkarma (Klasör Bombası Koruması)", isOn: $useSmartExtraction)
+                        Toggle("Otomatik Klasörleme (Dağılma Koruması)", isOn: $useSmartExtraction)
                             .font(.system(size: 12, weight: .medium))
 
                         Text("Arşivde dağınık dosyalar varsa otomatik yeni klasör açar; zaten tek bir klasör varsa fazladan klasör oluşturmaz.")

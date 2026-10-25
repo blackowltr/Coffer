@@ -261,11 +261,8 @@ public final class TarZipEngine: Sendable {
                     }
 
                     let startTime = Date()
-                    var totalSourceSize: Int64 = 0
-                    for src in sourceURLs {
-                        let attrs = try? FileManager.default.attributesOfItem(atPath: src.path)
-                        totalSourceSize += (attrs?[.size] as? Int64) ?? 1024
-                    }
+                    let sourceStats = CompressionSimulator.shared.analyzeSources(urls: sourceURLs)
+                    let totalSourceSize = max(Int64(1024), sourceStats.totalSize)
 
                     let process = Process()
                     var env = ProcessInfo.processInfo.environment
@@ -363,6 +360,9 @@ public final class TarZipEngine: Sendable {
 
                     try process.run()
 
+                    var currentFraction: Double = 0.05
+                    var lastYieldTime: TimeInterval = 0
+
                     while process.isRunning {
                         if Task.isCancelled {
                             process.terminate()
@@ -371,21 +371,40 @@ public final class TarZipEngine: Sendable {
                             return
                         }
 
-                        let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
-                        let simulatedPercent = min(elapsed / 1.5, 0.94)
-                        let processed = Int64(Double(totalSourceSize) * simulatedPercent)
+                        let now = Date().timeIntervalSinceReferenceDate
+                        if now - lastYieldTime >= 0.033 {
+                            lastYieldTime = now
+                            let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
 
-                        continuation.yield(
-                            ArchiveProgress(
-                                fractionCompleted: simulatedPercent,
-                                currentFilename: sourceURLs.first?.lastPathComponent ?? "Sıkıştırılıyor...",
-                                processedBytes: processed,
-                                totalBytes: max(1, totalSourceSize),
-                                speedBytesPerSecond: Double(processed) / elapsed
+                            // Yazılan dosya boyutu ve zamana göre adaptif akıcı oran:
+                            let writtenBytes = (try? FileManager.default.attributesOfItem(atPath: destinationURL.path)[.size] as? Int64) ?? 0
+                            let estimatedCompressedTotal = max(Int64(1024), Int64(Double(totalSourceSize) * 0.6))
+                            let byteRatio = Double(writtenBytes) / Double(estimatedCompressedTotal)
+
+                            let expectedDuration = max(1.8, Double(totalSourceSize) / 25_000_000.0)
+                            let timeRatio = 1.0 - exp(-elapsed / expectedDuration * 1.3)
+
+                            let targetFraction = min(0.985, max(byteRatio * 0.92, timeRatio * 0.90))
+                            currentFraction = max(currentFraction, targetFraction)
+
+                            let processed = Int64(Double(totalSourceSize) * currentFraction)
+                            let speed = Double(processed) / elapsed
+                            let estRemaining = currentFraction > 0.03 ? max(0.5, (elapsed / currentFraction) * (1.0 - currentFraction)) : nil
+
+                            continuation.yield(
+                                ArchiveProgress(
+                                    fractionCompleted: currentFraction,
+                                    currentFilename: sourceURLs.first?.lastPathComponent ?? "Arşiv sıkıştırılıyor...",
+                                    processedBytes: processed,
+                                    totalBytes: totalSourceSize,
+                                    speedBytesPerSecond: speed,
+                                    estimatedRemainingTime: estRemaining,
+                                    elapsedTime: elapsed
+                                )
                             )
-                        )
+                        }
 
-                        try? await Task.sleep(nanoseconds: 30_000_000)
+                        try? await Task.sleep(nanoseconds: 25_000_000)
                     }
 
                     process.waitUntilExit()

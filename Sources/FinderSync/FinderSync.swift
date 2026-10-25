@@ -2,15 +2,19 @@ import Cocoa
 import FinderSync
 
 /// macOS Finder Sağ Tık Entegrasyonu (Doğrudan Ana Menüde 'Coffer >' Alt Menüsü Sunan FinderSync Uzantısı)
+@objc(FinderSync)
 public class FinderSync: FIFinderSync {
 
     public override init() {
         super.init()
 
-        // Finder'da tüm kullanıcı dizinlerini ve bağlı diskleri izle (Böylece sağ tık her yerde çalışır)
-        let homeURL = URL(fileURLWithPath: NSHomeDirectory())
-        let volumesURL = URL(fileURLWithPath: "/Volumes")
-        FIFinderSyncController.default().directoryURLs = [homeURL, volumesURL, URL(fileURLWithPath: "/")]
+        // Finder'da tüm kullanıcı dizinlerini, kök dizini ve bağlı diskleri izle (Sağ tık ana menüde görünür)
+        var monitoredURLs = Set<URL>()
+        monitoredURLs.insert(URL(fileURLWithPath: "/"))
+        monitoredURLs.insert(URL(fileURLWithPath: "/Users"))
+        monitoredURLs.insert(URL(fileURLWithPath: "/Volumes"))
+        monitoredURLs.insert(FileManager.default.homeDirectoryForCurrentUser)
+        FIFinderSyncController.default().directoryURLs = monitoredURLs
     }
 
     // MARK: - Finder Doğrudan Sağ Tık İçerik Menüsü (Context Menu)
@@ -81,9 +85,9 @@ public class FinderSync: FIFinderSync {
             openItem.image = NSImage(systemSymbolName: "macwindow.on.rectangle", accessibilityDescription: nil)
             subMenu.addItem(openItem)
 
-            // 5. Coffer ile Güvenlik & Akıllı Analiz...
+            // 5. Coffer ile Güvenlik Analizi...
             let securityItem = NSMenuItem(
-                title: "Coffer ile Güvenlik & Akıllı Analiz...",
+                title: "Coffer ile Güvenlik Analizi...",
                 action: #selector(analyzeSecurityAction(_:)),
                 keyEquivalent: ""
             )
@@ -190,18 +194,23 @@ public class FinderSync: FIFinderSync {
 
     private func executeCoffer(arguments: [String]) {
         let pluginURL = Bundle.main.bundleURL
-        let appURL = pluginURL.deletingLastPathComponent().deletingLastPathComponent()
-        let binaryURL = appURL.appendingPathComponent("MacOS/Coffer")
+        // pluginURL: .../Contents/PlugIns/CofferFinderSync.appex -> Coffer.app
+        let appBundleURL = pluginURL.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let fallbackBundleURL = URL(fileURLWithPath: "/Applications/Coffer.app")
+        let targetBundleURL = FileManager.default.fileExists(atPath: appBundleURL.path) ? appBundleURL : fallbackBundleURL
 
-        if FileManager.default.fileExists(atPath: binaryURL.path) {
-            _ = try? Process.run(binaryURL, arguments: arguments)
-            return
-        }
+        let config = NSWorkspace.OpenConfiguration()
+        config.arguments = arguments
+        config.activates = true
 
-        // Yedek Uygulama Yolu
-        let fallbackURL = URL(fileURLWithPath: "/Applications/Coffer.app/Contents/MacOS/Coffer")
-        if FileManager.default.fileExists(atPath: fallbackURL.path) {
-            _ = try? Process.run(fallbackURL, arguments: arguments)
+        NSWorkspace.shared.openApplication(at: targetBundleURL, configuration: config) { _, error in
+            if error != nil {
+                // Yedek: Process ile doğrudan ikiliyi çalıştırmayı dene
+                let binaryURL = targetBundleURL.appendingPathComponent("Contents/MacOS/Coffer")
+                if FileManager.default.fileExists(atPath: binaryURL.path) {
+                    _ = try? Process.run(binaryURL, arguments: arguments)
+                }
+            }
         }
     }
 

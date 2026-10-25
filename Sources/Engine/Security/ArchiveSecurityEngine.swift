@@ -107,7 +107,7 @@ public struct ArchiveSecurityReport: Sendable {
     }
 }
 
-// MARK: - Arşiv Güvenlik ve Akıllı Analiz Motoru
+// MARK: - Arşiv Güvenlik ve Tehdit Analiz Motoru
 
 public final class ArchiveSecurityEngine: Sendable {
     public static let shared = ArchiveSecurityEngine()

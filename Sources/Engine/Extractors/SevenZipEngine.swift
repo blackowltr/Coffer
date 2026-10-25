@@ -611,29 +611,39 @@ public final class SevenZipEngine: Sendable {
                                     }
                                 }
                             }
+                        }
 
-                            // Arayüzü 30 FPS (~33ms) ile sınırla (SwiftUI akıcılığını korur)
-                            let now = Date().timeIntervalSinceReferenceDate
-                            if now - lastYieldTime >= 0.033 {
-                                lastYieldTime = now
-                                let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
-                                let processedBytes = Int64(Double(totalSourceSize) * currentFraction)
-                                let speed = Double(processedBytes) / elapsed
-                                let estRemaining = currentFraction > 0.02 ? (elapsed / currentFraction) * (1.0 - currentFraction) : nil
+                        // Arayüzü 30 FPS (~33ms) ile kesintisiz güncelle (stdout boş olsa bile donma ve %95 takılmasını önler)
+                        let now = Date().timeIntervalSinceReferenceDate
+                        if now - lastYieldTime >= 0.033 {
+                            lastYieldTime = now
+                            let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
 
-                                continuation.yield(
-                                    ArchiveProgress(
-                                        fractionCompleted: currentFraction,
-                                        currentFilename: currentFilename,
-                                        processedBytes: processedBytes,
-                                        totalBytes: max(1, totalSourceSize),
-                                        speedBytesPerSecond: speed,
-                                        estimatedRemainingTime: estRemaining,
-                                        elapsedTime: elapsed,
-                                        processedLog: processedLogs
-                                    )
-                                )
+                            // 7-Zip son aşamada (özellikle %90 üstünde sözlük ve başlık yazarken) stdout çıktısı üretmez;
+                            // Kullanıcıya donma hissi vermemek için ilerlemeyi %99'a kadar yumuşakça akıt:
+                            if currentFraction >= 0.90 && currentFraction < 0.99 {
+                                currentFraction = min(0.99, currentFraction + 0.0015)
+                                if currentFilename.isEmpty || currentFilename.contains("%") {
+                                    currentFilename = "Arşiv başlıkları ve bloklar tamamlanıyor..."
+                                }
                             }
+
+                            let processedBytes = Int64(Double(totalSourceSize) * currentFraction)
+                            let speed = Double(processedBytes) / elapsed
+                            let estRemaining = currentFraction > 0.02 ? max(0.5, (elapsed / currentFraction) * (1.0 - currentFraction)) : nil
+
+                            continuation.yield(
+                                ArchiveProgress(
+                                    fractionCompleted: currentFraction,
+                                    currentFilename: currentFilename,
+                                    processedBytes: processedBytes,
+                                    totalBytes: max(1, totalSourceSize),
+                                    speedBytesPerSecond: speed,
+                                    estimatedRemainingTime: estRemaining,
+                                    elapsedTime: elapsed,
+                                    processedLog: processedLogs
+                                )
+                            )
                         }
                         try? await Task.sleep(nanoseconds: 25_000_000)
                     }

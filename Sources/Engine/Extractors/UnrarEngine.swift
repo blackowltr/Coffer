@@ -230,13 +230,13 @@ public final class UnrarEngine: Sendable {
                     process.standardError = errPipe
 
                     let startTime = Date()
-                    var totalSourceSize: Int64 = 0
-                    for src in sourceURLs {
-                        let attrs = try? FileManager.default.attributesOfItem(atPath: src.path)
-                        totalSourceSize += (attrs?[.size] as? Int64) ?? 1024
-                    }
+                    let sourceStats = CompressionSimulator.shared.analyzeSources(urls: sourceURLs)
+                    let totalSourceSize = max(Int64(1024), sourceStats.totalSize)
+                    let totalFilesCount = max(1, sourceStats.fileCount)
 
                     var processedLogs: [String] = []
+                    var currentFraction: Double = 0.05
+                    var lastYieldTime: TimeInterval = 0
 
                     try process.run()
 
@@ -263,23 +263,46 @@ public final class UnrarEngine: Sendable {
                             }
                         }
 
-                        let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
-                        let simulatedPercent = min(elapsed / 1.5, 0.95)
-                        let processed = Int64(Double(totalSourceSize) * simulatedPercent)
+                        let now = Date().timeIntervalSinceReferenceDate
+                        if now - lastYieldTime >= 0.033 {
+                            lastYieldTime = now
+                            let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
 
-                        continuation.yield(
-                            ArchiveProgress(
-                                fractionCompleted: simulatedPercent,
-                                currentFilename: processedLogs.last ?? (sourceURLs.first?.lastPathComponent ?? "RAR sıkıştırılıyor..."),
-                                processedBytes: processed,
-                                totalBytes: max(1, totalSourceSize),
-                                speedBytesPerSecond: Double(processed) / elapsed,
-                                elapsedTime: elapsed,
-                                processedLog: processedLogs
+                            // 1. Eklenen dosya sayısına göre oran:
+                            let fileRatio = Double(processedLogs.count) / Double(totalFilesCount)
+
+                            // 2. Diske yazılan dosya boyutuna göre oran:
+                            let writtenBytes = (try? FileManager.default.attributesOfItem(atPath: destinationURL.path)[.size] as? Int64) ?? 0
+                            let estimatedCompressedTotal = max(Int64(1024), Int64(Double(totalSourceSize) * 0.55))
+                            let byteRatio = Double(writtenBytes) / Double(estimatedCompressedTotal)
+
+                            // 3. Geçen süreye göre adaptif akış:
+                            let expectedDuration = max(2.0, Double(totalSourceSize) / 20_000_000.0)
+                            let timeRatio = 1.0 - exp(-elapsed / expectedDuration * 1.2)
+
+                            // İlerlemeyi akıcı ve monoton artan şekilde harmanla (Asla aniden %95'e zıplamaz):
+                            let targetFraction = min(0.985, max(fileRatio * 0.92, max(byteRatio * 0.90, timeRatio * 0.88)))
+                            currentFraction = max(currentFraction, targetFraction)
+
+                            let processed = Int64(Double(totalSourceSize) * currentFraction)
+                            let speed = Double(processed) / elapsed
+                            let estRemaining = currentFraction > 0.03 ? max(0.5, (elapsed / currentFraction) * (1.0 - currentFraction)) : nil
+
+                            continuation.yield(
+                                ArchiveProgress(
+                                    fractionCompleted: currentFraction,
+                                    currentFilename: processedLogs.last ?? (sourceURLs.first?.lastPathComponent ?? "RAR arşivi oluşturuluyor..."),
+                                    processedBytes: processed,
+                                    totalBytes: totalSourceSize,
+                                    speedBytesPerSecond: speed,
+                                    estimatedRemainingTime: estRemaining,
+                                    elapsedTime: elapsed,
+                                    processedLog: processedLogs
+                                )
                             )
-                        )
+                        }
 
-                        try? await Task.sleep(nanoseconds: 30_000_000)
+                        try? await Task.sleep(nanoseconds: 25_000_000)
                     }
 
                     process.waitUntilExit()

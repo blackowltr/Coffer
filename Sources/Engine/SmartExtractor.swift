@@ -1,13 +1,13 @@
 import Foundation
 import AppKit
 
-/// Akıllı Çıkarma & Klasör Bombası (Anti-Folder-Bomb) Koruması
+/// Otomatik Klasörleme & Klasör Dağılma Koruması
 public final class SmartExtractor: Sendable {
     public static let shared = SmartExtractor()
 
     private init() {}
 
-    /// Hedef çıkarma yolunu arşiv yapısına göre akıllıca belirler
+    /// Hedef çıkarma yolunu arşiv yapısına göre belirler
     public func resolveDestinationPath(
         archiveURL: URL,
         items: [ArchiveItem],

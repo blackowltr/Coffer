@@ -162,11 +162,11 @@ public struct ArchiveSidebarView: View {
         }
     }
 
-    // MARK: - 3. Akıllı Filtreler Bölümü
+    // MARK: - 3. Dosya Filtreleri Bölümü
     private func smartFiltersSection(categories: [ArchiveCategoryFilter]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                sectionHeaderLabel("AKILLI FİLTRELER", icon: "slider.horizontal.3")
+                sectionHeaderLabel("KATEGORİLER", icon: "line.3.horizontal.decrease.circle")
 
                 Spacer()
 

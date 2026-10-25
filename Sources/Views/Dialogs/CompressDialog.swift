@@ -1,7 +1,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Sade, elit ve modern macOS tasarım standartlarında Yeni Arşiv Oluşturma Penceresi
+/// Apple macOS standartlarında, sade, ölçekli ve kaydırma gerektirmeyen Yeni Arşiv Oluşturma Penceresi
 public struct CompressDialog: View {
     @ObservedObject private var settings = AppSettings.shared
     public let initialSourceURLs: [URL]
@@ -36,7 +36,6 @@ public struct CompressDialog: View {
     @State private var stripMacJunk: Bool = true
     @State private var archiveFileName: String = ""
     @State private var destinationDirectory: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-    @State private var isDropTargeted: Bool = false
     @State private var isSplitArchive: Bool = false
     @State private var splitVolumeSizeMB: Int = 25
 
@@ -91,7 +90,7 @@ public struct CompressDialog: View {
     }
 
     private var targetFileURL: URL {
-        let cleanName = archiveFileName.isEmpty ? "Arşiv" : archiveFileName
+        let cleanName = archiveFileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Arşiv" : archiveFileName
         if isSplitArchive {
             if selectedFormat == .sevenZip {
                 return destinationDirectory.appendingPathComponent("\(cleanName).7z.001")
@@ -108,7 +107,7 @@ public struct CompressDialog: View {
 
     private var sourceSummaryText: String {
         if currentSourceURLs.isEmpty {
-            return "Referans model üzerinden hesaplanıyor"
+            return "Referans model"
         } else if currentSourceURLs.count == 1 {
             return "\(currentSourceURLs[0].lastPathComponent) (\(ByteCountFormatter.string(fromByteCount: simulation.originalTotalSize, countStyle: .file)))"
         } else {
@@ -116,7 +115,6 @@ public struct CompressDialog: View {
         }
     }
 
-    // Seçilen formata göre desteklenen özellikler
     private var supportsEncryption: Bool {
         selectedFormat == .rar || selectedFormat == .sevenZip || selectedFormat == .zip
     }
@@ -143,43 +141,11 @@ public struct CompressDialog: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // 1. BAŞLIK
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(settings.accentColorChoice.color.opacity(0.14))
-                        .frame(width: 38, height: 38)
-
-                    Image(systemName: "archivebox.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(settings.accentColorChoice.color)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Yeni Arşiv Oluştur")
-                        .font(.system(size: 15, weight: .semibold))
-
-                    Text(sourceSummaryText)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                Button(action: chooseSourceFiles) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "plus")
-                        Text("Dosya Ekle")
-                    }
-                    .font(.system(size: 11, weight: .medium))
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 18)
-            .padding(.bottom, 14)
+            // MARK: - 1. Başlık ve Dosya Ekleme
+            headerSection
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 12)
 
             Divider()
 
@@ -188,10 +154,10 @@ public struct CompressDialog: View {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(settings.accentColorChoice.color)
-                    Text("RAR formatında arşiv oluşturmak için RAR for macOS aracı gereklidir.")
+                    Text("RAR formatı için RAR aracı gereklidir.")
                         .font(.system(size: 11))
                     Spacer()
-                    Button("RAR Aracını İndir") {
+                    Button("İndir") {
                         if let url = URL(string: "https://www.rarlab.com/download.htm") {
                             NSWorkspace.shared.open(url)
                         }
@@ -199,290 +165,136 @@ public struct CompressDialog: View {
                     .controlSize(.small)
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(settings.accentColorChoice.color.opacity(0.12))
+                .padding(.vertical, 6)
+                .background(settings.accentColorChoice.color.opacity(0.10))
                 Divider()
             }
 
-            // 2. ANA İÇERİK
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 14) {
-                    // Canlı Referans ve Tahmin Kartı
-                    if settings.enableSizeSimulator {
-                        liveEstimateCard
-                            .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
-                                handleDroppedFiles(providers: providers)
-                                return true
-                            }
-                    }
+            // MARK: - 2. Ana Form İçeriği (Kaydırma Yok, Ekrana Tam Sığar)
+            VStack(spacing: 12) {
+                // Dosya Adı ve Format Seçici
+                nameAndFormatRow
 
-                    // Biçim ve Seviye Kartı
-                    formatAndLevelCard
+                // Hedef Klasör ve Sıkıştırma Düzeyi
+                destinationAndLevelRow
 
-                    // Dosya Adı ve Hedef Dizin
-                    fileAndDestinationCard
+                // Seçenekler & Güvenlik Izgarası (2 Sütunlu)
+                optionsGridSection
 
-                    // Güvenlik ve Gelişmiş Seçenekler
-                    optionsCard
+                // Kompakt Canlı Boyut ve Tasarruf Paneli
+                if settings.enableSizeSimulator {
+                    compactEstimateBar
                 }
-                .padding(18)
             }
+            .padding(18)
+
+            Spacer(minLength: 0)
 
             Divider()
 
-            // 3. ALT AKSİYON BARI
-            HStack(spacing: 12) {
-                Button("İptal") {
-                    isPresented = false
-                }
-                .keyboardShortcut(.cancelAction)
-
-                Spacer()
-
-                Button("Arşiv Oluştur") {
-                    isPresented = false
-                    let pass = isPasswordProtected && !password.isEmpty ? password : nil
-                    let splitMB = isSplitArchive ? splitVolumeSizeMB : nil
-                    onStartCompressWithOptions(
-                        selectedFormat,
-                        selectedLevel,
-                        pass,
-                        encryptHeaders && supportsHeaderEncryption,
-                        isSolid && supportsSolid,
-                        splitMB,
-                        hasRecoveryRecord && supportsRecoveryRecord,
-                        isSFX && supportsSFX,
-                        deleteSources,
-                        stripMacJunk,
-                        targetFileURL,
-                        currentSourceURLs
-                    )
-                }
-                .keyboardShortcut(.defaultAction)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.regular)
-                .disabled(currentSourceURLs.isEmpty && !sourceStats.isSampleReference)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(Color(NSColor.windowBackgroundColor))
+            // MARK: - 3. Alt Aksiyon Butonları
+            footerActionSection
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(width: 520, height: 600)
+        .frame(width: 550, height: 475)
         .tint(settings.accentColorChoice.color)
     }
 
-    // MARK: - Kart Bileşenleri
+    // MARK: - 1. Başlık
+    private var headerSection: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(settings.accentColorChoice.color.opacity(0.12))
+                    .frame(width: 32, height: 32)
 
-    private var liveEstimateCard: some View {
-        VStack(spacing: 10) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Orijinal Boyut")
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                    Text(ByteCountFormatter.string(fromByteCount: simulation.originalTotalSize, countStyle: .file))
-                        .font(.system(size: 13, weight: .medium, design: .monospaced))
-                }
-
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary.opacity(0.6))
-                    .padding(.horizontal, 10)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Tahmini Boyut")
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                    Text(ByteCountFormatter.string(fromByteCount: simulation.estimatedCompressedSize, countStyle: .file))
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
-                        .foregroundColor(settings.accentColorChoice.color)
-                }
-
-                Spacer()
-
-                if simulation.savingsPercentage > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 9))
-                        Text("%\(String(format: "%.0f", simulation.savingsPercentage)) Tasarruf")
-                            .font(.system(size: 11, weight: .semibold))
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.green.opacity(0.12))
-                    .foregroundColor(.green)
-                    .clipShape(Capsule())
-                }
+                Image(systemName: "archivebox.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(settings.accentColorChoice.color)
             }
 
-            GeometryReader { geo in
-                let ratio = simulation.originalTotalSize > 0
-                    ? max(0.04, min(1.0, Double(simulation.estimatedCompressedSize) / Double(simulation.originalTotalSize)))
-                    : 0.5
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Yeni Arşiv Oluştur")
+                    .font(.system(size: 14, weight: .semibold))
 
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.secondary.opacity(0.15))
-                        .frame(height: 5)
-
-                    Capsule()
-                        .fill(settings.accentColorChoice.color)
-                        .frame(width: max(8, geo.size.width * CGFloat(ratio)), height: 5)
-                }
-            }
-            .frame(height: 5)
-
-            HStack {
-                Text(simulation.formatBadge)
-                    .font(.system(size: 10, weight: .medium))
+                Text(sourceSummaryText)
+                    .font(.system(size: 11))
                     .foregroundColor(.secondary)
-
-                Text("•")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary.opacity(0.5))
-
-                Text(simulation.speedLabel)
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-
-                Spacer()
-
-                if simulation.isSampleReference {
-                    Text("Örnek Referans")
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(.secondary.opacity(0.8))
-                }
-            }
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
-        )
-    }
-
-    private var formatAndLevelCard: some View {
-        VStack(spacing: 14) {
-            // Biçim Seçici (Apple Liquid Glass Format Seçici - 2 Sıralı Simetrik Izgara)
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Biçim")
-                        .font(.system(size: 12, weight: .semibold))
-                    Spacer()
-                    Text(selectedFormat.localizedDescription)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-
-                LiquidGlassFormatPicker(selection: $selectedFormat)
+                    .lineLimit(1)
             }
 
-            Divider()
-                .opacity(0.4)
+            Spacer()
 
-            // Sıkıştırma Seviyesi (Tam Genişlikte, Simetrik Apple Menüsü)
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Düzey")
-                        .font(.system(size: 12, weight: .semibold))
-                    Spacer()
-                    Text(selectedLevel.localizedDescription)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
+            Button(action: chooseSourceFiles) {
+                HStack(spacing: 4) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 10, weight: .bold))
+                    Text("Dosya Ekle")
+                        .font(.system(size: 11, weight: .medium))
                 }
-
-                Menu {
-                    ForEach(CompressionLevel.allCases) { lvl in
-                        Button(action: {
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
-                                selectedLevel = lvl
-                            }
-                        }) {
-                            HStack {
-                                Text(lvl.title)
-                                if selectedLevel == lvl {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: levelIcon(for: selectedLevel))
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(settings.accentColorChoice.color)
-
-                        Text(selectedLevel.title)
-                            .font(.system(size: 12, weight: .medium))
-
-                        Spacer()
-
-                        Image(systemName: "chevron.up.chevron.down")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 7)
-                    .background(Color(NSColor.textBackgroundColor))
-                    .cornerRadius(6)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
-                    )
-                }
-                .menuStyle(.borderlessButton)
             }
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
-        )
-    }
-
-    private func levelIcon(for level: CompressionLevel) -> String {
-        switch level {
-        case .store: return "bolt.horizontal.fill"
-        case .fastest: return "hare.fill"
-        case .fast: return "bolt.fill"
-        case .normal: return "gauge.medium"
-        case .good: return "leaf.fill"
-        case .best: return "crown.fill"
+            .buttonStyle(.bordered)
+            .controlSize(.small)
         }
     }
 
-    private var fileAndDestinationCard: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 10) {
+    // MARK: - 2. İsim & Format
+    private var nameAndFormatRow: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text("Arşiv Adı")
-                    .font(.system(size: 12, weight: .medium))
-                    .frame(width: 80, alignment: .leading)
-
-                TextField("Arşiv adı", text: $archiveFileName)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 12))
-
-                LiquidGlassFormatBadge(format: selectedFormat, size: .small)
-            }
-
-            HStack(spacing: 10) {
-                Text("Hedef")
-                    .font(.system(size: 12, weight: .medium))
-                    .frame(width: 80, alignment: .leading)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
 
                 HStack(spacing: 6) {
-                    Image(systemName: "folder")
+                    TextField("Arşiv Adı", text: $archiveFileName)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.system(size: 12))
+
+                    Text(".\(selectedFormat.primaryExtension)")
+                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                        .foregroundColor(settings.accentColorChoice.color)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(settings.accentColorChoice.color.opacity(0.10))
+                        )
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Biçim")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                Picker("", selection: $selectedFormat) {
+                    Text("ZIP").tag(ArchiveFormat.zip)
+                    Text("RAR").tag(ArchiveFormat.rar)
+                    Text("7Z").tag(ArchiveFormat.sevenZip)
+                    Text("TAR").tag(ArchiveFormat.tar)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 200)
+            }
+        }
+    }
+
+    // MARK: - 3. Hedef Konum & Sıkıştırma Düzeyi
+    private var destinationAndLevelRow: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Kayıt Konumu")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "folder.fill")
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
-                        .font(.system(size: 11))
 
                     Text(destinationDirectory.lastPathComponent)
                         .font(.system(size: 12))
@@ -497,185 +309,246 @@ public struct CompressDialog: View {
                     .buttonStyle(.plain)
                     .foregroundColor(settings.accentColorChoice.color)
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(Color(NSColor.textBackgroundColor))
                 .cornerRadius(6)
                 .overlay(
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
+                        .strokeBorder(Color(NSColor.separatorColor).opacity(0.5), lineWidth: 0.8)
                 )
             }
+            .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Sıkıştırma Düzeyi")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                Picker("", selection: $selectedLevel) {
+                    ForEach(CompressionLevel.allCases) { lvl in
+                        Text(lvl.title).tag(lvl)
+                    }
+                }
+                .frame(width: 200)
+            }
         }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
-        )
     }
 
-    private var optionsCard: some View {
-        VStack(spacing: 10) {
-            // Parola Koruması (AES-256)
-            Toggle(isOn: $isPasswordProtected.animation(.spring(response: 0.28, dampingFraction: 0.8))) {
-                HStack(spacing: 6) {
-                    Image(systemName: "lock.shield")
-                        .font(.system(size: 11))
-                        .foregroundColor(supportsEncryption ? settings.accentColorChoice.color : .secondary)
-                    Text("Parola Koruması")
-                        .font(.system(size: 12))
+    // MARK: - 4. Seçenekler & Güvenlik Izgarası (2 Sütunlu Kompakt)
+    private var optionsGridSection: some View {
+        HStack(alignment: .top, spacing: 14) {
+            // Sol Sütun: Güvenlik ve Katı Arşiv
+            VStack(alignment: .leading, spacing: 9) {
+                Toggle(isOn: $isPasswordProtected.animation(.spring(response: 0.25))) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "lock.shield")
+                            .font(.system(size: 11))
+                            .foregroundColor(supportsEncryption ? settings.accentColorChoice.color : .secondary)
+                        Text("Parola Koruması (AES-256)")
+                            .font(.system(size: 11.5))
+                    }
                 }
-            }
-            .toggleStyle(.checkbox)
-            .disabled(!supportsEncryption)
-            .frame(maxWidth: .infinity, alignment: .leading)
+                .toggleStyle(.checkbox)
+                .disabled(!supportsEncryption)
 
-            if isPasswordProtected && supportsEncryption {
-                VStack(spacing: 8) {
-                    HStack(spacing: 10) {
-                        Text("Parola")
-                            .font(.system(size: 12, weight: .medium))
-                            .frame(width: 80, alignment: .leading)
-
+                if isPasswordProtected && supportsEncryption {
+                    HStack(spacing: 6) {
                         SecureField("Parola belirleyin", text: $password)
                             .textFieldStyle(.roundedBorder)
-                            .font(.system(size: 12))
-                    }
+                            .font(.system(size: 11.5))
 
-                    // Dosya Adlarını Şifrele (-hp / -mhe)
-                    Toggle(isOn: $encryptHeaders) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "text.badge.lock")
+                        if supportsHeaderEncryption {
+                            Toggle("Adları Gizle", isOn: $encryptHeaders)
+                                .font(.system(size: 10.5))
+                                .toggleStyle(.checkbox)
+                        }
+                    }
+                    .padding(.leading, 18)
+                }
+
+                Toggle(isOn: $isSolid) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "cube.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(supportsSolid ? .purple : .secondary)
+                        Text("Katı Arşiv (Daha Yüksek Sıkıştırma)")
+                            .font(.system(size: 11.5))
+                    }
+                }
+                .toggleStyle(.checkbox)
+                .disabled(!supportsSolid)
+
+                if supportsRecoveryRecord {
+                    Toggle(isOn: $hasRecoveryRecord) {
+                        HStack(spacing: 5) {
+                            Image(systemName: "cross.case.fill")
                                 .font(.system(size: 11))
-                            Text("Dosya Adlarını Şifrele")
-                                .font(.system(size: 11))
+                                .foregroundColor(.green)
+                            Text("Kurtarma Kaydı Ekle (%3)")
+                                .font(.system(size: 11.5))
                         }
                     }
                     .toggleStyle(.checkbox)
-                    .disabled(!supportsHeaderEncryption)
-                    .padding(.leading, 80)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.top, 2)
-            }
-
-            // Katı Arşiv (Solid)
-            Toggle(isOn: $isSolid) {
-                HStack(spacing: 6) {
-                    Image(systemName: "cube.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(supportsSolid ? .purple : .secondary)
-                    Text("Katı Arşiv (Solid)")
-                        .font(.system(size: 12))
                 }
             }
-            .toggleStyle(.checkbox)
-            .disabled(!supportsSolid)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            // Kurtarma Kaydı (Recovery Record - RAR)
-            Toggle(isOn: $hasRecoveryRecord) {
-                HStack(spacing: 6) {
-                    Image(systemName: "cross.case.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(supportsRecoveryRecord ? .green : .secondary)
-                    Text("Kurtarma Kaydı Ekle (%3)")
-                        .font(.system(size: 12))
-                }
-            }
-            .toggleStyle(.checkbox)
-            .disabled(!supportsRecoveryRecord)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            // Çok Parçalı Arşiv (Split / Multi-volume)
-            Toggle(isOn: $isSplitArchive.animation(.spring(response: 0.28, dampingFraction: 0.8))) {
-                HStack(spacing: 6) {
-                    Image(systemName: "square.split.2x1")
-                        .font(.system(size: 11))
-                        .foregroundColor(.indigo)
-                    Text("Arşivi Ciltlere Böl")
-                        .font(.system(size: 12))
-                }
-            }
-            .toggleStyle(.checkbox)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            if isSplitArchive {
-                HStack(spacing: 10) {
-                    Text("Cilt Boyutu")
-                        .font(.system(size: 12, weight: .medium))
-                        .frame(width: 80, alignment: .leading)
-
-                    Picker("", selection: $splitVolumeSizeMB) {
-                        Text("10 MB (Web)").tag(10)
-                        Text("25 MB (E-posta Eki)").tag(25)
-                        Text("100 MB (Hızlı Paylaşım)").tag(100)
-                        Text("700 MB (CD)").tag(700)
-                        Text("4000 MB (FAT32)").tag(4000)
-                        Text("4700 MB (DVD)").tag(4700)
+            // Sağ Sütun: Temizlik ve Ciltlere Bölme
+            VStack(alignment: .leading, spacing: 9) {
+                Toggle(isOn: $stripMacJunk) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11))
+                            .foregroundColor(.mint)
+                        Text("macOS Artıklarını Temizle (.DS_Store)")
+                            .font(.system(size: 11.5))
                     }
-                    .labelsHidden()
                 }
-                .padding(.top, 2)
-            }
+                .toggleStyle(.checkbox)
 
-            // SFX (Kendinden Açılan Arşiv)
-            Toggle(isOn: $isSFX) {
-                HStack(spacing: 6) {
-                    Image(systemName: "play.circle.fill")
-                        .font(.system(size: 11))
-                        .foregroundColor(supportsSFX ? .blue : .secondary)
-                    Text("Kendinden Açılan Arşiv (SFX)")
-                        .font(.system(size: 12))
+                Toggle(isOn: $deleteSources) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 11))
+                            .foregroundColor(.red)
+                        Text("Orijinal Dosyaları Sil")
+                            .font(.system(size: 11.5))
+                    }
                 }
-            }
-            .toggleStyle(.checkbox)
-            .disabled(!supportsSFX)
-            .frame(maxWidth: .infinity, alignment: .leading)
+                .toggleStyle(.checkbox)
 
-            // Kaynakları Sil
-            Toggle(isOn: $deleteSources) {
-                HStack(spacing: 6) {
-                    Image(systemName: "trash")
-                        .font(.system(size: 11))
-                        .foregroundColor(.red)
-                    Text("Tamamlandıktan sonra kaynak dosyaları sil")
-                        .font(.system(size: 12))
+                Toggle(isOn: $isSplitArchive.animation(.spring(response: 0.25))) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "square.split.2x1")
+                            .font(.system(size: 11))
+                            .foregroundColor(.indigo)
+                        Text("Ciltlere Böl (Multi-volume)")
+                            .font(.system(size: 11.5))
+                    }
                 }
-            }
-            .toggleStyle(.checkbox)
-            .frame(maxWidth: .infinity, alignment: .leading)
+                .toggleStyle(.checkbox)
 
-            // macOS Artıkları Temizliği
-            Toggle(isOn: $stripMacJunk) {
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 11))
-                        .foregroundColor(.mint)
-                    Text("macOS sistem artıklarını temizle (.DS_Store)")
-                        .font(.system(size: 12))
+                if isSplitArchive {
+                    HStack(spacing: 6) {
+                        Text("Cilt:")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+
+                        Picker("", selection: $splitVolumeSizeMB) {
+                            Text("25 MB (E-posta)").tag(25)
+                            Text("100 MB (Web)").tag(100)
+                            Text("700 MB (CD)").tag(700)
+                            Text("4 GB (FAT32)").tag(4000)
+                        }
+                        .labelsHidden()
+                        .controlSize(.small)
+                    }
+                    .padding(.leading, 18)
                 }
             }
-            .toggleStyle(.checkbox)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(14)
+        .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color(NSColor.controlBackgroundColor))
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor).opacity(0.6))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .strokeBorder(Color(NSColor.separatorColor).opacity(0.4), lineWidth: 0.8)
         )
     }
 
-    // MARK: - Dosya & Dizin Seçimi
+    // MARK: - 5. Kompakt Canlı Boyut & Tasarruf Göstergesi
+    private var compactEstimateBar: some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 4) {
+                Text("Orijinal:")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                Text(ByteCountFormatter.string(fromByteCount: simulation.originalTotalSize, countStyle: .file))
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+            }
 
+            Image(systemName: "arrow.right")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundColor(.secondary.opacity(0.5))
+
+            HStack(spacing: 4) {
+                Text("Tahmini:")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                Text(ByteCountFormatter.string(fromByteCount: simulation.estimatedCompressedSize, countStyle: .file))
+                    .font(.system(size: 11.5, weight: .bold, design: .monospaced))
+                    .foregroundColor(settings.accentColorChoice.color)
+            }
+
+            Spacer()
+
+            if simulation.savingsPercentage > 0 {
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 9))
+                    Text("%\(String(format: "%.0f", simulation.savingsPercentage)) Tasarruf")
+                        .font(.system(size: 10.5, weight: .semibold))
+                }
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Color.green.opacity(0.12))
+                .foregroundColor(.green)
+                .clipShape(Capsule())
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(Color(NSColor.separatorColor).opacity(0.3), lineWidth: 0.6)
+        )
+    }
+
+    // MARK: - 6. Alt Aksiyon Barı
+    private var footerActionSection: some View {
+        HStack(spacing: 12) {
+            Button("Vazgeç") {
+                isPresented = false
+            }
+            .keyboardShortcut(.cancelAction)
+
+            Spacer()
+
+            Button("Arşiv Oluştur") {
+                isPresented = false
+                let pass = isPasswordProtected && !password.isEmpty ? password : nil
+                let splitMB = isSplitArchive ? splitVolumeSizeMB : nil
+                onStartCompressWithOptions(
+                    selectedFormat,
+                    selectedLevel,
+                    pass,
+                    encryptHeaders && supportsHeaderEncryption,
+                    isSolid && supportsSolid,
+                    splitMB,
+                    hasRecoveryRecord && supportsRecoveryRecord,
+                    isSFX && supportsSFX,
+                    deleteSources,
+                    stripMacJunk,
+                    targetFileURL,
+                    currentSourceURLs
+                )
+            }
+            .keyboardShortcut(.defaultAction)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .disabled(currentSourceURLs.isEmpty && !sourceStats.isSampleReference)
+        }
+    }
+
+    // MARK: - Dosya Seçimi
     private func chooseDestination() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -698,51 +571,8 @@ public struct CompressDialog: View {
         panel.message = "Sıkıştırılacak dosya ve klasörleri seçin:"
 
         if panel.runModal() == .OK, !panel.urls.isEmpty {
-            addSourceURLs(panel.urls)
-        }
-    }
-
-    private func addSourceURLs(_ urls: [URL]) {
-        var merged = currentSourceURLs
-        for url in urls where !merged.contains(url) {
-            merged.append(url)
-        }
-        currentSourceURLs = merged
-
-        if archiveFileName.isEmpty || archiveFileName == "Yeni_Arşiv" {
-            archiveFileName = merged.first?.deletingPathExtension().lastPathComponent ?? "Yeni_Arşiv"
-        }
-
-        Task {
-            let stats = CompressionSimulator.shared.analyzeSources(urls: merged)
-            await MainActor.run {
-                withAnimation(.spring(response: 0.35)) {
-                    self.sourceStats = stats
-                }
-            }
-        }
-    }
-
-    private func handleDroppedFiles(providers: [NSItemProvider]) {
-        var droppedURLs: [URL] = []
-        let group = DispatchGroup()
-
-        for provider in providers {
-            group.enter()
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
-                defer { group.leave() }
-                if let data = item as? Data, let url = URL(dataRepresentation: data, relativeTo: nil) {
-                    droppedURLs.append(url)
-                } else if let url = item as? URL {
-                    droppedURLs.append(url)
-                }
-            }
-        }
-
-        group.notify(queue: .main) {
-            if !droppedURLs.isEmpty {
-                self.addSourceURLs(droppedURLs)
-            }
+            currentSourceURLs.append(contentsOf: panel.urls)
+            sourceStats = CompressionSimulator.shared.analyzeSources(urls: currentSourceURLs)
         }
     }
 }
