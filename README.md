@@ -1,101 +1,121 @@
-# Coffer
+<div align="center">
+  <img src="docs/assets/app-icon.png" width="112" height="112" alt="Coffer Logo" />
+  <h1>Coffer</h1>
+  <p><strong>macOS için hızlı, sade ve güvenli arşiv yöneticisi.</strong></p>
 
-**macOS için modern, akıllı ve zarif arşiv yöneticisi.**
-
-[![Web Sitesi](https://img.shields.io/badge/Web_Sitesi-blackowltr.github.io%2FCoffer-3b82f6?style=for-the-badge&logo=safari&logoColor=white)](https://blackowltr.github.io/Coffer/)
-[![Son Sürüm](https://img.shields.io/github/v/release/blackowltr/Coffer?style=for-the-badge&color=8b5cf6&label=S%C3%BCr%C3%BCm)](https://github.com/blackowltr/Coffer/releases)
-[![Platform](https://img.shields.io/badge/Platform-macOS%2014%2B%20(Sonoma%20%26%20Sequoia)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/blackowltr/Coffer)
-[![Lisans](https://img.shields.io/badge/Lisans-MIT-green?style=for-the-badge)](LICENSE)
-
-> 🌐 **Canlı Tanıtım Sitesi:** Coffer'ın arayüz vitrini, özellikler tablosu ve detaylı bilgilerine web sitemizden göz atabilirsiniz: **[blackowltr.github.io/Coffer](https://blackowltr.github.io/Coffer/)**
-
-Coffer; hafif, hızlı ve macOS tasarım standartlarına sadık kalınarak saf Swift ve SwiftUI ile geliştirilmiş bir arşiv yönetim uygulamasıdır.
-
-Apple Silicon (M1–M4) ve Intel işlemcileri evrensel (Universal Binary) olarak yerel hızda destekler; arka planda sistem kaynaklarını yormadan güvenli ve akıcı bir arşivleme deneyimi sunar.
+  <p>
+    <a href="https://blackowltr.github.io/Coffer/"><img src="https://img.shields.io/badge/Web_Sitesi-blackowltr.github.io%2FCoffer-007AFF?style=flat-square&logo=safari&logoColor=white" alt="Web Sitesi" /></a>
+    <a href="https://github.com/blackowltr/Coffer/releases"><img src="https://img.shields.io/github/v/release/blackowltr/Coffer?style=flat-square&color=34C759&label=S%C3%BCr%C3%BCm" alt="Sürüm" /></a>
+    <a href="https://github.com/blackowltr/Coffer"><img src="https://img.shields.io/badge/Platform-macOS%2014%2B%20(Sonoma%20%26%20Sequoia)-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-grey?style=flat-square" alt="Lisans" /></a>
+  </p>
+</div>
 
 ---
 
-## ✨ Temel Özellikler
+Coffer; macOS işletim sisteminin modern tasarım diline sadık kalınarak saf Swift ve SwiftUI ile geliştirilmiş bir arşiv yönetim aracıdır. 
 
-### 1. 🗂️ Çift Çalışma Modu
-* **Gezgin Modu:** Arşiv içeriğini diske çıkarmadan doğrudan görüntüleyin. Ağaç yapısındaki kenar çubuğu ve dosya listesi üzerinden klasörler arasında gezinin, aradığınız dosyaları hızla filtreleyin veya Quick Look ile anında önizleyin.
-* **Hızlı Bırakma Alanı:** Dosyalarınızı pencereye sürükleyip bırakarak saniyeler içinde yeni bir arşiv oluşturun veya mevcut arşivleri tek adımda açın.
+ZIP, RAR, 7Z ve TAR arşivlerini diske çıkarmadan incelemenizi, aradığınız dosyaları Quick Look ile anında önizlemenizi, masaüstünüzü dağıtmadan dosyalarınızı ayıklamanızı ve güvenli yeni arşivler oluşturmanızı sağlar.
 
-### 2. 🛡️ Akıllı Çıkarma (Smart Extraction)
-* Çok sayıda dağınık dosyadan oluşan arşivlerde masaüstünüzün düzenini korumak için içeriği otomatik olarak arşiv adını taşıyan bir klasör içine açar.
-* Zaten tek bir ana klasör barındıran arşivleri doğrudan hedef dizine çıkararak gereksiz iç içe klasör oluşumunu engeller.
+Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal Binary) hızda çalışır; arka planda sistem kaynaklarını tüketmeden akıcı bir deneyim sunar.
 
-### 3. 🖱️ Finder Entegrasyonu
-* macOS Finder üzerinden dosya ve arşivlere sağ tıklayarak doğrudan işlem yapın:
+---
+
+## Öne Çıkan Özellikler
+
+### 🗂️ Arşiv Gezgini ve Önizleme
+* **Çıkarmadan İnceleme:** Arşivi diske açmaya gerek kalmadan klasör hiyerarşisinde rahatça dolaşın.
+* **Quick Look Desteği:** Boşluk (`Space`) tuşuna basarak metinleri, kodları, PDF'leri ve görselleri anında önizleyin.
+* **İki Farklı Görünüm:** Tercihinize göre Finder tarzı simge (ızgara) görünümü veya ayrıntılı liste görünümü arasında tek tıkla geçiş yapın.
+* **Anında Arama:** `⌘F` kısayoluyla arşiv içindeki yüzlerce dosya arasında gecikmesiz filtreleme yapın.
+
+### 🖱️ Doğrudan Finder Entegrasyonu
+* Finder üzerinde herhangi bir dosyaya veya arşive sağ tıkladığınızda Coffer eylemleri doğrudan ana menüde listelenir:
   * **Buraya Çıkart**
   * **Klasöre Çıkart**
-  * **ZIP Olarak Sıkıştır**
-  * **Coffer ile Sıkıştır...** (Gelişmiş seçenekler)
+  * **Coffer ile Aç ve İncele**
+  * **Hızlı .ZIP / .RAR / .7Z Sıkıştır**
+  * **Coffer ile Arşivle...** (Gelişmiş seçenekler)
 
-### 4. 🔒 Güvenlik ve Bütünlük
-* **AES-256 Şifreleme:** Arşivlerinizi güçlü parolalar ve isteğe bağlı başlık (dosya adı) şifrelemesiyle koruyun.
-* **Güvenlik Taraması:** Arşiv açılmadan önce Zip Slip güvenlik açıklarına ve gizli yürütülebilir dosyalara karşı otomatik ön kontrol sağlar.
-* **Bütünlük Testi:** Arşiv dosyalarının sağlamlığını ve sağlama toplamlarını (CRC32) tek tıkla test edin.
+### 🛡️ Otomatik Klasörleme (Dağılma Koruması)
+* Arşivin içinde tek bir ana klasör yoksa ve dosyalar kök dizine yayılmışsa, Coffer masaüstünüzün dağılmasını engellemek için otomatik olarak arşiv adında bir klasör oluşturur ve dosyaları içine yerleştirir.
+* Arşiv zaten tek bir klasör içeriyorsa fazladan iç içe klasör yaratmaz.
 
-### 5. 🔄 Arşiv Dönüştürme & Karşılaştırma
-* **Format Dönüştürücü:** Arşivleri diske çıkarmaya gerek kalmadan doğrudan farklı bir formata (ör. RAR'dan 7Z veya ZIP'e) dönüştürün.
-* **Arşiv Farkı (Diff):** İki arşiv arasındaki eklenen, silinen ve güncellenen dosyaları görsel rozetlerle karşılaştırın.
+### 🔒 Güvenlik ve Şifreleme
+* **AES-256 Güvenliği:** Arşivlerinizi güçlü parolalarla şifreleyin. İsteğe bağlı olarak dosya adlarını da gizleyerek tam gizlilik sağlayın.
+* **Zararlı Dosya Taraması:** Güvensiz betikleri, gizli yürütülebilir dosyaları ve dizin aşımı (Zip Slip) açıklarını arşiv açılmadan önce tespit eder.
+* **Bütünlük Doğrulaması:** Arşivin bozulup bozulmadığını sağlama toplamları (CRC32/SHA) üzerinden tek tıkla test edin.
 
-### 6. 🎨 Kişiselleştirilebilir Modern Tasarım
-* macOS Sequoia ve Sonoma arayüz estetiğiyle tam uyum.
-* Seçilen vurgu rengine duyarlı modern ve minimalist bileşenler.
-* Koyu ve açık tema desteği.
+### ⚙️ Sade Arşiv Oluşturma
+* Ekrana tam sığan, kaydırma gerektirmeyen şık tasarım.
+* Sıkıştırma düzeyini ayarlayın (Depola, Hızlı, Normal, En İyi).
+* `.DS_Store` ve `__MACOSX` gibi gereksiz macOS sistem artıklarını tek dokunuşla arşivden temizleyin.
+* Büyük dosyaları e-posta veya harici diskler için ciltlere (parçalara) bölün.
+
+### 🔄 Format Dönüştürme ve Karşılaştırma (Diff)
+* Mevcut bir arşivi diske açıp tekrar sıkıştırmakla uğraşmadan doğrudan başka bir formata (örneğin RAR'dan ZIP veya 7Z'ye) dönüştürün.
+* İki arşiv dosyasını yan yana koyarak eklenen, silinen ve değiştirilen dosyaları karşılaştırın.
 
 ---
 
-## 📸 Uygulama İçi Gerçek Ekran Görüntüleri
+## Ekran Görüntüleri
 
 <div align="center">
-  <p><strong>🗂️ Arşiv Gezgini (Explorer Modu & Retina SF Symbols)</strong></p>
+  <p><strong>Arşiv Gezgini (Finder Tasarımlı Liste ve Hızlı Önizleme)</strong></p>
   <img src="docs/assets/screenshot-explorer.png" width="880" alt="Coffer Arşiv Gezgini" />
   <br><br>
 </div>
 
-| ⚙️ Ayarlar & Motor Mimarisi | 🚀 Dahili Otomatik Güncelleyici |
+| Ayarlar ve Tercihler | Canlı Sürüm Güncelleyici |
 | :---: | :---: |
-| <img src="docs/assets/screenshot-settings.png" width="430" alt="Coffer Ayarlar Paneli" /> | <img src="docs/assets/screenshot-updater.png" width="430" alt="Coffer Canlı Güncelleyici" /> |
+| <img src="docs/assets/screenshot-settings.png" width="430" alt="Coffer Ayarlar Paneli" /> | <img src="docs/assets/screenshot-updater.png" width="430" alt="Coffer Güncelleyici" /> |
 
 <div align="center">
   <br>
-  <p><strong>⚡ Hızlı Bırakma (Minimalist Drop Zone)</strong></p>
+  <p><strong>Hızlı Dosya Bırakma Alanı</strong></p>
   <img src="docs/assets/screenshot-quickdrop.png" width="680" alt="Coffer Hızlı Mod" />
   <br>
 </div>
 
 ---
 
-## 📦 Desteklenen Formatlar
+## Desteklenen Formatlar
 
-| Format | Görüntüleme & Açma | Oluşturma & Sıkıştırma |
-| :--- | :---: | :---: |
-| **ZIP** | ✅ | ✅ |
-| **TAR / GZ / BZ2 / XZ** | ✅ | ✅ |
-| **7-Zip (.7z)** | ✅ | ✅ |
-| **RAR (.rar)** | ✅ | ✅ *(RAR for macOS ile)* |
-| **Çok Parçalı Arşivler** (`.part1.rar`, `.001` vb.) | ✅ | ✅ |
-
----
-
-## 💻 Sistem Gereksinimleri
-
-* macOS 14.0 (Sonoma) veya üzeri
-* Apple Silicon (M1/M2/M3/M4) veya Intel x86_64 işlemci
+| Format | İnceleme | Çıkartma | Oluşturma |
+| :--- | :---: | :---: | :---: |
+| **ZIP (.zip, .zipx)** | Evet | Evet | Evet |
+| **RAR (.rar, .cbr)** | Evet | Evet | Evet *(RAR for macOS ile)* |
+| **7-Zip (.7z, .cb7)** | Evet | Evet | Evet |
+| **TAR (.tar, .tar.gz, .tgz, .tar.bz2, .tar.xz)** | Evet | Evet | Evet |
+| **Çok Parçalı Arşivler (.part1.rar, .001, .z01)** | Evet | Evet | Evet |
+| **Disk Görüntüleri (.iso)** | Evet | Evet | — |
 
 ---
 
-## 🚀 Kurulum
+## Sistem Gereksinimleri
 
-1. En güncel `.dmg` kurulum kalıbını **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** veya doğrudan **[GitHub Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından indirin (`Coffer-1.6.0.dmg`).
-2. İndirilen DMG dosyasını açıp `Coffer.app` uygulamasını `Uygulamalar` (Applications) klasörünüze sürükleyin.
-3. Coffer'ı ilk kez çalıştırdığınızda karşılama sihirbazı gerekli sistem izinlerini otomatik olarak yapılandırır ve sonrasında arka planda sessizce çalışır.
+* **İşletim Sistemi:** macOS 14.0 (Sonoma), macOS 15.0 (Sequoia) veya üzeri
+* **İşlemci Mimarisi:** Apple Silicon (M1 / M2 / M3 / M4) veya Intel x86_64
 
 ---
 
-## 📄 Lisans
+## Kurulum
 
-Bu proje MIT Lisansı altında sunulmaktadır.
+1. En son sürüm yükleyicisini (`Coffer-1.6.0.dmg`) **[Releases](https://github.com/blackowltr/Coffer/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/Coffer/)** indirin.
+2. DMG dosyasını açıp `Coffer` simgesini `Uygulamalar` (Applications) klasörüne sürükleyin.
+3. Uygulamayı ilk kez açtığınızda gerekli sistem izinleri onaylanır; ardından Coffer arka planda sessizce ve kesintisiz şekilde çalışmaya devam eder.
+
+---
+
+## Gizlilik ve Güvenlik
+
+Coffer tamamen yerel olarak çalışır:
+* Telemetri, analiz veya kullanıcı davranışı takibi yapmaz.
+* Dosyalarınız hiçbir zaman harici bir sunucuya iletilmez; tüm arşivleme ve şifreleme işlemleri kendi bilgisayarınızda gerçekleşir.
+* Açık kaynak kodludur ve MIT lisansı ile korunur.
+
+---
+
+## Lisans
+
+Bu proje [MIT Lisansı](LICENSE) kapsamında sunulmaktadır.
