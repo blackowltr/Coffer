@@ -84,6 +84,7 @@ public struct ArchiveBrowserView: View {
 
     // Yüksek Performanslı İndeksler (O(1) Gezinme ve Sıfır Takılma)
     @State private var cleanItems: [ArchiveItem] = []
+    @State private var displayedItems: [ArchiveItem] = []
     @State private var itemsByParentPath: [String: [ArchiveItem]] = [:]
     @State private var itemsByCategory: [ArchiveCategoryFilter: [ArchiveItem]] = [:]
     @State private var itemsByID: [UUID: ArchiveItem] = [:]
@@ -101,19 +102,21 @@ public struct ArchiveBrowserView: View {
         }
     }
 
-    private var visibleItems: [ArchiveItem] {
+    private func updateDisplayedItems() {
         if !searchText.isEmpty {
             let query = searchText.lowercased()
-            return cleanItems.filter {
+            displayedItems = cleanItems.filter {
                 $0.lowerName.contains(query) || $0.lowerPath.contains(query)
             }
+            return
         }
 
         if let filter = activeCategoryFilter {
-            return itemsByCategory[filter] ?? []
+            displayedItems = itemsByCategory[filter] ?? []
+            return
         }
 
-        return itemsByParentPath[currentPath] ?? []
+        displayedItems = itemsByParentPath[currentPath] ?? []
     }
 
     public var body: some View {
@@ -290,7 +293,7 @@ public struct ArchiveBrowserView: View {
                 Group {
                     if isGridView {
                         ArchiveGridView(
-                            items: visibleItems,
+                            items: displayedItems,
                             selectedItemIDs: $selectedItemIDs,
                             onOpenDirectory: { path in
                                 activeCategoryFilter = nil
@@ -320,7 +323,7 @@ public struct ArchiveBrowserView: View {
                         )
                     } else {
                         ArchiveTableView(
-                            items: visibleItems,
+                            items: displayedItems,
                             selectedItemIDs: $selectedItemIDs,
                             onOpenDirectory: { path in
                                 activeCategoryFilter = nil
@@ -354,7 +357,7 @@ public struct ArchiveBrowserView: View {
 
             // 4. Durum Çubuğu (Footer)
             ArchiveFooterBar(
-                totalItemsCount: visibleItems.count,
+                totalItemsCount: displayedItems.count,
                 totalUncompressedSize: metadata?.totalUncompressedSize ?? 0,
                 selectedItemsCount: selectedItemIDs.count,
                 selectedSize: selectedSize,
@@ -373,6 +376,15 @@ public struct ArchiveBrowserView: View {
             if let url = archiveURL {
                 multiPartInfo = MultiPartVolumeManager.shared.analyzeArchive(at: url)
             }
+        }
+        .onChange(of: currentPath) { _, _ in
+            updateDisplayedItems()
+        }
+        .onChange(of: searchText) { _, _ in
+            updateDisplayedItems()
+        }
+        .onChange(of: activeCategoryFilter) { _, _ in
+            updateDisplayedItems()
         }
         .onChange(of: settings.stripMacJunkFiles) { _, _ in
             rebuildDirectoryCache()
@@ -423,5 +435,6 @@ public struct ArchiveBrowserView: View {
             .media: byCat[.media]?.count ?? 0,
             .code: byCat[.code]?.count ?? 0
         ]
+        self.updateDisplayedItems()
     }
 }

@@ -362,7 +362,7 @@ public final class SevenZipEngine: Sendable {
                                 )
                             }
                         }
-                        try? await Task.sleep(nanoseconds: 20_000_000)
+                        try? await Task.sleep(nanoseconds: 40_000_000)
                     }
 
                     process.waitUntilExit()
@@ -649,7 +649,7 @@ public final class SevenZipEngine: Sendable {
                                 )
                             )
                         }
-                        try? await Task.sleep(nanoseconds: 25_000_000)
+                        try? await Task.sleep(nanoseconds: 45_000_000)
                     }
 
                     process.waitUntilExit()

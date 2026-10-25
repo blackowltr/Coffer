@@ -247,14 +247,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             UpdateChecker.shared.performSilentBackgroundCheck()
         }
 
-        // Uygulama açık kaldığı sürece periyodik (4 saatte bir) sessiz denetim
-        Timer.scheduledTimer(withTimeInterval: 14400, repeats: true) { _ in
+        // Eski önizleme ve sürükleme artıklarını arka planda temizle (Disk & RAM optimizasyonu)
+        ArchiveManager.shared.cleanupTemporaryCaches()
+
+        // Uygulama açık kaldığı sürece periyodik (4 saatte bir) sessiz denetim (Enerji tasarruflu timer coalescing)
+        let timer = Timer.scheduledTimer(withTimeInterval: 14400, repeats: true) { _ in
             DispatchQueue.main.async {
                 UpdateChecker.shared.performSilentBackgroundCheck()
             }
         }
+        timer.tolerance = 600
 
         handleCommandLineArguments()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        ArchiveManager.shared.cleanupTemporaryCaches()
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {

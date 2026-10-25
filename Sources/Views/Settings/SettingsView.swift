@@ -891,6 +891,17 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
+        ## 🚀 UnPack v1.7.2
+
+        RAM ve CPU tüketimini en aza indirgeyen, arka plan işlemlerini ve dosya önbelleğini optimize eden yüksek verimlilik güncellemesi.
+
+        ### 🌿 Düşük RAM ve CPU Tüketimi Optimizasyonları
+        - 🧠 **Otomatik Temizlenen Simge Önbelleği:** Dosya simgeleri artık `NSCache` altyapısıyla yönetilmekte; sistem bellek baskısı hissettiğinde otomatik tahliye edilerek RAM şişmesi engellenmektedir.
+        - 🔋 **Düşük CPU ve Güç Tüketimi:** Arşivleme ve çıkarma sırasındaki boru hattı okuma döngüleri optimize edildi. Gereksiz uyandırmalar azaltılarak CPU çekirdeklerinin düşük güç durumunda kalması sağlandı.
+        - ⚡ **Sıfır Gecikmeli Liste Filtreleme:** Arama ve klasör içi dosya listelemeleri önbelleğe alınarak her kullanıcı etkileşiminde tekrarlanan CPU filtreleme yükü ortadan kaldırıldı.
+        - 🧹 **Otomatik Geçici Alan Temizliği:** Hızlı bakış ve sürükle-bırak için açılan geçici dosyalar periyodik olarak temizlenerek disk ve bellek sağlığı güvenceye alındı.
+        - ⏱️ **Zamanlayıcı Birleştirme (Timer Coalescing):** Arka plan güncelleme denetimleri macOS enerji tasarrufu standartlarına uygun şekilde optimize edildi.
+
         ## 🚀 UnPack v1.7.1
 
         Performans, verimlilik ve dosya ilişkilendirme süreçlerini optimize eden bu güncelleme; macOS sistem uyumluluğunu en üst düzeye taşır.

@@ -1,18 +1,20 @@
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
-import os
 
-/// Yüksek çözünürlüklü ve yerel macOS dosya/klasör simgelerini sağlayan ve önbelleğe alan ultra-düşük gecikmeli sağlayıcı
+/// Yüksek çözünürlüklü ve yerel macOS dosya/klasör simgelerini sağlayan,
+/// bellek baskısında kendini otomatik temizleyen yüksek verimli sağlayıcı
 public final class FileIconProvider: @unchecked Sendable {
     public static let shared = FileIconProvider()
 
-    private var cache = [String: NSImage]()
+    private let cache = NSCache<NSString, NSImage>()
     public let folderIcon: NSImage
     public let defaultFileIcon: NSImage
-    private var unfairLock = os_unfair_lock()
 
     private init() {
+        cache.countLimit = 160
+        cache.totalCostLimit = 16 * 1024 * 1024 // Maksimum 16 MB simge önbelleği
+
         let folder = NSWorkspace.shared.icon(for: .folder)
         folder.size = NSSize(width: 64, height: 64)
         self.folderIcon = folder
@@ -20,10 +22,9 @@ public final class FileIconProvider: @unchecked Sendable {
         let generic = NSWorkspace.shared.icon(for: .item)
         generic.size = NSSize(width: 64, height: 64)
         self.defaultFileIcon = generic
-        self.cache["__default_file__"] = generic
+        self.cache.setObject(generic, forKey: "__default_file__")
 
-        // Özel Apple Liquid Glass belge simgelerini ve yaygın uzantıları önbelleğe al
-        prewarmIcons()
+        prewarmArchiveIcons()
     }
 
     /// Uygulama paketindeki (.app/Contents/Resources) yüksek çözünürlüklü belge simgesini yükler
@@ -40,8 +41,7 @@ public final class FileIconProvider: @unchecked Sendable {
         return nil
     }
 
-    private func prewarmIcons() {
-        // 1. Özel Arşiv Formatı Simgeleri (Apple Liquid Glass)
+    private func prewarmArchiveIcons() {
         let archiveMappings: [String: String] = [
             "rar": "RarDocIcon",
             "cbr": "RarDocIcon",
@@ -68,33 +68,12 @@ public final class FileIconProvider: @unchecked Sendable {
 
         for (ext, iconName) in archiveMappings {
             if let customImg = loadBundledIcon(named: iconName) {
-                cache[ext] = customImg
-            }
-        }
-
-        // 2. Yaygın Dosya Uzantıları (macOS Native Simgeler)
-        let commonExtensions = [
-            "pdf", "txt", "rtf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "csv",
-            "png", "jpg", "jpeg", "heic", "webp", "gif", "svg", "tiff", "psd", "ai", "icns",
-            "mp4", "mov", "mkv", "avi", "mp3", "wav", "m4a", "flac", "aac",
-            "swift", "py", "js", "ts", "html", "css", "json", "xml", "sh", "md", "c", "cpp", "h", "sql", "yaml", "yml"
-        ]
-
-        for ext in commonExtensions {
-            if cache[ext] == nil {
-                let sysIcon: NSImage
-                if let utType = UTType(filenameExtension: ext) {
-                    sysIcon = NSWorkspace.shared.icon(for: utType)
-                } else {
-                    sysIcon = defaultFileIcon
-                }
-                sysIcon.size = NSSize(width: 64, height: 64)
-                cache[ext] = sysIcon
+                cache.setObject(customImg, forKey: ext as NSString)
             }
         }
     }
 
-    /// Dosya veya klasör için yerel, yüksek kaliteli macOS simgesini döner (Nanosecond Fast Path)
+    /// Dosya veya klasör için yerel, yüksek kaliteli macOS simgesini döner (Düşük bellek ve CPU)
     public func icon(for item: ArchiveItem) -> NSImage {
         if item.isDirectory {
             return folderIcon
@@ -105,12 +84,10 @@ public final class FileIconProvider: @unchecked Sendable {
             return defaultFileIcon
         }
 
-        os_unfair_lock_lock(&unfairLock)
-        if let cached = cache[ext] {
-            os_unfair_lock_unlock(&unfairLock)
+        let key = ext as NSString
+        if let cached = cache.object(forKey: key) {
             return cached
         }
-        os_unfair_lock_unlock(&unfairLock)
 
         // Özel simge kontrolü
         let iconName: String?
@@ -139,10 +116,7 @@ public final class FileIconProvider: @unchecked Sendable {
             resolvedIcon = defaultFileIcon
         }
 
-        os_unfair_lock_lock(&unfairLock)
-        cache[ext] = resolvedIcon
-        os_unfair_lock_unlock(&unfairLock)
-
+        cache.setObject(resolvedIcon, forKey: key)
         return resolvedIcon
     }
 }

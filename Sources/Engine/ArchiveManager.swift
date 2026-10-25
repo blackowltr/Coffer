@@ -358,4 +358,21 @@ public actor ArchiveManager {
 
         return nil
     }
+
+    // MARK: - Geçici Bellek ve Disk Temizliği (RAM & Disk Sağlığı)
+
+    /// Önizleme ve sürükle-bırak için açılmış geçici dizinleri arka planda temizler
+    nonisolated public func cleanupTemporaryCaches() {
+        DispatchQueue.global(qos: .utility).async {
+            let tempBase = FileManager.default.temporaryDirectory
+            let previewDir = tempBase.appendingPathComponent("UnPack_Preview")
+            let dragDir = tempBase.appendingPathComponent("UnPack_DragOut")
+
+            for dir in [previewDir, dragDir] {
+                if FileManager.default.fileExists(atPath: dir.path) {
+                    try? FileManager.default.removeItem(at: dir)
+                }
+            }
+        }
+    }
 }

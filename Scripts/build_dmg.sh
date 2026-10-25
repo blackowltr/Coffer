@@ -4,7 +4,7 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${PROJECT_DIR}/build"
 APP_NAME="UnPack"
-VERSION="1.7.1"
+VERSION="1.7.2"
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="${BUILD_DIR}/${DMG_NAME}"
 STAGING_DIR="${BUILD_DIR}/dmg_staging"

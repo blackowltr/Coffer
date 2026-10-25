@@ -310,7 +310,7 @@ public final class UnrarEngine: Sendable {
                             )
                         }
 
-                        try? await Task.sleep(nanoseconds: 25_000_000)
+                        try? await Task.sleep(nanoseconds: 45_000_000)
                     }
 
                     process.waitUntilExit()
