@@ -70,7 +70,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.4.0")
+                    Text("Coffer v1.5.0")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")
@@ -890,18 +890,17 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
-        ## 🚀 Coffer v1.4.0 (En Son Sürüm)
+        ## 🚀 Coffer v1.5.0 (En Son Sürüm)
 
-        Bu sürümde Coffer'ın tüm çekirdek motorları baştan aşağı optimize edildi. Yüksek bellek verimliliği, sıfır gecikmeli arayüz ve ışık hızında dosya işleme mimarisi kullanıma sunuldu.
+        Coffer Arşiv Gezgini sayfası; macOS Sequoia ve Sonoma tasarım diline uygun, yarı saydam Apple cam kapsülleri ve yepyeni görsel düzen seçenekleriyle baştan tasarlandı.
 
-        ### ⚡ Verimlilik ve Performans Geliştirmeleri
+        ### ✨ Tasarım ve Kullanıcı Deneyimi Yenilikleri
 
-        - 🏎️ **Sıfır Ek Tahsisatlı Dosya Modeli:** Dosya adları, uzantılar ve biçimlendirilmiş boyut bilgileri tek seferde hesaplanır. Liste kaydırma sırasında gereksiz bellek tahsisatı tamamen ortadan kaldırıldı.
-        - 🚀 **120 FPS Akıcı Tablo Sıralaması:** Büyük arşivlerde sıralama işlemleri arka plana aktarıldı; ProMotion ekranlarda takılma ve donma yaşanmaz.
-        - 🔍 **Işık Hızında Arama:** Arama kutusuna yazılan terimler, önceden dizinlenmiş küçük harf önbelleği sayesinde gecikmesiz olarak filtrelenir.
-        - 🔒 **Ultra Düşük Gecikmeli Simge Motoru:** Dosya simgesi sağlayıcısı nanosecond kilit mekanizmasına kavuşturuldu; klasör geçişleri anlık olarak gerçekleşir.
-        - 📦 **Dengelenmiş İlerleme Akışı:** Sıkıştırma ve çıkarma sırasında arayüze iletilen veri akışı 30-60 FPS aralığında dengelendi; işlemci tüketimi asgariye indirildi.
-        - 🛡️ **Hızlandırılmış Güvenlik Analizi:** Sıkıştırma bombası ve sahte uzantı kontrolleri optimize edildi; arşiv açılış süresi belirgin şekilde kısaltıldı.
+        - 💎 **Yüzen Cam Kapsül Araç Çubuğu:** Klasik buton kalabalığı kaldırıldı; birincil çıkarma ve ekleme eylemleri, hızlı önizleme araçları ve gelişmiş özellikler modern Apple kapsülleri halinde toplandı.
+        - 🖼️ **Finder Tarzı Izgara (Grid) Görünümü:** Arşiv içeriğini ayrıntılı tablonun yanı sıra büyük önizleme kartları halinde görüntüleme seçeneği eklendi. Araç çubuğundan tek tıkla Liste ve Izgara arasında geçiş yapabilirsiniz.
+        - 🧭 **Apple Yol ve Spotlight Arama Çubuğu:** Klasör hiyerarşisinde rahatça gezinmeyi sağlayan tıklanabilir yol kapsülleri ve Spotlight arama kutusu baştan tasarlandı.
+        - 🎨 **Zarif Boş Durumlar:** Henüz arşiv açılmadığında veya boş klasörlere girildiğinde kullanıcıyı karşılayan estetik Apple simge ve yönlendirmeleri eklendi.
+        - ⌨️ **Klavye Kısayol Rozetleri:** Alt çubuğa Space ile hızlı bakış ve ⌘E ile çıkarma kısayollarını hatırlatan Apple tuş rozetleri yerleştirildi.
 
         ### 📦 Sistem Uyumluluğu
         - **Evrensel Destek:** Apple Silicon (M1, M2, M3, M4) ve Intel (x86_64) işlemcili Mac bilgisayarlarla tam uyumludur.

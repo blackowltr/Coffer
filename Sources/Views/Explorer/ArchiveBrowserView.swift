@@ -80,6 +80,7 @@ public struct ArchiveBrowserView: View {
     @State private var cachedCategoryCounts: [ArchiveCategoryFilter: Int] = [:]
     @State private var activeCategoryFilter: ArchiveCategoryFilter? = nil
     @State private var multiPartInfo: MultiPartVolumeInfo? = nil
+    @State private var isGridView: Bool = false
 
     // Yüksek Performanslı İndeksler (O(1) Gezinme ve Sıfır Takılma)
     @State private var cleanItems: [ArchiveItem] = []
@@ -117,52 +118,37 @@ public struct ArchiveBrowserView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // 1. Üst Eylem Araç Çubuğu (Toolbar)
-            HStack(spacing: 6) {
-                if let onNew = onNewArchive {
-                    WinRARToolbarButton(title: "Sıkıştır", icon: "archivebox.circle.fill", color: settings.accentColorChoice.color, action: onNew)
-                }
-                WinRARToolbarButton(title: "Dizine Çıkart", icon: "tray.and.arrow.down.fill", color: .cyan, action: onExtract)
-                WinRARToolbarButton(title: "Dosya Ekle", icon: "doc.badge.plus", color: .green, action: onAddFiles)
-                WinRARToolbarButton(title: "Test Et", icon: "checkmark.shield.fill", color: .purple, action: onTestArchive)
-
-                // Quick Look Önizleme Butonu
-                WinRARToolbarButton(title: "Önizle", icon: "eye.circle.fill", color: .indigo) {
+            // 1. Apple Tarzı Yüzen Kapsül Araç Çubuğu (Floating Capsule Toolbar)
+            ArchiveExplorerToolbar(
+                onExtract: onExtract,
+                onAddFiles: onAddFiles,
+                onTestArchive: onTestArchive,
+                onPreview: {
                     if let firstID = selectedItemIDs.first, let item = items.first(where: { $0.id == firstID }), !item.isDirectory {
                         onPreviewItem(item)
                     } else if let firstFile = items.first(where: { !$0.isDirectory }) {
                         selectedItemIDs = [firstFile.id]
                         onPreviewItem(firstFile)
                     }
-                }
-
-                WinRARToolbarButton(title: "Sil", icon: "trash.fill", color: .red, action: onDeleteSelected)
-
-                Divider().frame(height: 18)
-
-                WinRARToolbarButton(title: "Dönüştür", icon: "arrow.triangle.2.circlepath.circle.fill", color: settings.accentColorChoice.color, action: onConvertArchive)
-                WinRARToolbarButton(title: "Farklar", icon: "arrow.left.and.right.circle.fill", color: .teal, action: onDiffArchive)
-                WinRARToolbarButton(title: "Bilgi", icon: "info.circle.fill", color: .cyan, action: onShowInfo)
-                WinRARToolbarButton(title: "Kilitle", icon: "lock.shield.fill", color: .pink, action: onLockArchive)
-                WinRARToolbarButton(title: "Onar", icon: "wrench.and.screwdriver.fill", color: .indigo, action: onRepairArchive)
-                WinRARToolbarButton(title: "Güvenlik", icon: "shield.checkered", color: .red) {
-                    onShowSecurity?()
-                }
-
-                Spacer()
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(Color(NSColor.controlBackgroundColor))
+                },
+                onDeleteSelected: onDeleteSelected,
+                onShowInfo: onShowInfo,
+                onConvertArchive: onConvertArchive,
+                onDiffArchive: onDiffArchive,
+                onLockArchive: onLockArchive,
+                onRepairArchive: onRepairArchive,
+                onShowSecurity: onShowSecurity,
+                onNewArchive: onNewArchive,
+                isGridView: $isGridView
+            )
 
             // Güvenlik & Risk Tespit Bandı
             if let sec = securityReport, sec.riskLevel != .safe {
-                Divider()
-                HStack(spacing: 8) {
+                HStack(spacing: 9) {
                     Image(systemName: sec.riskLevel.systemIcon)
                         .symbolRenderingMode(.hierarchical)
                         .foregroundColor(sec.riskLevel == .danger ? .red : .orange)
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text("Güvenlik Uyarısı (Skor: \(sec.safetyScore)/100 - \(sec.riskLevel.rawValue))")
@@ -189,13 +175,17 @@ public struct ArchiveBrowserView: View {
                     .controlSize(.small)
                 }
                 .padding(.horizontal, 12)
-                .padding(.vertical, 5)
-                .background((sec.riskLevel == .danger ? Color.red : Color.orange).opacity(0.10))
+                .padding(.vertical, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill((sec.riskLevel == .danger ? Color.red : Color.orange).opacity(0.12))
+                )
+                .padding(.horizontal, 10)
+                .padding(.top, 4)
             }
 
             // Çok Parçalı Arşiv Tespit Bandı
             if let mp = multiPartInfo, mp.isMultiPart {
-                Divider()
                 HStack(spacing: 8) {
                     Image(systemName: mp.isComplete ? "square.split.2x1.fill" : "exclamationmark.triangle.fill")
                         .symbolRenderingMode(.hierarchical)
@@ -218,17 +208,21 @@ public struct ArchiveBrowserView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 5)
-                .background(mp.isComplete ? Color.indigo.opacity(0.10) : Color.red.opacity(0.12))
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(mp.isComplete ? Color.indigo.opacity(0.10) : Color.red.opacity(0.12))
+                )
+                .padding(.horizontal, 10)
+                .padding(.top, 4)
             }
 
             // macOS Artıkları Tespit Uyarısı & Hızlı Temizlik Bandı
             if junkItemsCount > 0 {
-                Divider()
                 HStack(spacing: 8) {
                     Image(systemName: "sparkles")
                         .symbolRenderingMode(.hierarchical)
                         .foregroundColor(.mint)
-                        .font(.system(size: 12))
+                        .font(.system(size: 13, weight: .semibold))
 
                     Text("Bu arşivde \(junkItemsCount) adet macOS/sistem artığı (.DS_Store, __MACOSX, ._*) tespit edildi.")
                         .font(.system(size: 11, weight: .medium))
@@ -244,14 +238,18 @@ public struct ArchiveBrowserView: View {
                         .font(.system(size: 11, weight: .semibold))
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.mint)
                     .controlSize(.small)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.mint.opacity(0.12))
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color.mint.opacity(0.12))
+                )
+                .padding(.horizontal, 10)
+                .padding(.top, 4)
             }
-
-            Divider()
 
             // 2. Yol & Arama Çubuğu (Breadcrumb)
             BreadcrumbBar(
@@ -289,35 +287,69 @@ public struct ArchiveBrowserView: View {
                 )
                 .frame(minWidth: 160, idealWidth: 200, maxWidth: 280)
 
-                ArchiveTableView(
-                    items: visibleItems,
-                    selectedItemIDs: $selectedItemIDs,
-                    onOpenDirectory: { path in
-                        activeCategoryFilter = nil
-                        onNavigateTo(path)
-                    },
-                    onOpenFile: { item in
-                        Task {
-                            guard let arcURL = archiveURL else { return }
-                            if let extractedURL = try? await ArchiveManager.shared.extractItemForPreview(archiveURL: arcURL, item: item) {
-                                await MainActor.run {
-                                    _ = NSWorkspace.shared.open(extractedURL)
+                Group {
+                    if isGridView {
+                        ArchiveGridView(
+                            items: visibleItems,
+                            selectedItemIDs: $selectedItemIDs,
+                            onOpenDirectory: { path in
+                                activeCategoryFilter = nil
+                                onNavigateTo(path)
+                            },
+                            onOpenFile: { item in
+                                Task {
+                                    guard let arcURL = archiveURL else { return }
+                                    if let extractedURL = try? await ArchiveManager.shared.extractItemForPreview(archiveURL: arcURL, item: item) {
+                                        await MainActor.run {
+                                            _ = NSWorkspace.shared.open(extractedURL)
+                                        }
+                                    }
                                 }
+                            },
+                            onPreviewItem: onPreviewItem,
+                            onExtractSelected: onExtract,
+                            onDragItem: { item in
+                                guard let arcURL = archiveURL else { return nil }
+                                if let localURL = ArchiveManager.shared.extractItemSynchronouslyForDrag(archiveURL: arcURL, item: item) {
+                                    let provider = NSItemProvider(item: localURL as NSSecureCoding, typeIdentifier: "public.file-url")
+                                    provider.suggestedName = item.name
+                                    return provider
+                                }
+                                return nil
                             }
-                        }
-                    },
-                    onPreviewItem: onPreviewItem,
-                    onExtractSelected: onExtract,
-                    onDragItem: { item in
-                        guard let arcURL = archiveURL else { return nil }
-                        if let localURL = ArchiveManager.shared.extractItemSynchronouslyForDrag(archiveURL: arcURL, item: item) {
-                            let provider = NSItemProvider(item: localURL as NSSecureCoding, typeIdentifier: "public.file-url")
-                            provider.suggestedName = item.name
-                            return provider
-                        }
-                        return nil
+                        )
+                    } else {
+                        ArchiveTableView(
+                            items: visibleItems,
+                            selectedItemIDs: $selectedItemIDs,
+                            onOpenDirectory: { path in
+                                activeCategoryFilter = nil
+                                onNavigateTo(path)
+                            },
+                            onOpenFile: { item in
+                                Task {
+                                    guard let arcURL = archiveURL else { return }
+                                    if let extractedURL = try? await ArchiveManager.shared.extractItemForPreview(archiveURL: arcURL, item: item) {
+                                        await MainActor.run {
+                                            _ = NSWorkspace.shared.open(extractedURL)
+                                        }
+                                    }
+                                }
+                            },
+                            onPreviewItem: onPreviewItem,
+                            onExtractSelected: onExtract,
+                            onDragItem: { item in
+                                guard let arcURL = archiveURL else { return nil }
+                                if let localURL = ArchiveManager.shared.extractItemSynchronouslyForDrag(archiveURL: arcURL, item: item) {
+                                    let provider = NSItemProvider(item: localURL as NSSecureCoding, typeIdentifier: "public.file-url")
+                                    provider.suggestedName = item.name
+                                    return provider
+                                }
+                                return nil
+                            }
+                        )
                     }
-                )
+                }
             }
 
             // 4. Durum Çubuğu (Footer)

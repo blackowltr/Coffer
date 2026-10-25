@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// WinRAR tarzı alt durum çubuğu:
-/// Dosya sayısı, toplam ve paketlenmiş boyut, format rozeti ve arşiv bayrakları (katı, şifreli başlıklar, ciltler).
+/// macOS Apple Human Interface Guidelines standartlarında alt durum ve kısayol çubuğu
 public struct ArchiveFooterBar: View {
     @ObservedObject private var settings = AppSettings.shared
     public let totalItemsCount: Int
@@ -27,127 +26,151 @@ public struct ArchiveFooterBar: View {
         self.metadata = metadata
     }
 
+    private var accentColor: Color {
+        settings.accentColorChoice.color
+    }
+
     public var body: some View {
-        HStack(spacing: 12) {
-            // Seçili dosya bilgisi
+        HStack(spacing: 10) {
+            // MARK: 1. Seçim Durumu Kapsülü
             if selectedItemsCount > 0 {
-                HStack(spacing: 4) {
+                HStack(spacing: 5) {
                     Image(systemName: "checkmark.circle.fill")
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundColor(settings.accentColorChoice.color)
-                        .font(.system(size: 12))
-                    Text("Seçili: \(selectedItemsCount) (\(ByteCountFormatter.string(fromByteCount: selectedSize, countStyle: .file)))")
-                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(accentColor)
+                        .font(.system(size: 11))
+                    Text("\(selectedItemsCount) seçili (\(ByteCountFormatter.string(fromByteCount: selectedSize, countStyle: .file)))")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                 }
-            } else {
-                Text("Dosya seçilmedi")
-                    .font(.system(size: 11))
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(accentColor.opacity(0.12))
+                .clipShape(Capsule())
+            }
+
+            // MARK: 2. Toplam Öğe ve Boyut
+            HStack(spacing: 4) {
+                Image(systemName: "doc.on.doc.fill")
                     .foregroundColor(.secondary)
+                    .font(.system(size: 10))
+                if let meta = metadata {
+                    Text("\(totalItemsCount) öğe • \(meta.formattedUncompressedSize) (Paketli: \(meta.formattedArchiveSize))")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("\(totalItemsCount) öğe • \(ByteCountFormatter.string(fromByteCount: totalUncompressedSize, countStyle: .file))")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            // MARK: 3. Tasarruf Oranı Rozeti
+            if savingsRatio > 0 {
+                HStack(spacing: 3) {
+                    Image(systemName: "arrow.down.right.and.arrow.up.left")
+                        .font(.system(size: 9, weight: .bold))
+                    Text("%\(String(format: "%.1f", savingsRatio)) Tasarruf")
+                        .font(.system(size: 10.5, weight: .semibold, design: .rounded))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.green.opacity(0.14))
+                .foregroundColor(.green)
+                .clipShape(Capsule())
+            }
+
+            Spacer()
+
+            // MARK: 4. Format ve Arşiv Bayrakları
+            if let meta = metadata {
+                HStack(spacing: 6) {
+                    LiquidGlassFormatBadge(format: meta.format, size: .small)
+
+                    if meta.isSolid {
+                        StatusFlagPill(text: "Katı (Solid)", color: .purple)
+                    }
+
+                    if meta.hasEncryptedHeaders {
+                        StatusFlagPill(text: "Şifreli", icon: "lock.shield.fill", color: .orange)
+                    }
+
+                    if meta.isMultiVolume || meta.volumeCount > 1 {
+                        StatusFlagPill(text: "\(meta.volumeCount) Cilt", color: .indigo)
+                    }
+                }
             }
 
             Divider()
                 .frame(height: 12)
 
-            // Toplam dosya sayısı ve orijinal / paketlenmiş boyut
-            HStack(spacing: 4) {
-                Image(systemName: "doc.stack.fill")
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundColor(.secondary)
-                    .font(.system(size: 11))
-                if let meta = metadata {
-                    Text("Toplam: \(totalItemsCount) öğe • \(meta.formattedUncompressedSize) (Paketli: \(meta.formattedArchiveSize))")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("Toplam: \(totalItemsCount) öğe (\(ByteCountFormatter.string(fromByteCount: totalUncompressedSize, countStyle: .file)))")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
+            // MARK: 5. Apple Klavye Kısayol İpuçları (Keycap Hints)
+            HStack(spacing: 6) {
+                KeycapHint(key: "␣", action: "Önizle")
+                KeycapHint(key: "⌘E", action: "Çıkart")
             }
-
-            // Tasarruf oranı
-            if savingsRatio > 0 {
-                Divider()
-                    .frame(height: 12)
-
-                HStack(spacing: 4) {
-                    Image(systemName: "arrow.down.right.and.arrow.up.left")
-                        .foregroundColor(.green)
-                        .font(.system(size: 10))
-                    Text("%\(String(format: "%.1f", savingsRatio))")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.green)
-                }
-            }
-
-            Spacer()
-
-            // Format ve Bayraklar (Flags: Solid, Encrypted Headers, Volumes)
-            if let meta = metadata {
-                HStack(spacing: 6) {
-                    // Format Rozeti
-                    LiquidGlassFormatBadge(format: meta.format, size: .small)
-
-                    // Solid Arşiv Bayrağı
-                    if meta.isSolid {
-                        Text("Katı / Solid")
-                            .font(.system(size: 10, weight: .medium))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(Color.purple.opacity(0.12))
-                            .foregroundColor(.purple)
-                            .cornerRadius(4)
-                    }
-
-                    // Şifreli Başlıklar Bayrağı
-                    if meta.hasEncryptedHeaders {
-                        HStack(spacing: 3) {
-                            Image(systemName: "lock.shield.fill")
-                                .font(.system(size: 9))
-                            Text("Şifreli Başlıklar")
-                                .font(.system(size: 10, weight: .medium))
-                        }
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 2)
-                        .background(settings.accentColorChoice.color.opacity(0.12))
-                        .foregroundColor(settings.accentColorChoice.color)
-                        .cornerRadius(4)
-                    }
-
-                    // Çok Parçalı Arşiv (Volumes) Bayrağı
-                    if meta.isMultiVolume || meta.volumeCount > 1 {
-                        Text("Ciltler: \(meta.volumeCount)")
-                            .font(.system(size: 10, weight: .medium))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 2)
-                            .background(Color.indigo.opacity(0.12))
-                            .foregroundColor(.indigo)
-                            .cornerRadius(4)
-                    }
-                }
-            }
-
-            // Durum Göstergesi
-            HStack(spacing: 5) {
-                Circle()
-                    .fill(Color.green)
-                    .frame(width: 6, height: 6)
-                Text("Hazır")
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(Color(NSColor.controlBackgroundColor))
-            .overlay(
-                RoundedRectangle(cornerRadius: 5)
-                    .strokeBorder(Color(NSColor.separatorColor), lineWidth: 1)
-            )
-            .cornerRadius(5)
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .background(Color(NSColor.windowBackgroundColor))
-        .border(Color(NSColor.separatorColor), width: 0.5)
+        .background(
+            Color(NSColor.windowBackgroundColor)
+                .opacity(0.85)
+                .background(.ultraThinMaterial)
+        )
+        .overlay(
+            Rectangle()
+                .frame(height: 0.5)
+                .foregroundColor(Color(NSColor.separatorColor).opacity(0.4)),
+            alignment: .top
+        )
+    }
+}
+
+// MARK: - Durum Rozeti (Pill)
+private struct StatusFlagPill: View {
+    let text: String
+    var icon: String? = nil
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 3) {
+            if let ic = icon {
+                Image(systemName: ic)
+                    .font(.system(size: 8.5))
+            }
+            Text(text)
+                .font(.system(size: 9.5, weight: .medium, design: .rounded))
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(color.opacity(0.14))
+        .foregroundColor(color)
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Klavye Kısayol İpucu (Keycap Hint)
+private struct KeycapHint: View {
+    let key: String
+    let action: String
+
+    var body: some View {
+        HStack(spacing: 3) {
+            Text(key)
+                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 1)
+                .background(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .fill(Color(NSColor.quaternaryLabelColor).opacity(0.6))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .strokeBorder(Color(NSColor.separatorColor).opacity(0.4), lineWidth: 0.5)
+                )
+
+            Text(action)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+        }
     }
 }
