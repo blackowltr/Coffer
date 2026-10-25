@@ -29,6 +29,11 @@ public struct MultiPartVolumeInfo: Equatable, Sendable {
 public final class MultiPartVolumeManager: Sendable {
     public static let shared = MultiPartVolumeManager()
 
+    // Statik ve Önceden Derlenmiş Düzenli İfadeler (Sıfır Regex Yeniden Derleme Masrafı)
+    private static let partRarRegex = try? NSRegularExpression(pattern: #"^(.*?)\.part(\d+)\.rar$"#, options: .caseInsensitive)
+    private static let split7zRegex = try? NSRegularExpression(pattern: #"^(.*?)\.7z\.(\d+)$"#, options: .caseInsensitive)
+    private static let splitZipRegex = try? NSRegularExpression(pattern: #"^(.*?)\.(z\d{2}|zip)$"#, options: .caseInsensitive)
+
     private init() {}
 
     /// Verilen dosya URL'sinin çok parçalı bir arşivin parçası olup olmadığını analiz eder
@@ -37,8 +42,7 @@ public final class MultiPartVolumeManager: Sendable {
         let parentDir = fileURL.deletingLastPathComponent()
 
         // 1. .part1.rar, .part01.rar, .part001.rar formatı
-        let partRarRegex = try? NSRegularExpression(pattern: #"^(.*?)\.part(\d+)\.rar$"#, options: .caseInsensitive)
-        if let match = partRarRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
+        if let match = Self.partRarRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
             if let baseRange = Range(match.range(at: 1), in: filename),
                let indexRange = Range(match.range(at: 2), in: filename),
                let currentIndex = Int(filename[indexRange]) {
@@ -48,8 +52,7 @@ public final class MultiPartVolumeManager: Sendable {
         }
 
         // 2. .7z.001, .7z.002 formatı
-        let split7zRegex = try? NSRegularExpression(pattern: #"^(.*?)\.7z\.(\d+)$"#, options: .caseInsensitive)
-        if let match = split7zRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
+        if let match = Self.split7zRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
             if let baseRange = Range(match.range(at: 1), in: filename),
                let indexRange = Range(match.range(at: 2), in: filename),
                let currentIndex = Int(filename[indexRange]) {
@@ -59,8 +62,7 @@ public final class MultiPartVolumeManager: Sendable {
         }
 
         // 3. .zip, .z01, .z02 formatı
-        let splitZipRegex = try? NSRegularExpression(pattern: #"^(.*?)\.(z\d{2}|zip)$"#, options: .caseInsensitive)
-        if let match = splitZipRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
+        if let match = Self.splitZipRegex?.firstMatch(in: filename, range: NSRange(location: 0, length: filename.utf16.count)) {
             if let baseRange = Range(match.range(at: 1), in: filename) {
                 let baseName = String(filename[baseRange])
                 let ext = fileURL.pathExtension.lowercased()

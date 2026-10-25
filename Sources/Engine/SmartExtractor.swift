@@ -25,15 +25,20 @@ public final class SmartExtractor: Sendable {
             if AppleJunkSanitizer.shared.isJunk(path: item.path) {
                 continue // .DS_Store, __MACOSX vb. kök klasör hesabını bozmasın
             }
-            let parts = item.path.split(separator: "/")
-            if let first = parts.first {
-                rootComponents.insert(String(first))
+            let firstPart: Substring
+            if let slashIdx = item.path.firstIndex(of: "/") {
+                firstPart = item.path[..<slashIdx]
+            } else {
+                firstPart = item.path[...]
+            }
+            if !firstPart.isEmpty {
+                rootComponents.insert(String(firstPart))
             }
         }
 
         // Eğer arşivde yalnızca 1 adet kök klasör varsa klasör bombası riski yoktur
         if rootComponents.count == 1, let singleRoot = rootComponents.first,
-           items.filter({ !AppleJunkSanitizer.shared.isJunk(path: $0.path) }).allSatisfy({ $0.path.hasPrefix(singleRoot + "/") || $0.path == singleRoot }) {
+           items.allSatisfy({ AppleJunkSanitizer.shared.isJunk(path: $0.path) || $0.path.hasPrefix(singleRoot + "/") || $0.path == singleRoot }) {
             return (baseDestinationURL, false)
         }
 

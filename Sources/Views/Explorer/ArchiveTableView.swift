@@ -40,7 +40,18 @@ public struct ArchiveTableView: View {
     }
 
     private func recalculateSortedItems() {
-        sortedItems = items.sorted(using: sortOrder)
+        if items.count > 300 {
+            let order = sortOrder
+            let inputItems = items
+            Task.detached(priority: .userInitiated) {
+                let result = inputItems.sorted(using: order)
+                await MainActor.run {
+                    self.sortedItems = result
+                }
+            }
+        } else {
+            sortedItems = items.sorted(using: sortOrder)
+        }
     }
 
     public var body: some View {

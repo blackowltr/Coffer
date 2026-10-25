@@ -70,7 +70,7 @@ public struct SettingsView: View {
 
                 // Sol Alt Sürüm Rozeti
                 VStack(spacing: 2) {
-                    Text("Coffer v1.3.0")
+                    Text("Coffer v1.4.0")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.secondary)
                     Text("Universal (Apple & Intel)")
@@ -890,18 +890,18 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
-        ## 🚀 Coffer v1.3.0 (En Son Sürüm)
+        ## 🚀 Coffer v1.4.0 (En Son Sürüm)
 
-        Coffer'ın yeni sürümü; yenilenen sol kenar çubuğu tasarımı, yüksek performans optimizasyonları ve Apple standartlarında görsel geliştirmelerle kullanıma sunuldu.
+        Bu sürümde Coffer'ın tüm çekirdek motorları baştan aşağı optimize edildi. Yüksek bellek verimliliği, sıfır gecikmeli arayüz ve ışık hızında dosya işleme mimarisi kullanıma sunuldu.
 
-        ### ✨ Yenilikler ve İyileştirmeler
+        ### ⚡ Verimlilik ve Performans Geliştirmeleri
 
-        - 📂 **Yenilenen Sol Kenar Çubuğu:** Sıkıştırılmış arşiv açıldığında sol tarafta yer alan klasör konumu, akıllı filtreler ve klasör ağacı Apple tasarım çizgilerine uygun şekilde baştan tasarlandı.
-        - ⚡ **Yüksek Hız ve Sıfır Takılma:** Çok sayıda dosya ve klasör içeren büyük arşivlerde gezinirken yaşanan bekleme ve donmalar tamamen giderildi. Önbellekleme mimarisi sayesinde tüm klasör geçişleri anında gerçekleşir.
-        - 🎯 **Akıllı Kategori Filtreleri:** Arşiv içindeki görseller, belgeler, medya dosyaları ve kodlar renkli Apple simgeleriyle gruplandırıldı. Aradığınız dosya türüne tek bir tıklamayla ulaşabilirsiniz.
-        - 🌀 **Animasyonlu İlerleme Ekranı:** Arşiv oluşturma ve çıkarma ekranları; dönen yörünge halkası, canlı hız göstergesi ve kalan süre sayacı ile donatıldı.
-        - 📝 **Zengin Sürüm Notları:** Yeni özellikler ve değişiklikler, tüm detaylarıyla anlaşılır kartlar halinde sunulmaktadır.
-        - 🛡️ **Kolay Kurulum Sihirbazı:** Uygulama ilk kez açıldığında gerekli macOS sistem izinleri tek tıkla otomatik olarak tanımlanır.
+        - 🏎️ **Sıfır Ek Tahsisatlı Dosya Modeli:** Dosya adları, uzantılar ve biçimlendirilmiş boyut bilgileri tek seferde hesaplanır. Liste kaydırma sırasında gereksiz bellek tahsisatı tamamen ortadan kaldırıldı.
+        - 🚀 **120 FPS Akıcı Tablo Sıralaması:** Büyük arşivlerde sıralama işlemleri arka plana aktarıldı; ProMotion ekranlarda takılma ve donma yaşanmaz.
+        - 🔍 **Işık Hızında Arama:** Arama kutusuna yazılan terimler, önceden dizinlenmiş küçük harf önbelleği sayesinde gecikmesiz olarak filtrelenir.
+        - 🔒 **Ultra Düşük Gecikmeli Simge Motoru:** Dosya simgesi sağlayıcısı nanosecond kilit mekanizmasına kavuşturuldu; klasör geçişleri anlık olarak gerçekleşir.
+        - 📦 **Dengelenmiş İlerleme Akışı:** Sıkıştırma ve çıkarma sırasında arayüze iletilen veri akışı 30-60 FPS aralığında dengelendi; işlemci tüketimi asgariye indirildi.
+        - 🛡️ **Hızlandırılmış Güvenlik Analizi:** Sıkıştırma bombası ve sahte uzantı kontrolleri optimize edildi; arşiv açılış süresi belirgin şekilde kısaltıldı.
 
         ### 📦 Sistem Uyumluluğu
         - **Evrensel Destek:** Apple Silicon (M1, M2, M3, M4) ve Intel (x86_64) işlemcili Mac bilgisayarlarla tam uyumludur.

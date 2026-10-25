@@ -25,40 +25,42 @@ public final class AppleJunkSanitizer: Sendable {
 
     private init() {}
 
-    /// Verilen dosya adının veya yolunun macOS / sistem artığı olup olmadığını kapsamlı kontrol eder
+    /// Verilen dosya adının veya yolunun macOS / sistem artığı olup olmadığını kapsamlı ve yüksek hızda kontrol eder
     public func isJunk(path: String) -> Bool {
-        let clean = path.trimmingCharacters(in: .whitespaces)
-        guard !clean.isEmpty else { return false }
+        guard !path.isEmpty else { return false }
 
-        let normalized = clean.replacingOccurrences(of: "\\", with: "/")
-        let filename = (normalized as NSString).lastPathComponent
-
-        // 1. .DS_Store varyantları
-        if filename == ".DS_Store" || filename == "._.DS_Store" { return true }
-
-        // 2. AppleDouble kaynak çatalı (Resource Fork) kalıntıları
-        if filename.hasPrefix("._") { return true }
-
-        // 3. __MACOSX üst ve alt dizinleri
-        if filename == "__MACOSX" || normalized.contains("__MACOSX") || normalized.hasPrefix("__MACOSX/") || normalized.contains("/__MACOSX/") {
+        // 1. En yaygın macOS artık kalıpları (Hızlı alt dize araması - Sıfır tahsisat)
+        if path.contains("__MACOSX") || path.contains(".DS_Store") {
             return true
         }
 
-        // 4. AppleDouble / AppleDesktop dizinleri
-        if filename == ".AppleDouble" || normalized.contains(".AppleDouble") { return true }
-        if filename == ".AppleDesktop" || normalized.contains(".AppleDesktop") { return true }
+        // 2. AppleDouble kaynak çatalı (Resource Fork) kalıntıları (örn: ._dosya.jpg veya /path/._dosya.jpg)
+        if path.hasPrefix("._") || path.contains("/._") || path.contains("\\._") {
+            return true
+        }
 
-        // 5. macOS İndeksleme ve Çöp Sepeti sistem klasörleri
-        if filename == ".Spotlight-V100" || normalized.contains(".Spotlight-V100") { return true }
-        if filename == ".Trashes" || normalized.contains(".Trashes") { return true }
-        if filename == ".fseventsd" || normalized.contains(".fseventsd") { return true }
+        // 3. Dosya adını belirle (Hızlı indeks araması)
+        let filename: Substring
+        if let idx = path.lastIndex(where: { $0 == "/" || $0 == "\\" }) {
+            filename = path[path.index(after: idx)...]
+        } else {
+            filename = path[...]
+        }
 
-        // 6. Özel disk ikonları ve AFP metadata
-        if filename == ".VolumeIcon.icns" || filename == ".apdisk" { return true }
+        guard !filename.isEmpty else { return false }
 
-        // 7. Windows önbellek kalıntıları
-        let lowerName = filename.lowercased()
-        if lowerName == "thumbs.db" || lowerName == "ehthumbs.db" || lowerName == "desktop.ini" {
+        // 4. Sabit sistem artık adları
+        if filename == ".AppleDouble" || filename == ".AppleDesktop" ||
+           filename == ".Spotlight-V100" || filename == ".Trashes" ||
+           filename == ".fseventsd" || filename == ".VolumeIcon.icns" ||
+           filename == ".apdisk" {
+            return true
+        }
+
+        // 5. Windows önbellek kalıntıları
+        if filename.caseInsensitiveCompare("thumbs.db") == .orderedSame ||
+           filename.caseInsensitiveCompare("ehthumbs.db") == .orderedSame ||
+           filename.caseInsensitiveCompare("desktop.ini") == .orderedSame {
             return true
         }
 

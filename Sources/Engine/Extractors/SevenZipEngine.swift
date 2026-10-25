@@ -84,6 +84,15 @@ public final class SevenZipEngine: Sendable {
         }.value
     }
 
+    // Paylaşımlı Statik Tarih Formatlayıcı (Tek defa oluşturulur)
+    private static let staticDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
     private func parseTechnicalListing(output: String, archiveURL: URL) -> (items: [ArchiveItem], metadata: ArchiveMetadata) {
         let separator = "----------"
         var headerSection = output
@@ -102,7 +111,7 @@ public final class SevenZipEngine: Sendable {
         var hasEncryptedHeaders = false
         var physicalSize: Int64 = (try? FileManager.default.attributesOfItem(atPath: archiveURL.path)[.size] as? Int64) ?? 0
 
-        for line in headerSection.components(separatedBy: .newlines) {
+        headerSection.enumerateLines { line, _ in
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if trimmed.hasPrefix("Type = ") {
                 let val = trimmed.dropFirst(7).trimmingCharacters(in: .whitespaces).lowercased()
@@ -128,57 +137,23 @@ public final class SevenZipEngine: Sendable {
             }
         }
 
-        // Items Parsing
+        // Items Parsing (Sıfır Dizi Bölme / Streaming Line-by-Line)
         var items: [ArchiveItem] = []
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-
-        let recordBlocks = recordsSection.components(separatedBy: "\n\n")
         var anyItemEncrypted = hasEncryptedHeaders
 
-        for block in recordBlocks {
-            let lines = block.components(separatedBy: .newlines)
-            var path: String?
-            var isFolder = false
-            var size: Int64 = 0
-            var packedSize: Int64 = 0
-            var modDate: Date?
-            var isEncrypted = false
-            var crc: String?
+        var currentPath: String?
+        var isFolder = false
+        var size: Int64 = 0
+        var packedSize: Int64 = 0
+        var modDate: Date?
+        var isEncrypted = false
+        var crc: String?
 
-            for line in lines {
-                let trimmed = line.trimmingCharacters(in: .whitespaces)
-                guard let eqIdx = trimmed.firstIndex(of: "=") else { continue }
-                let key = trimmed[..<eqIdx].trimmingCharacters(in: .whitespaces)
-                let value = trimmed[trimmed.index(after: eqIdx)...].trimmingCharacters(in: .whitespaces)
-
-                switch key {
-                case "Path":
-                    path = value
-                case "Folder":
-                    isFolder = (value == "+")
-                case "Size":
-                    size = Int64(value) ?? 0
-                case "Packed Size":
-                    packedSize = Int64(value) ?? 0
-                case "Modified":
-                    let cleanDateStr = String(value.prefix(19))
-                    modDate = dateFormatter.date(from: cleanDateStr)
-                case "Encrypted":
-                    isEncrypted = (value == "+")
-                    if isEncrypted { anyItemEncrypted = true }
-                case "CRC":
-                    crc = value.isEmpty ? nil : value.uppercased()
-                default:
-                    break
-                }
-            }
-
-            guard let itemPath = path, !itemPath.isEmpty else { continue }
-
+        func commitCurrentRecord() {
+            guard let path = currentPath, !path.isEmpty else { return }
             items.append(
                 ArchiveItem(
-                    path: itemPath,
+                    path: path,
                     uncompressedSize: size,
                     compressedSize: packedSize > 0 ? packedSize : size,
                     modificationDate: modDate,
@@ -187,7 +162,54 @@ public final class SevenZipEngine: Sendable {
                     crc32: crc
                 )
             )
+            currentPath = nil
+            isFolder = false
+            size = 0
+            packedSize = 0
+            modDate = nil
+            isEncrypted = false
+            crc = nil
         }
+
+        recordsSection.enumerateLines { line, _ in
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty {
+                commitCurrentRecord()
+                return
+            }
+
+            guard let eqIdx = trimmed.firstIndex(of: "=") else { return }
+            let key = trimmed[..<eqIdx].trimmingCharacters(in: .whitespaces)
+            let value = trimmed[trimmed.index(after: eqIdx)...].trimmingCharacters(in: .whitespaces)
+
+            switch key {
+            case "Path":
+                // Eğer önceki kayıt henüz tamamlanmadan yeni bir Path geldiyse kaydet
+                if currentPath != nil {
+                    commitCurrentRecord()
+                }
+                currentPath = value
+            case "Folder":
+                isFolder = (value == "+")
+            case "Size":
+                size = Int64(value) ?? 0
+            case "Packed Size":
+                packedSize = Int64(value) ?? 0
+            case "Modified":
+                let cleanDateStr = String(value.prefix(19))
+                modDate = Self.staticDateFormatter.date(from: cleanDateStr)
+            case "Encrypted":
+                isEncrypted = (value == "+")
+                if isEncrypted { anyItemEncrypted = true }
+            case "CRC":
+                crc = value.isEmpty ? nil : value.uppercased()
+            default:
+                break
+            }
+        }
+
+        // Son kalan kaydı ekle
+        commitCurrentRecord()
 
         let dirCount = items.filter { $0.isDirectory }.count
         let fileCount = items.count - dirCount
@@ -260,6 +282,8 @@ public final class SevenZipEngine: Sendable {
                     let startTime = Date()
                     let totalArchiveSize = (try? FileManager.default.attributesOfItem(atPath: archiveURL.path)[.size] as? Int64) ?? 1024
                     var processedLogs: [String] = []
+                    var seenLogs = Set<String>()
+                    var lastYieldTime: Double = 0
 
                     try process.run()
 
@@ -290,18 +314,31 @@ public final class SevenZipEngine: Sendable {
                                     let remainder = trimmed[trimmed.index(after: percentIdx)...].trimmingCharacters(in: .whitespaces)
                                     if !remainder.isEmpty {
                                         currentFilename = remainder
-                                        if !processedLogs.contains(remainder) {
+                                        if !seenLogs.contains(remainder) {
+                                            seenLogs.insert(remainder)
                                             processedLogs.append(remainder)
+                                            if processedLogs.count > 80 {
+                                                processedLogs.removeFirst(15)
+                                            }
                                         }
                                     }
                                 } else if trimmed.hasPrefix("Extracting ") {
                                     let fn = String(trimmed.dropFirst(11)).trimmingCharacters(in: .whitespaces)
                                     currentFilename = fn
-                                    if !processedLogs.contains(fn) {
+                                    if !seenLogs.contains(fn) {
+                                        seenLogs.insert(fn)
                                         processedLogs.append(fn)
+                                        if processedLogs.count > 80 {
+                                            processedLogs.removeFirst(15)
+                                        }
                                     }
                                 }
+                            }
 
+                            // Arayüzü 30 FPS (~33ms) ile sınırla (SwiftUI akıcılığını korur)
+                            let now = Date().timeIntervalSinceReferenceDate
+                            if now - lastYieldTime >= 0.033 {
+                                lastYieldTime = now
                                 let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
                                 let processedBytes = Int64(Double(totalArchiveSize) * currentFraction)
                                 let speed = Double(processedBytes) / elapsed
@@ -532,6 +569,8 @@ public final class SevenZipEngine: Sendable {
                     process.standardError = stderrPipe
 
                     var processedLogs: [String] = []
+                    var seenLogs = Set<String>()
+                    var lastYieldTime: Double = 0
 
                     try process.run()
 
@@ -562,12 +601,21 @@ public final class SevenZipEngine: Sendable {
                                     let remainder = trimmed[trimmed.index(after: percentIdx)...].trimmingCharacters(in: .whitespaces)
                                     if !remainder.isEmpty {
                                         currentFilename = remainder
-                                        if !processedLogs.contains(remainder) {
+                                        if !seenLogs.contains(remainder) {
+                                            seenLogs.insert(remainder)
                                             processedLogs.append(remainder)
+                                            if processedLogs.count > 80 {
+                                                processedLogs.removeFirst(15)
+                                            }
                                         }
                                     }
                                 }
+                            }
 
+                            // Arayüzü 30 FPS (~33ms) ile sınırla (SwiftUI akıcılığını korur)
+                            let now = Date().timeIntervalSinceReferenceDate
+                            if now - lastYieldTime >= 0.033 {
+                                lastYieldTime = now
                                 let elapsed = max(Date().timeIntervalSince(startTime), 0.001)
                                 let processedBytes = Int64(Double(totalSourceSize) * currentFraction)
                                 let speed = Double(processedBytes) / elapsed

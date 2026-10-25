@@ -88,6 +88,12 @@ public struct ArchiveBrowserView: View {
     @State private var itemsByID: [UUID: ArchiveItem] = [:]
     @State private var junkItemsCount: Int = 0
 
+    // Paylaşımlı Statik Kategori Kümeleri (Tek Seferde Oluşturulur)
+    private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "heic", "webp", "gif", "svg", "bmp", "tiff", "ico"]
+    private static let docExtensions: Set<String> = ["pdf", "doc", "docx", "pages", "txt", "rtf", "md", "xls", "xlsx", "numbers", "csv", "ppt", "pptx", "key"]
+    private static let mediaExtensions: Set<String> = ["mp4", "mov", "mkv", "avi", "webm", "m4v", "mp3", "m4a", "flac", "wav", "aac", "ogg"]
+    private static let codeExtensions: Set<String> = ["swift", "c", "cpp", "h", "hpp", "py", "js", "ts", "html", "css", "json", "xml", "sh", "yaml", "yml", "sql"]
+
     private var selectedSize: Int64 {
         selectedItemIDs.reduce(0) { total, id in
             total + (itemsByID[id]?.uncompressedSize ?? 0)
@@ -96,9 +102,9 @@ public struct ArchiveBrowserView: View {
 
     private var visibleItems: [ArchiveItem] {
         if !searchText.isEmpty {
+            let query = searchText.lowercased()
             return cleanItems.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.path.localizedCaseInsensitiveContains(searchText)
+                $0.lowerName.contains(query) || $0.lowerPath.contains(query)
             }
         }
 
@@ -350,11 +356,6 @@ public struct ArchiveBrowserView: View {
         var byID: [UUID: ArchiveItem] = [:]
         byID.reserveCapacity(items.count)
 
-        let imageExts: Set<String> = ["png", "jpg", "jpeg", "heic", "webp", "gif", "svg", "bmp", "tiff", "ico"]
-        let docExts: Set<String> = ["pdf", "doc", "docx", "pages", "txt", "rtf", "md", "xls", "xlsx", "numbers", "csv", "ppt", "pptx", "key"]
-        let mediaExts: Set<String> = ["mp4", "mov", "mkv", "avi", "webm", "m4v", "mp3", "m4a", "flac", "wav", "aac", "ogg"]
-        let codeExts: Set<String> = ["swift", "c", "cpp", "h", "hpp", "py", "js", "ts", "html", "css", "json", "xml", "sh", "yaml", "yml", "sql"]
-
         var byCat: [ArchiveCategoryFilter: [ArchiveItem]] = [
             .images: [], .documents: [], .media: [], .code: []
         ]
@@ -370,10 +371,10 @@ public struct ArchiveBrowserView: View {
 
             if !item.isDirectory {
                 let ext = item.fileExtension
-                if imageExts.contains(ext) { byCat[.images]?.append(item) }
-                else if docExts.contains(ext) { byCat[.documents]?.append(item) }
-                else if mediaExts.contains(ext) { byCat[.media]?.append(item) }
-                else if codeExts.contains(ext) { byCat[.code]?.append(item) }
+                if Self.imageExtensions.contains(ext) { byCat[.images]?.append(item) }
+                else if Self.docExtensions.contains(ext) { byCat[.documents]?.append(item) }
+                else if Self.mediaExtensions.contains(ext) { byCat[.media]?.append(item) }
+                else if Self.codeExtensions.contains(ext) { byCat[.code]?.append(item) }
             }
         }
 

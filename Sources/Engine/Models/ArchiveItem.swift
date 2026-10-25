@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Arşiv içerisindeki her bir dosya veya klasörün metadata modeli
+/// Bellek ve işlemci optimizasyonu için türetilmiş alanlar tek seferde hesaplanır ve önbelleğe alınır.
 public struct ArchiveItem: Identifiable, Hashable, Sendable {
     public let id: UUID
     public let path: String               // Örn: "Belgeler/Raporlar/Mali_2026.pdf"
@@ -14,6 +15,23 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
     public let isEncrypted: Bool          // Şifreli mi?
     public let crc32: String?             // Hex CRC32 (örn: "4F1A8C9E")
 
+    // Yüksek Performanslı Önbelleğe Alınmış Alanlar (Sıfır Ek Tahsisat)
+    public let fileExtension: String
+    public let lowerName: String
+    public let lowerPath: String
+    public let formattedUncompressedSize: String
+    public let formattedCompressedSize: String
+    public let formattedRatio: String
+    public let compressionRatio: Double
+
+    // Global Paylaşımlı Statik Boyut Formatlayıcı (Tek defa oluşturulur)
+    private static let sharedByteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        formatter.allowedUnits = [.useBytes, .useKB, .useMB, .useGB, .useTB]
+        return formatter
+    }()
+
     public init(
         id: UUID = UUID(),
         path: String,
@@ -25,6 +43,7 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
         crc32: String? = nil
     ) {
         self.id = id
+
         // 1. Ters eğik çizgileri (Windows / WinRAR '\') düz çizgiye '/' çevir
         var cleanPath = path.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\\", with: "/")
 
@@ -36,10 +55,10 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
             cleanPath.removeFirst()
         }
 
-        // 3. Klasör olup olmadığını tespit et (sonunda / varsa klasördür)
+        // 3. Klasör tespiti
         let isDir = isDirectory || cleanPath.hasSuffix("/")
 
-        // 4. Sondaki tüm / işaretlerini temizle (böylece klasör ile dosya yolları standartlaşır)
+        // 4. Sondaki tüm / işaretlerini temizle
         while cleanPath.hasSuffix("/") {
             cleanPath.removeLast()
         }
@@ -47,19 +66,54 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
         self.path = cleanPath
         self.isDirectory = isDir
 
-        let components = cleanPath.split(separator: "/").map(String.init)
-        self.name = components.last ?? cleanPath
-        if components.count > 1 {
-            self.parentPath = components.dropLast().joined(separator: "/")
+        // 5. Yüksek Hızlı Yol Ayrıştırma (Dizi/Split tahsisi yapmadan tek geçişte)
+        if let lastSlash = cleanPath.lastIndex(of: "/") {
+            self.name = String(cleanPath[cleanPath.index(after: lastSlash)...])
+            self.parentPath = String(cleanPath[..<lastSlash])
         } else {
+            self.name = cleanPath
             self.parentPath = ""
         }
 
         self.uncompressedSize = uncompressedSize
-        self.compressedSize = compressedSize > 0 ? compressedSize : uncompressedSize
+        let finalCompressed = compressedSize > 0 ? compressedSize : uncompressedSize
+        self.compressedSize = finalCompressed
         self.modificationDate = modificationDate
         self.isEncrypted = isEncrypted
         self.crc32 = crc32
+
+        // 6. Dosya Uzantısı (NSString köprülemesi olmadan yerel Swift indeks taraması)
+        if isDir {
+            self.fileExtension = ""
+        } else if let lastDot = self.name.lastIndex(of: "."), lastDot != self.name.startIndex {
+            self.fileExtension = String(self.name[self.name.index(after: lastDot)...]).lowercased()
+        } else {
+            self.fileExtension = ""
+        }
+
+        // 7. Arama İndeksi İçin Küçük Harf Önbelleği
+        self.lowerName = self.name.lowercased()
+        self.lowerPath = cleanPath.lowercased()
+
+        // 8. Sıkıştırma Oranı ve Formatlanmış Boyutlar (Önceden hesaplanır)
+        if isDir {
+            self.compressionRatio = 0.0
+            self.formattedUncompressedSize = "--"
+            self.formattedCompressedSize = "--"
+            self.formattedRatio = "--"
+        } else {
+            if uncompressedSize > 0 {
+                let ratio = (1.0 - (Double(finalCompressed) / Double(uncompressedSize))) * 100.0
+                let clampedRatio = max(0.0, min(ratio, 99.9))
+                self.compressionRatio = clampedRatio
+                self.formattedRatio = String(format: "%%%0.1f", clampedRatio)
+            } else {
+                self.compressionRatio = 0.0
+                self.formattedRatio = "--"
+            }
+            self.formattedUncompressedSize = Self.sharedByteFormatter.string(fromByteCount: uncompressedSize)
+            self.formattedCompressedSize = Self.sharedByteFormatter.string(fromByteCount: finalCompressed)
+        }
     }
 
     public static func == (lhs: ArchiveItem, rhs: ArchiveItem) -> Bool {
@@ -78,37 +132,6 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
     /// Sıralama için güvenli CRC32
     public var crc32Sortable: String {
         crc32 ?? ""
-    }
-
-    /// Sıkıştırma oranı (örn: %45 tasarruf)
-    public var compressionRatio: Double {
-        guard uncompressedSize > 0 else { return 0.0 }
-        let ratio = (1.0 - (Double(compressedSize) / Double(uncompressedSize))) * 100.0
-        return max(0.0, min(ratio, 99.9))
-    }
-
-    /// Dosya uzantısı
-    public var fileExtension: String {
-        guard !isDirectory else { return "" }
-        return (name as NSString).pathExtension.lowercased()
-    }
-
-    /// Okunabilir orijinal boyut formatı
-    public var formattedUncompressedSize: String {
-        if isDirectory { return "--" }
-        return ByteCountFormatter.string(fromByteCount: uncompressedSize, countStyle: .file)
-    }
-
-    /// Okunabilir sıkıştırılmış boyut formatı
-    public var formattedCompressedSize: String {
-        if isDirectory { return "--" }
-        return ByteCountFormatter.string(fromByteCount: compressedSize, countStyle: .file)
-    }
-
-    /// Okunabilir sıkıştırma oranı metni
-    public var formattedRatio: String {
-        if isDirectory { return "--" }
-        return String(format: "%%%0.1f", compressionRatio)
     }
 
     /// Dosya tipine uygun SF Symbol simgesi

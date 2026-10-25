@@ -41,14 +41,13 @@ public final class TarZipEngine: Sendable {
 
     private func parseTarOutput(_ output: String) -> [ArchiveItem] {
         var items: [ArchiveItem] = []
-        let lines = output.components(separatedBy: .newlines)
 
-        for line in lines {
+        output.enumerateLines { line, _ in
             let trimmed = line.trimmingCharacters(in: .whitespaces)
-            guard !trimmed.isEmpty else { continue }
+            guard !trimmed.isEmpty else { return }
 
             let parts = trimmed.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
-            guard parts.count >= 6 else { continue }
+            guard parts.count >= 6 else { return }
 
             let permissions = parts[0]
             let isDirByPerm = permissions.hasPrefix("d")
@@ -92,7 +91,7 @@ public final class TarZipEngine: Sendable {
             }
 
             let cleanPath = rawFilePath.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !cleanPath.isEmpty, !cleanPath.contains("..") else { continue }
+            guard !cleanPath.isEmpty, !cleanPath.contains("..") else { return }
 
             let isDir = isDirByPerm || cleanPath.hasSuffix("/")
 

@@ -217,18 +217,21 @@ public final class ArchiveSecurityEngine: Sendable {
         var disguisedApps: [String] = []
         var hiddenSuspiciousFiles: [String] = []
 
+        let deceptiveExecs: Set<String> = ["exe", "scr", "vbs", "bat", "cmd", "pif", "hta"]
+
         for item in items {
             guard !item.isDirectory else { continue }
-            let lowerName = item.name.lowercased()
-            let ext = (lowerName as NSString).pathExtension
+            let ext = item.fileExtension
 
             // Gerçek çift uzantılı kimlik avı kontrolü: örn "fatura.pdf.exe", "resim.jpg.scr"
-            let components = lowerName.split(separator: ".").map(String.init)
-            if components.count >= 3 {
-                let penultimateExt = components[components.count - 2]
-                let deceptiveExecs: Set<String> = ["exe", "scr", "vbs", "bat", "cmd", "pif", "hta"]
-                if Self.harmlessDocumentExtensions.contains(penultimateExt) && deceptiveExecs.contains(ext) {
-                    disguisedApps.append(item.path)
+            // Yalnızca aldatıcı bir uzantı varsa ayrıştırma yapılır (Gereksiz dizi tahsisatı önlenir)
+            if deceptiveExecs.contains(ext) {
+                let parts = item.lowerName.split(separator: ".")
+                if parts.count >= 3 {
+                    let penultimateExt = String(parts[parts.count - 2])
+                    if Self.harmlessDocumentExtensions.contains(penultimateExt) {
+                        disguisedApps.append(item.path)
+                    }
                 }
             }
 
@@ -238,7 +241,7 @@ public final class ArchiveSecurityEngine: Sendable {
                 scripts.append(item.path)
             }
 
-            // Gizlenmiş yürütülebilir dosyalar
+            // Gizlenmiş yürütülebilir dosyalar (örn: .gizli.exe)
             if item.name.hasPrefix(".") && Self.dangerousExecutableExtensions.contains(ext) {
                 hiddenSuspiciousFiles.append(item.path)
             }

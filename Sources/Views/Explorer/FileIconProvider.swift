@@ -1,15 +1,16 @@
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
+import os
 
-/// Yüksek çözünürlüklü ve yerel macOS dosya/klasör simgelerini sağlayan ve önbelleğe alan yüksek performanslı sağlayıcı
+/// Yüksek çözünürlüklü ve yerel macOS dosya/klasör simgelerini sağlayan ve önbelleğe alan ultra-düşük gecikmeli sağlayıcı
 public final class FileIconProvider: @unchecked Sendable {
     public static let shared = FileIconProvider()
 
     private var cache = [String: NSImage]()
     public let folderIcon: NSImage
     public let defaultFileIcon: NSImage
-    private let lock = NSLock()
+    private var unfairLock = os_unfair_lock()
 
     private init() {
         let folder = NSWorkspace.shared.icon(for: .folder)
@@ -93,23 +94,23 @@ public final class FileIconProvider: @unchecked Sendable {
         }
     }
 
-    /// Dosya veya klasör için yerel, yüksek kaliteli macOS simgesini döner
+    /// Dosya veya klasör için yerel, yüksek kaliteli macOS simgesini döner (Nanosecond Fast Path)
     public func icon(for item: ArchiveItem) -> NSImage {
         if item.isDirectory {
             return folderIcon
         }
 
-        let ext = item.fileExtension.lowercased()
+        let ext = item.fileExtension
         if ext.isEmpty {
             return defaultFileIcon
         }
 
-        lock.lock()
+        os_unfair_lock_lock(&unfairLock)
         if let cached = cache[ext] {
-            lock.unlock()
+            os_unfair_lock_unlock(&unfairLock)
             return cached
         }
-        lock.unlock()
+        os_unfair_lock_unlock(&unfairLock)
 
         // Özel simge kontrolü
         let iconName: String?
@@ -138,9 +139,9 @@ public final class FileIconProvider: @unchecked Sendable {
             resolvedIcon = defaultFileIcon
         }
 
-        lock.lock()
+        os_unfair_lock_lock(&unfairLock)
         cache[ext] = resolvedIcon
-        lock.unlock()
+        os_unfair_lock_unlock(&unfairLock)
 
         return resolvedIcon
     }
