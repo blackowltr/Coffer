@@ -10,6 +10,7 @@ public struct ArchiveProgress: Sendable {
     public let estimatedRemainingTime: TimeInterval? // Kalan tahmini süre (saniye)
     public let elapsedTime: TimeInterval   // Geçen süre (saniye)
     public let processedLog: [String]      // İşlenen dosyaların kayıt günlüğü
+    public let freedBytes: Int64           // Alan açma modunda şimdiye kadar serbest bırakılan disk alanı (byte)
 
     public init(
         fractionCompleted: Double,
@@ -19,7 +20,8 @@ public struct ArchiveProgress: Sendable {
         speedBytesPerSecond: Double = 0.0,
         estimatedRemainingTime: TimeInterval? = nil,
         elapsedTime: TimeInterval = 0.0,
-        processedLog: [String] = []
+        processedLog: [String] = [],
+        freedBytes: Int64 = 0
     ) {
         self.fractionCompleted = max(0.0, min(fractionCompleted, 1.0))
         self.currentFilename = currentFilename
@@ -29,6 +31,7 @@ public struct ArchiveProgress: Sendable {
         self.estimatedRemainingTime = estimatedRemainingTime
         self.elapsedTime = elapsedTime
         self.processedLog = processedLog
+        self.freedBytes = freedBytes
     }
 
     /// Yüzde metni ("%78.4")
@@ -84,5 +87,10 @@ public struct ArchiveProgress: Sendable {
     /// Okunabilir toplam boyut ("120.0 MB")
     public var formattedTotalBytes: String {
         ByteCountFormatter.string(fromByteCount: totalBytes, countStyle: .file)
+    }
+
+    /// Okunabilir serbest bırakılan alan ("14.2 GB")
+    public var formattedFreedBytes: String {
+        ByteCountFormatter.string(fromByteCount: freedBytes, countStyle: .file)
     }
 }

@@ -29,6 +29,14 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 * **İki Farklı Görünüm:** Tercihinize göre Finder tarzı simge (ızgara) görünümü veya ayrıntılı liste görünümü arasında tek tıkla geçiş yapın.
 * **Anında Arama:** `⌘F` kısayoluyla arşiv içindeki yüzlerce dosya arasında gecikmesiz filtreleme yapın.
 
+### ⚡ Alan Açarak Çıkarma (Düşük Disk Alanı Modu)
+* **Yetersiz Disk Alanında Bile Çıkarma:** Standart araçlar 50 GB'lık bir arşivi açmak için 50 GB arşiv + 50 GB çıkarılan dosyalar = 100 GB boş alan ister. UnPack'in Alan Açma Modu ile yalnızca en büyük tek dosya boyutu kadar (~500 MB) boş alanla devasa arşivleri dahi başarıyla açabilirsiniz.
+* **macOS APFS Blok Delme (Sparse Hole Punching):** macOS APFS dosya sistemi üzerinde `F_PUNCHHOLE` ile çıkarılan dosyaların arşivdeki blokları anında deallocate edilir ve işletim sistemine iade edilir.
+* **Ters Kısaltma (Reverse Truncation) & Kuyruk Koruma:** APFS harici disklerde ve ZIP/TAR dosyalarında dosyalar sondan başa doğru ayıklanarak `ftruncate` ile arşiv kademeli olarak küçültülür.
+* **Çökme ve Kesinti Korumalı Günlükleme (Journaling):** `.unpack-journal.json` sayesinde işlem elektrik kesintisi veya iptal ile yarıda kalsa dahi arşiv bozulmaz; UnPack açıldığında tek tıkla kaldığı yerden devam eder.
+* **Önceden Alan Analizi (Pre-flight Space Check):** Hedef diskteki boş alan çıkarma öncesinde simüle edilir; alan kritikse Alan Açma Modu otomatik olarak önerilir.
+* **Çok Parçalı Arşiv (Multi-part) Otomatik Tasarrufu:** `.part1.rar` veya `.7z.001` gibi çok ciltli arşivlerde tamamlanan ciltler anında temizlenerek disk alanı serbest bırakılır.
+
 ### 🖱️ Doğrudan Finder Entegrasyonu
 * Finder üzerinde herhangi bir dosyaya veya arşive sağ tıkladığınızda UnPack eylemleri doğrudan ana menüde listelenir:
   * **Buraya Çıkart**

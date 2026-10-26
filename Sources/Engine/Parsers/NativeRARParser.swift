@@ -179,7 +179,8 @@ public final class NativeRARParser: Sendable {
             modificationDate: modDate,
             isDirectory: isDirectory,
             isEncrypted: isEncrypted,
-            crc32: crcString
+            crc32: crcString,
+            headerOffset: Int64(offset)
         )
     }
 
@@ -299,7 +300,8 @@ public final class NativeRARParser: Sendable {
             modificationDate: modDate,
             isDirectory: isDirectory,
             isEncrypted: isEncrypted,
-            crc32: crcString
+            crc32: crcString,
+            headerOffset: Int64(offset)
         )
     }
 

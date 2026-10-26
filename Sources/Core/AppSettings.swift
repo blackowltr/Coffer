@@ -36,6 +36,11 @@ public final class AppSettings: ObservableObject {
     @AppStorage("revealInFinderAfterExtract") public var revealInFinderAfterExtract: Bool = true
     @AppStorage("playSoundOnCompletion") public var playSoundOnCompletion: Bool = true
 
+    // MARK: - Alan Açarak Çıkarma (Space-Saver Extraction)
+    @AppStorage("enableSpaceSaverMode") public var enableSpaceSaverMode: Bool = false
+    @AppStorage("autoEnableSpaceSaverOnLowDisk") public var autoEnableSpaceSaverOnLowDisk: Bool = true
+    @AppStorage("spaceSaverSafetyMarginMB") public var spaceSaverSafetyMarginMB: Int = 512
+
     private init() {}
 
     public enum AppTheme: String, CaseIterable, Identifiable {

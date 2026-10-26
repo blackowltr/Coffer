@@ -14,6 +14,7 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
     public let isDirectory: Bool          // Klasör mü?
     public let isEncrypted: Bool          // Şifreli mi?
     public let crc32: String?             // Hex CRC32 (örn: "4F1A8C9E")
+    public let headerOffset: Int64?       // Arşiv dosyası içindeki fiziksel byte ofseti (Alan açarak çıkarma için)
 
     // Yüksek Performanslı Önbelleğe Alınmış Alanlar (Sıfır Ek Tahsisat)
     public let fileExtension: String
@@ -40,7 +41,8 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
         modificationDate: Date? = nil,
         isDirectory: Bool = false,
         isEncrypted: Bool = false,
-        crc32: String? = nil
+        crc32: String? = nil,
+        headerOffset: Int64? = nil
     ) {
         self.id = id
 
@@ -81,6 +83,7 @@ public struct ArchiveItem: Identifiable, Hashable, Sendable {
         self.modificationDate = modificationDate
         self.isEncrypted = isEncrypted
         self.crc32 = crc32
+        self.headerOffset = headerOffset
 
         // 6. Dosya Uzantısı (NSString köprülemesi olmadan yerel Swift indeks taraması)
         if isDir {

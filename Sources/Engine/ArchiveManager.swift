@@ -146,6 +146,41 @@ public actor ArchiveManager {
         }
     }
 
+    // MARK: - Alan Açarak Çıkarma (Space-Saving Extraction)
+
+    /// Çıkarma öncesi disk alanı gereksinimlerini ve tasarruf potansiyelini değerlendirir
+    public func estimateSpaceRequirements(
+        archiveURL: URL,
+        destinationURL: URL,
+        items: [ArchiveItem]
+    ) -> SpaceRequirementReport {
+        return SpaceRequirementEstimator.shared.evaluate(
+            archiveURL: archiveURL,
+            destinationURL: destinationURL,
+            items: items
+        )
+    }
+
+    /// Büyük arşivleri disk bloklarını kademeli serbest bırakarak minimum alanda çıkartır
+    public func extractWithSpaceSaving(
+        archiveURL: URL,
+        destinationURL: URL,
+        items: [ArchiveItem],
+        selectedItems: [ArchiveItem]? = nil,
+        password: String? = nil,
+        isResume: Bool = false
+    ) -> AsyncThrowingStream<ArchiveProgress, Error> {
+        let effectivePassword = password ?? sessionPasswordStore.get(archiveURL)
+        return SpaceSaverExtractor.shared.extract(
+            archiveURL: archiveURL,
+            destinationURL: destinationURL,
+            items: items,
+            selectedItems: selectedItems,
+            password: effectivePassword,
+            isResume: isResume
+        )
+    }
+
     // MARK: - Sıkıştırma İşlemi (Compression)
 
     public func compress(

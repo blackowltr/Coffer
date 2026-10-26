@@ -152,6 +152,7 @@ public final class SevenZipEngine: Sendable {
         var modDate: Date?
         var isEncrypted = false
         var crc: String?
+        var offset: Int64?
 
         func commitCurrentRecord() {
             guard let path = currentPath, !path.isEmpty else { return }
@@ -163,7 +164,8 @@ public final class SevenZipEngine: Sendable {
                     modificationDate: modDate,
                     isDirectory: isFolder,
                     isEncrypted: isEncrypted,
-                    crc32: crc
+                    crc32: crc,
+                    headerOffset: offset
                 )
             )
             currentPath = nil
@@ -173,6 +175,7 @@ public final class SevenZipEngine: Sendable {
             modDate = nil
             isEncrypted = false
             crc = nil
+            offset = nil
         }
 
         recordsSection.enumerateLines { line, _ in
@@ -207,6 +210,8 @@ public final class SevenZipEngine: Sendable {
                 if isEncrypted { anyItemEncrypted = true }
             case "CRC":
                 crc = value.isEmpty ? nil : value.uppercased()
+            case "Offset":
+                offset = Int64(value)
             default:
                 break
             }

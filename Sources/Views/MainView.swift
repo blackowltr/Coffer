@@ -66,6 +66,8 @@ public struct MainView: View {
     @State private var showSuccessAlert: Bool = false
     @State private var conflictingFileName: String = ""
     @State private var conflictResolutionAction: ((ConflictResolutionChoice, Bool) -> Void)? = nil
+    @State private var resumeJournalRecord: SpaceSaverJournal.Record? = nil
+    @State private var showResumeBanner: Bool = false
 
     public init() {
         let isDone = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") || AppSettings.shared.hasCompletedOnboarding
@@ -146,42 +148,85 @@ public struct MainView: View {
                 // Ana Mod İçeriği
                 if currentMode == .explorer {
                     if let archiveURL = openedArchiveURL {
-                        ArchiveBrowserView(
-                            archiveURL: archiveURL,
-                            items: archiveItems,
-                            metadata: archiveMetadata,
-                            currentPath: $currentPath,
-                            searchText: $searchText,
-                            selectedItemIDs: $selectedItemIDs,
-                            onAddFiles: { triggerAddFiles() },
-                            onExtract: { activeSheet = .extract },
-                            onTestArchive: { runIntegrityTest() },
-                            onPreviewItem: { item in previewItem(item) },
-                            onDeleteSelected: { deleteSelectedItems() },
-                            onCleanMacJunk: { cleanMacJunkFromCurrentArchive() },
-                            onShowInfo: {
-                                if let meta = archiveMetadata {
-                                    activeSheet = .info(metadata: meta)
+                        VStack(spacing: 0) {
+                            if showResumeBanner, let journal = resumeJournalRecord {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "bolt.badge.clock.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.orange)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Yarıda Kalan Alan Açarak Çıkarma Tespit Edildi")
+                                            .font(.system(size: 12, weight: .bold))
+                                        Text("\(journal.completedItems.count) dosya önceden başarıyla çıkarıldı. Kaldığı yerden anında devam edebilirsiniz.")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(.secondary)
+                                    }
+
+                                    Spacer()
+
+                                    Button("Kaldığı Yerden Devam Et") {
+                                        showResumeBanner = false
+                                        resumeSpaceSavingExtraction(for: archiveURL, journal: journal)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .controlSize(.small)
+
+                                    Button("Yoksay") {
+                                        showResumeBanner = false
+                                        SpaceSaverJournal.shared.deleteJournalAndTail(for: archiveURL)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .controlSize(.small)
                                 }
-                            },
-                            onConvertArchive: {
-                                if let src = openedArchiveURL {
-                                    activeSheet = .convert(sourceURL: src)
-                                }
-                            },
-                            onDiffArchive: { activeSheet = .diff(initialURL: openedArchiveURL) },
-                            onLockArchive: { promptPasswordProtection() },
-                            onRepairArchive: { repairArchive() },
-                            onNavigateTo: { path in currentPath = path },
-                            onNavigateUp: { navigateUp() },
-                            securityReport: securityReport,
-                            onShowSecurity: {
-                                if let rep = securityReport {
-                                    activeSheet = .security(report: rep)
-                                }
-                            },
-                            onNewArchive: { browseAndCompress() }
-                        )
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color.orange.opacity(0.12))
+                                .overlay(
+                                    Rectangle()
+                                        .frame(height: 1)
+                                        .foregroundColor(Color.orange.opacity(0.3)),
+                                    alignment: .bottom
+                                )
+                            }
+
+                            ArchiveBrowserView(
+                                archiveURL: archiveURL,
+                                items: archiveItems,
+                                metadata: archiveMetadata,
+                                currentPath: $currentPath,
+                                searchText: $searchText,
+                                selectedItemIDs: $selectedItemIDs,
+                                onAddFiles: { triggerAddFiles() },
+                                onExtract: { activeSheet = .extract },
+                                onTestArchive: { runIntegrityTest() },
+                                onPreviewItem: { item in previewItem(item) },
+                                onDeleteSelected: { deleteSelectedItems() },
+                                onCleanMacJunk: { cleanMacJunkFromCurrentArchive() },
+                                onShowInfo: {
+                                    if let meta = archiveMetadata {
+                                        activeSheet = .info(metadata: meta)
+                                    }
+                                },
+                                onConvertArchive: {
+                                    if let src = openedArchiveURL {
+                                        activeSheet = .convert(sourceURL: src)
+                                    }
+                                },
+                                onDiffArchive: { activeSheet = .diff(initialURL: openedArchiveURL) },
+                                onLockArchive: { promptPasswordProtection() },
+                                onRepairArchive: { repairArchive() },
+                                onNavigateTo: { path in currentPath = path },
+                                onNavigateUp: { navigateUp() },
+                                securityReport: securityReport,
+                                onShowSecurity: {
+                                    if let rep = securityReport {
+                                        activeSheet = .security(report: rep)
+                                    }
+                                },
+                                onNewArchive: { browseAndCompress() }
+                            )
+                        }
                     } else {
                         emptyExplorerWelcomeView
                     }
@@ -403,17 +448,20 @@ public struct MainView: View {
 
         case .extract:
             ExtractDialog(
+                archiveURL: openedArchiveURL,
                 archiveName: openedArchiveURL?.lastPathComponent ?? "Arşiv",
+                items: archiveItems,
                 selectedItemsCount: selectedItemIDs.count,
                 isPresented: isPresentedBinding,
-                onStartExtract: { destURL, selectedOnly, overwrite, reveal, trashOriginal in
+                onStartExtract: { destURL, selectedOnly, overwrite, reveal, trashOriginal, useSpaceSaver in
                     activeSheet = nil
                     startExtraction(
                         baseDestinationURL: destURL,
                         selectedOnly: selectedOnly,
                         overwrite: overwrite,
                         revealInFinder: reveal,
-                        trashOriginal: trashOriginal
+                        trashOriginal: trashOriginal,
+                        useSpaceSaver: useSpaceSaver
                     )
                 }
             )
@@ -687,6 +735,15 @@ public struct MainView: View {
                     if metadata.isEncrypted && password == nil {
                         self.activeSheet = .password(archiveName: url.lastPathComponent)
                     }
+
+                    if SpaceSaverJournal.shared.hasActiveJournal(for: url),
+                       let journal = SpaceSaverJournal.shared.readJournal(for: url) {
+                        self.resumeJournalRecord = journal
+                        self.showResumeBanner = true
+                    } else {
+                        self.resumeJournalRecord = nil
+                        self.showResumeBanner = false
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -796,7 +853,8 @@ public struct MainView: View {
         selectedOnly: Bool,
         overwrite: Bool,
         revealInFinder: Bool,
-        trashOriginal: Bool
+        trashOriginal: Bool,
+        useSpaceSaver: Bool = false
     ) {
         guard let arcURL = openedArchiveURL else { return }
 
@@ -830,7 +888,8 @@ public struct MainView: View {
                         finalDestinationURL: finalDestinationURL,
                         selectedItems: selectedItems,
                         revealInFinder: revealInFinder,
-                        trashOriginal: trashOriginal
+                        trashOriginal: trashOriginal,
+                        useSpaceSaver: useSpaceSaver
                     )
                 case .autoRename:
                     let renamedURL = finalDestinationURL.appendingPathComponent("Cikarilan_\(UUID().uuidString.prefix(4))")
@@ -840,7 +899,8 @@ public struct MainView: View {
                         finalDestinationURL: renamedURL,
                         selectedItems: selectedItems,
                         revealInFinder: revealInFinder,
-                        trashOriginal: trashOriginal
+                        trashOriginal: trashOriginal,
+                        useSpaceSaver: useSpaceSaver
                     )
                 case .skip, .cancel:
                     break
@@ -855,7 +915,8 @@ public struct MainView: View {
             finalDestinationURL: finalDestinationURL,
             selectedItems: selectedItems,
             revealInFinder: revealInFinder,
-            trashOriginal: trashOriginal
+            trashOriginal: trashOriginal,
+            useSpaceSaver: useSpaceSaver
         )
     }
 
@@ -864,19 +925,33 @@ public struct MainView: View {
         finalDestinationURL: URL,
         selectedItems: [ArchiveItem]?,
         revealInFinder: Bool,
-        trashOriginal: Bool
+        trashOriginal: Bool,
+        useSpaceSaver: Bool = false,
+        isResume: Bool = false
     ) {
-        progressTitle = "Dosyalar Çıkartılıyor..."
+        progressTitle = useSpaceSaver ? "Alan Açarak Çıkartılıyor (Space-Saver)..." : "Dosyalar Çıkartılıyor..."
         showProgressModal = true
 
         Task {
             do {
-                let stream = await ArchiveManager.shared.extract(
-                    archiveURL: arcURL,
-                    destinationURL: finalDestinationURL,
-                    selectedItems: selectedItems,
-                    password: nil
-                )
+                let stream: AsyncThrowingStream<ArchiveProgress, Error>
+                if useSpaceSaver {
+                    stream = await ArchiveManager.shared.extractWithSpaceSaving(
+                        archiveURL: arcURL,
+                        destinationURL: finalDestinationURL,
+                        items: archiveItems,
+                        selectedItems: selectedItems,
+                        password: nil,
+                        isResume: isResume
+                    )
+                } else {
+                    stream = await ArchiveManager.shared.extract(
+                        archiveURL: arcURL,
+                        destinationURL: finalDestinationURL,
+                        selectedItems: selectedItems,
+                        password: nil
+                    )
+                }
 
                 for try await prog in stream {
                     await MainActor.run {
@@ -886,13 +961,24 @@ public struct MainView: View {
 
                 await MainActor.run {
                     self.showProgressModal = false
-                    SmartExtractor.shared.performPostExtractionActions(
-                        archiveURL: arcURL,
-                        destinationURL: finalDestinationURL,
-                        trashOriginal: trashOriginal,
-                        revealInFinder: revealInFinder,
-                        playSound: settings.playSoundOnCompletion
-                    )
+                    if !useSpaceSaver {
+                        SmartExtractor.shared.performPostExtractionActions(
+                            archiveURL: arcURL,
+                            destinationURL: finalDestinationURL,
+                            trashOriginal: trashOriginal,
+                            revealInFinder: revealInFinder,
+                            playSound: settings.playSoundOnCompletion
+                        )
+                    } else {
+                        if settings.playSoundOnCompletion {
+                            NSSound.beep()
+                        }
+                        if revealInFinder {
+                            NSWorkspace.shared.selectFile(finalDestinationURL.path, inFileViewerRootedAtPath: "")
+                        }
+                        self.successAlertMessage = "Alan açılarak çıkarma başarıyla tamamlandı. Arşiv disk alanı sisteme geri kazandırıldı."
+                        self.showSuccessAlert = true
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -902,6 +988,19 @@ public struct MainView: View {
                 }
             }
         }
+    }
+
+    private func resumeSpaceSavingExtraction(for arcURL: URL, journal: SpaceSaverJournal.Record) {
+        let destURL = URL(fileURLWithPath: journal.destinationPath)
+        performActualExtraction(
+            arcURL: arcURL,
+            finalDestinationURL: destURL,
+            selectedItems: nil,
+            revealInFinder: settings.revealInFinderAfterExtract,
+            trashOriginal: false,
+            useSpaceSaver: true,
+            isResume: true
+        )
     }
 
     private func startConversion(targetFormat: ArchiveFormat, level: CompressionLevel, targetURL: URL) {

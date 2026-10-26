@@ -621,6 +621,55 @@ private struct ExtractionSettingsPane: View {
                     }
                 }
             }
+
+            // Alan Açarak Çıkarma (Space-Saver) Kartı
+            SettingsCard(title: "Alan Açarak Çıkarma (Düşük Disk Alanı Modu)") {
+                VStack(spacing: 0) {
+                    SettingsRow(
+                        icon: "bolt.shield.fill",
+                        iconColor: .orange,
+                        title: "Düşük Disk Alanında Otomatik Alan Aç",
+                        subtitle: "Hedef diskte standart çıkarma için yetersiz boş alan tespit edildiğinde Alan Açma Modunu otomatik önerir ve aktifleştirir."
+                    ) {
+                        Toggle("", isOn: $settings.autoEnableSpaceSaverOnLowDisk)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+
+                    CardRowDivider()
+
+                    SettingsRow(
+                        icon: "cylinder.split.1x2.fill",
+                        iconColor: .purple,
+                        title: "Varsayılan Alan Açma Modu",
+                        subtitle: "Tüm çıkarma işlemlerinde arşivden çıkan dosyaların disk bloklarını anında serbest bırakarak tepe disk kullanımını minimumda tutar."
+                    ) {
+                        Toggle("", isOn: $settings.enableSpaceSaverMode)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+
+                    CardRowDivider()
+
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.orange)
+                            .padding(.top, 2)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Alan Açarak Çıkarma Nasıl Çalışır?")
+                                .font(.system(size: 12, weight: .semibold))
+
+                            Text("Standart araçlar 50 GB'lık bir arşivi açmak için 50 GB arşiv + 50 GB çıkarılan dosyalar = 100 GB boş alan ister. UnPack, macOS APFS blok delme (sparse hole punching), ters kısaltma (reverse truncation) ve çökme korumalı günlük (journaling) mimarisiyle, dosyaları çıkardıkça arşivin disk bloklarını anında sisteme iade eder. Böylece disk dolmadan çıkarma başarıyla tamamlanır.")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                                .lineSpacing(2)
+                        }
+                    }
+                    .padding(14)
+                }
+            }
         }
     }
 }
@@ -891,6 +940,18 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
+        ## 🚀 UnPack v1.8.0
+
+        Yetersiz disk alanına sahip Mac'lerde büyük arşivlerin açılabilmesini sağlayan "Alan Açarak Çıkarma (Space-Saving In-Place Extraction)" modu eklendi. Çıkarılan dosyaların arşivdeki blokları adım adım serbest bırakılarak minimum boş alanda ayıklama yapılır.
+
+        ### ⚡ Alan Açarak Çıkarma (Düşük Disk Alanı Modu)
+        - 💾 **Minimum Tepe Disk Kullanımı:** Normalde `Arşiv Boyutu + Çıkarılan Dosyalar` kadar boş alan gerekirken; Alan Açma Modu ile yalnızca en büyük tek dosya boyutu kadar alanla 50-100 GB devasa arşivleri bile açabilirsiniz.
+        - 🕳️ **macOS APFS Blok Delme (Sparse Hole Punching):** macOS APFS dosya sistemi üzerinde `F_PUNCHHOLE` çağrısı kullanılarak çıkarılan her dosyanın disk blokları anında deallocate edilir ve işletim sistemine geri kazandırılır.
+        - 🔄 **Ters Kısaltma (Reverse Truncation) & Kuyruk Koruma:** APFS harici disklerde ve ZIP/TAR arşivlerinde dosyalar sondan başa doğru ayıklanır; her adımda `ftruncate` ile arşiv küçültülür.
+        - 🛡️ **Çökme ve Kesinti Korumalı Günlükleme (Journaling):** `.unpack-journal.json` sayesinde işlem elektrik kesintisi veya iptal ile yarıda kalsa bile arşiv bozulmaz; UnPack açıldığında tek tıkla kaldığı yerden devam eder.
+        - 📊 **Akıllı Ön Kontrol (Pre-flight Space Check):** Hedef diskte yeterli alan olup olmadığı çıkarma öncesinde simüle edilir; alan kritikse kullanıcıya otomatik Alan Açma Modu önerilir.
+        - 📦 **Çok Parçalı Arşiv (Multi-part) Otomatik Tasarrufu:** `.part1.rar` veya `.7z.001` gibi çok ciltli arşivlerde tamamlanan ciltler anında temizlenerek disk alanı serbest bırakılır.
+
         ## 🚀 UnPack v1.7.2
 
         RAM ve CPU tüketimini en aza indirgeyen, arka plan işlemlerini ve dosya önbelleğini optimize eden yüksek verimlilik güncellemesi.
