@@ -109,9 +109,18 @@ Apple Silicon (M1–M4) ve Intel işlemcili Mac bilgisayarlarda yerel (Universal
 
 ## Kurulum
 
-1. En son sürüm yükleyicisini (`UnPack-1.7.2.dmg`) **[Releases](https://github.com/blackowltr/UnPack/releases)** sayfasından veya **[Web Sitemizden](https://blackowltr.github.io/UnPack/)** indirin.
-2. DMG dosyasını açıp `UnPack` simgesini `Uygulamalar` (Applications) klasörüne sürükleyin.
-3. Uygulamayı ilk kez açtığınızda gerekli sistem izinleri onaylanır; ardından UnPack arka planda sessizce ve kesintisiz şekilde çalışmaya devam eder.
+1. En son sürüm yükleyicisini (`UnPack-1.8.0.dmg`) **[Releases](https://github.com/blackowltr/UnPack/releases)** sayfasından indirin.
+2. İndirilen DMG dosyasını açın.
+
+### ⚡ Önerilen Hızlı Kurulum (Tek Tıkla)
+* DMG penceresindeki **`Hızlı_Kurulum.command`** dosyasına çift tıklayın.
+* macOS Gatekeeper *"Zararlı dosya"* uyarısını otomatik olarak temizler, UnPack'i Uygulamalar klasörüne yerleştirir ve doğrudan başlatır.
+
+### Alternatif Sürükle - Bırak Kurulumu
+1. `UnPack` simgesini `Applications` klasörüne sürükleyin.
+2. Açarken *"Zararlı yazılım / çöpe taşı"* uyarısı alırsanız:
+   * **Sistem Ayarları ➔ Gizlilik ve Güvenlik** bölümüne gidin.
+   * Sayfanın altındaki **"Yine de Aç"** butonuna tıklayın (veya DMG içindeki `Hızlı_Kurulum.command` dosyasını çalıştırın).
 
 ---
 

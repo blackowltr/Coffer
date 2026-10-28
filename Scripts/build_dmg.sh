@@ -29,30 +29,27 @@ ln -s /Applications "${STAGING_DIR}/Applications"
 # Add Kurulum Rehberi into DMG
 cat << 'EOF' > "${BUILD_DIR}/Kurulum_Rehberi.txt"
 =====================================================
-          UnPack 1.7 - Hızlı Kurulum Rehberi
+          UnPack - Kolay Kurulum Rehberi
 =====================================================
 
-UnPack'i Mac'inize kurmak için 2 kolay yöntem vardır:
-
-YÖNTEM 1 (Klasik Mac Sürükle-Bırak):
-1. Bu penceredeki "UnPack" uygulamasını "Applications" (Uygulamalar) klasörünün üzerine sürükleyip bırakın.
-2. Uygulamalar'dan UnPack'i açın. Karşınıza gelen Kurulum Sihirbazı'nda "Kurulumu Tamamla" butonuna basın.
-
-YÖNTEM 2 (Otomatik Tek Tıkla Kurulum):
-1. "Hızlı_Kurulum.command" dosyasına çift tıklayın.
-2. UnPack otomatik olarak Uygulamalar klasörüne taşınacak, güvenlik izinleri verilecek ve başlatılacaktır.
+YÖNTEM 1 (ÖNERİLEN - TEK TIKLA OTOMATİK KURULUM):
+1. Bu penceredeki "Hızlı_Kurulum.command" dosyasına ÇİFT TIKLAYIN.
+   (macOS "Açmak istediğinizden emin misiniz?" diye sorarsa "Aç" butonuna basın.)
+2. Terminal açılacak; UnPack'i otomatik olarak Uygulamalar'a taşıyacak,
+   macOS "Zararlı dosya / Çöpe taşı" güvenlik engelini kaldıracak ve
+   uygulamayı doğrudan başlatacaktır.
 
 -----------------------------------------------------
-ÖNEMLİ (Apple Güvenlik Uyarısı / Gatekeeper):
-İnternetten veya harici kaynaktan indirilen uygulamalarda
-macOS ilk açılışta "Geliştirici doğrulanamadı" uyarısı gösterebilir.
-Bunu aşmak için:
--> Uygulamaya SAĞ TIKLAYIP (veya Control tuşuna basıp) "Aç" deyin,
-   çıkan pencerede "Aç" butonuna basın.
-(Bu işlem yalnızca İLK AÇILIŞTA 1 KEZ yapılır, sonrasında normal açılır.)
------------------------------------------------------
 
-Tebrikler! RAR, ZIP, 7Z ve TAR dosyalarınız artık UnPack ile güvende.
+YÖNTEM 2 (Klasik Sürükle - Bırak):
+1. "UnPack" uygulamasını "Applications" klasörüne sürükleyin.
+2. Açarken "Zararlı dosya / Çöpe taşı" uyarısı çıkarsa:
+   -> Sistem Ayarları ➔ Gizlilik ve Güvenlik bölümüne gidin.
+   -> Sayfanın en altındaki "Yine de Aç" butonuna basın.
+   (VEYA bu penceredeki "Hızlı_Kurulum.command" dosyasına çift tıklayın.)
+
+=====================================================
+Tebrikler! UnPack kullanıma hazırdır.
 EOF
 cp "${BUILD_DIR}/Kurulum_Rehberi.txt" "${STAGING_DIR}/Kurulum_Rehberi.txt"
 
@@ -63,8 +60,11 @@ set -e
 clear
 
 echo "====================================================="
-echo "           UnPack 1.7 - Otomatik Kurulum             "
+echo "        UnPack - Otomatik Kurulum & Güvenlik İzni    "
 echo "====================================================="
+echo ""
+echo "Bu araç UnPack'i Uygulamalar klasörüne kurar ve macOS"
+echo "Gatekeeper 'Zararlı dosya' güvenlik engelini kaldırır."
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -74,42 +74,40 @@ if [ -d "${SCRIPT_DIR}/UnPack.app" ]; then
     APP_PATH="${SCRIPT_DIR}/UnPack.app"
 elif [ -d "/Volumes/UnPack/UnPack.app" ]; then
     APP_PATH="/Volumes/UnPack/UnPack.app"
-elif [ -d "${HOME}/Desktop/UnPack-Kurulum/UnPack.app" ]; then
-    APP_PATH="${HOME}/Desktop/UnPack-Kurulum/UnPack.app"
-elif [ -d "${HOME}/Desktop/UnPack/UnPack.app" ]; then
-    APP_PATH="${HOME}/Desktop/UnPack/UnPack.app"
+elif [ -d "/Applications/UnPack.app" ]; then
+    APP_PATH="/Applications/UnPack.app"
 fi
 
 if [ -z "${APP_PATH}" ] || [ ! -d "${APP_PATH}" ]; then
     echo "❌ HATA: UnPack.app paketi bulunamadı!"
-    echo "Lütfen bu dosyayı UnPack.app dosyasının yanında çalıştırın."
+    echo "Lütfen bu dosyayı UnPack DMG penceresi içinde çalıştırın."
     echo ""
     read -p "Çıkmak için Enter'a basın..."
     exit 1
 fi
 
-echo "==> 1/4: UnPack.app Uygulamalar (/Applications) klasörüne kopyalanıyor..."
+echo "==> [1/3] UnPack.app Uygulamalar (/Applications) klasörüne yerleştiriliyor..."
 pkill -x "UnPack" 2>/dev/null || true
-rm -rf "/Applications/UnPack.app"
-cp -R "${APP_PATH}" "/Applications/UnPack.app"
+if [ "${APP_PATH}" != "/Applications/UnPack.app" ]; then
+    rm -rf "/Applications/UnPack.app"
+    cp -R "${APP_PATH}" "/Applications/UnPack.app"
+fi
 
-echo "==> 2/4: macOS Gatekeeper güvenlik karantinası kaldırılıyor..."
+echo "==> [2/3] macOS Gatekeeper güvenlik karantinası kaldırılıyor..."
 xattr -cr "/Applications/UnPack.app" 2>/dev/null || true
+chmod -R 755 "/Applications/UnPack.app" 2>/dev/null || true
 
-echo "==> 3/4: Finder eklentisi (UnPackFinderSync) kaydediliyor..."
-pluginkit -a "/Applications/UnPack.app/Contents/PlugIns/UnPackFinderSync.appex" 2>/dev/null || true
-pluginkit -e use -i com.unpack.app.FinderSync 2>/dev/null || true
-
-echo "==> 4/4: UnPack başlatılıyor..."
+echo "==> [3/3] UnPack başlatılıyor..."
 open "/Applications/UnPack.app"
 
 echo ""
 echo "====================================================="
 echo "🎉 Tebrikler! UnPack başarıyla kuruldu ve başlatıldı."
-echo "   RAR, ZIP, 7Z, TAR dosyalarınız artık UnPack ile açılacak."
+echo "   Güvenlik engeli kaldırıldı, artık doğrudan açılacaktır."
 echo "====================================================="
 echo ""
 sleep 2
+exit 0
 EOF
 chmod +x "${BUILD_DIR}/Hızlı_Kurulum.command"
 cp "${BUILD_DIR}/Hızlı_Kurulum.command" "${STAGING_DIR}/Hızlı_Kurulum.command"
