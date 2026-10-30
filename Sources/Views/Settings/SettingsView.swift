@@ -927,6 +927,17 @@ private struct AboutSettingsPane: View {
             return body
         }
         return """
+        ## 🚀 UnPack v1.8.5
+
+        Yapay zeka arayüz klişelerinden (AI slop) tamamen arındırılmış, macOS Human Interface Guidelines (HIG) standartlarında zarif ve yerel Apple tasarım dili.
+
+        ### 🍎 Özgün macOS Arayüz Tasarımı
+        - 🧼 **Sade ve Doğal Apple Standartları:** Sahne arkası kromatik ışık auraları, sahte sıvı cam parıltıları ve renk cümbüşü kapsüller kaldırıldı; Apple'ın özgün macOS tasarım felsefesi uygulandı.
+        - 🎨 **macOS Resmi 8 Vurgu Rengi:** Sistem Ayarları ile uyumlu resmi Apple renk paleti (Mavi, Mor, Pembe, Kırmızı, Turuncu, Sarı, Yeşil, Grafit) entegre edildi.
+        - 🗂️ **Finder Tarzı Yol Çubuğu & Arama:** Dosya hiyerarşisinde gezinmeyi kolaylaştıran kompakt yol çubuğu ve standart arama alanı oluşturuldu.
+        - ⚡ **Yerel Segmented Kontroller:** Araç çubuğu ve pencere kontrollerinde yerel macOS `.bordered` ve `.segmented` buton stillerine geçildi.
+        - 🎯 **Yalın İlerleme Paneli:** Dönen yörüngeler yerine sistemle uyumlu `ProgressView` ve metrik kartları getirildi.
+
         ## 🚀 UnPack v1.8.0
 
         Yetersiz disk alanına sahip Mac'lerde büyük arşivlerin açılabilmesini sağlayan "Alan Açarak Çıkarma (Space-Saving In-Place Extraction)" modu eklendi. Çıkarılan dosyaların arşivdeki blokları adım adım serbest bırakılarak minimum boş alanda ayıklama yapılır.
