@@ -85,11 +85,11 @@ public struct MainView: View {
                 HStack(spacing: 12) {
                     HStack(spacing: 8) {
                         Image(systemName: "doc.zipper")
-                            .font(.system(size: 18, weight: .bold))
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(settings.accentColorChoice.color)
 
                         Text("UnPack")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(size: 14, weight: .bold))
                     }
 
                     Spacer()
@@ -100,47 +100,45 @@ public struct MainView: View {
                         Label("Hızlı Bırakma", systemImage: "bolt.shield.fill").tag(AppMode.quickDrop)
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 250)
+                    .frame(width: 240)
 
                     Spacer()
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         // Gözat ve Sıkıştır Butonu
                         Button(action: browseAndCompress) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "plus.circle.fill")
-                                Text("Sıkıştır")
-                            }
-                            .font(.system(size: 12))
+                            Label("Sıkıştır", systemImage: "plus")
                         }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                         .help("Dosya veya klasör seçip sıkıştırın (Gözat)")
 
                         Button(action: openArchiveWithFilePicker) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "folder.fill")
-                                Text("Arşiv Aç")
-                            }
-                            .font(.system(size: 12))
+                            Label("Arşiv Aç", systemImage: "folder")
                         }
-                        .help("Mevcut bir arşivi açın (Cmd+O)")
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .help("Mevcut bir arşivi açın (⌘O)")
 
                         Button(action: { activeSheet = .diff(initialURL: openedArchiveURL) }) {
                             Image(systemName: "arrow.left.arrow.right")
-                                .font(.system(size: 13))
+                                .frame(width: 22, height: 18)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                         .help("İki arşivi karşılaştır (Diff)")
 
                         Button(action: { activeSheet = .settings }) {
                             Image(systemName: "gearshape")
-                                .font(.system(size: 13))
+                                .frame(width: 22, height: 18)
                         }
-                        .buttonStyle(.plain)
-                        .help("UnPack Ayarları (Cmd+,)")
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .help("UnPack Ayarları (⌘,)")
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 9)
+                .padding(.vertical, 8)
                 .background(Color(NSColor.windowBackgroundColor))
 
                 Divider()
@@ -264,13 +262,6 @@ public struct MainView: View {
                     Color.black.opacity(0.40)
                         .background(.ultraThinMaterial.opacity(0.75))
                         .ignoresSafeArea()
-
-                    // Çok Renkli Kromatik Sahne Arkası Işık Aurası
-                    BackstageAmbientAuraView(
-                        primaryColor: settings.accentColorChoice.color,
-                        secondaryColor: settings.accentColorChoice.secondaryColor
-                    )
-                    .allowsHitTesting(false)
 
                     OnboardingWizardView(isPresented: $showOnboardingWizard)
                         .padding(.vertical, 24)
@@ -526,146 +517,68 @@ public struct MainView: View {
     // MARK: - Karşılama Ekranı
 
     private var emptyExplorerWelcomeView: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             Spacer()
 
-            // 1. Apple Tarzı Parıltılı Sandık İkonu
+            // 1. Apple macOS Standart İkon Kutusu
             ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                settings.accentColorChoice.color.opacity(0.22),
-                                settings.accentColorChoice.color.opacity(0.04),
-                                Color.clear
-                            ],
-                            center: .center,
-                            startRadius: 20,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 140, height: 140)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(settings.accentColorChoice.color.opacity(0.12))
+                    .frame(width: 84, height: 84)
 
-                Circle()
-                    .fill(Color(NSColor.controlBackgroundColor).opacity(0.85))
-                    .frame(width: 88, height: 88)
-                    .overlay(
-                        Circle()
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [
-                                        settings.accentColorChoice.color.opacity(0.45),
-                                        Color.white.opacity(0.15)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1.5
-                            )
-                    )
-                    .shadow(color: settings.accentColorChoice.color.opacity(0.25), radius: 12, y: 4)
-
-                Image(systemName: "archivebox.fill")
-                    .font(.system(size: 38, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [
-                                settings.accentColorChoice.color,
-                                settings.accentColorChoice.color.opacity(0.75)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
+                Image(systemName: "archivebox")
+                    .font(.system(size: 40, weight: .regular))
+                    .foregroundColor(settings.accentColorChoice.color)
             }
 
-            // 2. Başlık ve Açıklama
+            // 2. Başlık ve Açıklama (SF Pro Typography)
             VStack(spacing: 6) {
                 Text("UnPack Arşiv Gezgini")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.title2)
+                    .fontWeight(.semibold)
 
                 Text("Açmak istediğiniz bir arşivi buraya sürükleyin veya dosyalara göz atın.")
-                    .font(.system(size: 13))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
 
-            // 3. Apple Eylem Düğmeleri
+            // 3. Apple macOS Eylem Düğmeleri
             HStack(spacing: 12) {
                 Button(action: browseAndCompress) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("Dosya Seç ve Sıkıştır...")
-                            .font(.system(size: 13, weight: .semibold))
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 9)
-                    .background(
-                        LinearGradient(
-                            colors: [settings.accentColorChoice.color, settings.accentColorChoice.color.opacity(0.85)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .foregroundColor(.white)
-                    .clipShape(Capsule())
-                    .shadow(color: settings.accentColorChoice.color.opacity(0.3), radius: 4, y: 2)
+                    Label("Dosya Seç ve Sıkıştır...", systemImage: "plus.circle.fill")
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.regular)
 
                 Button(action: openArchiveWithFilePicker) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "folder.fill")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(settings.accentColorChoice.color)
-                        Text("Bir Arşiv Aç...")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8.5)
-                    .background(
-                        Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor).opacity(0.85))
-                    )
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(Color(NSColor.separatorColor).opacity(0.4), lineWidth: 0.8)
-                    )
+                    Label("Bir Arşiv Aç...", systemImage: "folder.fill")
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
 
                 Button(action: { currentMode = .quickDrop }) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "bolt.shield.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(.orange)
-                        Text("Hızlı Bırakma")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8.5)
-                    .background(
-                        Capsule()
-                            .fill(Color(NSColor.controlBackgroundColor).opacity(0.85))
-                    )
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(Color(NSColor.separatorColor).opacity(0.4), lineWidth: 0.8)
-                    )
+                    Label("Hızlı Bırakma", systemImage: "bolt.shield.fill")
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
             }
 
             // 4. Desteklenen Formatlar Rozet Şeridi
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 LiquidGlassFormatBadge(format: .zip, size: .small)
                 LiquidGlassFormatBadge(format: .rar, size: .small)
                 LiquidGlassFormatBadge(format: .sevenZip, size: .small)
                 LiquidGlassFormatBadge(format: .tarGz, size: .small)
                 LiquidGlassFormatBadge(format: .iso, size: .small)
             }
-            .padding(.top, 6)
+            .padding(.top, 4)
 
             Spacer()
         }
@@ -1265,55 +1178,5 @@ public struct MainView: View {
     }
 }
 
-// MARK: - Sahne Arkası Kromatik Işıklandırma Aurası
 
-struct BackstageAmbientAuraView: View {
-    let primaryColor: Color
-    let secondaryColor: Color
-
-    var body: some View {
-        ZStack {
-            // Sol-Üst Kromatik Işıma
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [primaryColor.opacity(0.32), primaryColor.opacity(0.0)],
-                        center: .center,
-                        startRadius: 20,
-                        endRadius: 280
-                    )
-                )
-                .frame(width: 520, height: 520)
-                .offset(x: -110, y: -120)
-                .blur(radius: 65)
-
-            // Sağ-Alt Tamamlayıcı Kromatik Işıma
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [secondaryColor.opacity(0.26), secondaryColor.opacity(0.0)],
-                        center: .center,
-                        startRadius: 20,
-                        endRadius: 300
-                    )
-                )
-                .frame(width: 540, height: 540)
-                .offset(x: 110, y: 130)
-                .blur(radius: 70)
-
-            // Merkez Canlı Işık Halkası
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [primaryColor.opacity(0.18), secondaryColor.opacity(0.06), Color.clear],
-                        center: .center,
-                        startRadius: 10,
-                        endRadius: 220
-                    )
-                )
-                .frame(width: 420, height: 420)
-                .blur(radius: 45)
-        }
-    }
-}
 

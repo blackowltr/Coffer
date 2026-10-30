@@ -124,7 +124,7 @@ public struct ArchiveFooterBar: View {
     }
 }
 
-// MARK: - Durum Rozeti (Pill)
+// MARK: - Durum Rozeti (macOS Tag)
 private struct StatusFlagPill: View {
     let text: String
     var icon: String? = nil
@@ -137,13 +137,13 @@ private struct StatusFlagPill: View {
                     .font(.system(size: 8.5))
             }
             Text(text)
-                .font(.system(size: 9.5, weight: .medium, design: .rounded))
+                .font(.system(size: 10, weight: .medium))
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
-        .background(color.opacity(0.14))
+        .background(color.opacity(0.12))
         .foregroundColor(color)
-        .clipShape(Capsule())
+        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
     }
 }
 

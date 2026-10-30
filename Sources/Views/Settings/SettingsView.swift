@@ -397,25 +397,25 @@ private struct AppearanceSettingsPane: View {
             }
 
             // Vurgu Rengi Paleti Kartı
-            SettingsCard(title: "Buton ve Vurgu Rengi") {
-                VStack(alignment: .leading, spacing: 12) {
+            SettingsCard(title: "Vurgu Rengi") {
+                VStack(alignment: .leading, spacing: 14) {
                     HStack {
-                        Text("Aktif Renk:")
+                        Text("Seçilen Renk:")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.secondary)
                         Text(settings.accentColorChoice.rawValue)
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 12, weight: .semibold))
                             .foregroundColor(settings.accentColorChoice.color)
                         Spacer()
                     }
 
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 6), spacing: 12) {
+                    HStack(spacing: 12) {
                         ForEach(AppSettings.AppAccentColor.allCases) { accent in
                             ModernAccentColorItem(
                                 accent: accent,
                                 isSelected: settings.accentColorChoice == accent,
                                 onSelect: {
-                                    withAnimation(settings.enableAnimations ? .spring(response: 0.3) : nil) {
+                                    withAnimation(settings.enableAnimations ? .spring(response: 0.25) : nil) {
                                         settings.accentColorChoice = accent
                                     }
                                 }
@@ -428,7 +428,7 @@ private struct AppearanceSettingsPane: View {
             }
 
             // Animasyon ve Görsel Efektler Kartı
-            SettingsCard(title: "Arayüz ve Görsel Efektler") {
+            SettingsCard(title: "Arayüz ve Efektler") {
                 VStack(spacing: 0) {
                     SettingsRow(
                         icon: "sparkles",
@@ -437,19 +437,6 @@ private struct AppearanceSettingsPane: View {
                         subtitle: "Pencere geçişleri, diyalog açılışları ve buton etkileşim efektleri."
                     ) {
                         Toggle("", isOn: $settings.enableAnimations)
-                            .toggleStyle(.switch)
-                            .labelsHidden()
-                    }
-
-                    CardRowDivider()
-
-                    SettingsRow(
-                        icon: "cube.transparent.fill",
-                        iconColor: .purple,
-                        title: "3D Derinlik ve Eğim Efekti",
-                        subtitle: "İmleç pozisyonuna göre pencere ve butonlara hafif jiroskopik perspektif kazandırır."
-                    ) {
-                        Toggle("", isOn: $settings.enable3DDepthTilt)
                             .toggleStyle(.switch)
                             .labelsHidden()
                     }
@@ -1238,7 +1225,7 @@ private struct ThemeSelectionCard: View {
     }
 }
 
-/// Modernize Edilmiş Vurgu Rengi Seçim Butonu
+/// Apple macOS Standartlarında Vurgu Rengi Seçim Butonu
 @MainActor
 private struct ModernAccentColorItem: View {
     let accent: AppSettings.AppAccentColor
@@ -1247,17 +1234,16 @@ private struct ModernAccentColorItem: View {
 
     var body: some View {
         Button(action: onSelect) {
-            VStack(spacing: 5) {
+            VStack(spacing: 6) {
                 ZStack {
                     Circle()
-                        .fill(accent.color.gradient)
-                        .frame(width: 28, height: 28)
-                        .shadow(color: accent.color.opacity(isSelected ? 0.5 : 0.2), radius: isSelected ? 5 : 2, y: 1)
+                        .fill(accent.color)
+                        .frame(width: 26, height: 26)
 
                     if isSelected {
                         Circle()
                             .strokeBorder(Color.white, lineWidth: 2)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 26, height: 26)
 
                         Image(systemName: "checkmark")
                             .font(.system(size: 11, weight: .bold))
@@ -1267,11 +1253,11 @@ private struct ModernAccentColorItem: View {
                 .overlay(
                     Circle()
                         .stroke(isSelected ? accent.color : Color.clear, lineWidth: 2)
-                        .frame(width: 36, height: 36)
+                        .frame(width: 34, height: 34)
                 )
 
                 Text(accent.rawValue)
-                    .font(.system(size: 9, weight: isSelected ? .bold : .regular))
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
                     .lineLimit(1)
                     .foregroundColor(isSelected ? .primary : .secondary)
             }

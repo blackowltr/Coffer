@@ -190,7 +190,6 @@ private struct GridItemCard: View {
                     lineWidth: isSelected ? 1.5 : 0.5
                 )
         )
-        .scaleEffect(isHovered ? 1.02 : 1.0)
         .animation(.spring(response: 0.22, dampingFraction: 0.8), value: isHovered)
         .animation(.spring(response: 0.22, dampingFraction: 0.8), value: isSelected)
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))

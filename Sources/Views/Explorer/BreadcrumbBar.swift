@@ -36,32 +36,24 @@ public struct BreadcrumbBar: View {
 
     public var body: some View {
         HStack(spacing: 10) {
-            // MARK: 1. Üst Dizine Dönüş Butonu (Apple Style Back / Up Chevron)
+            // MARK: 1. Üst Dizine Dönüş Butonu (Apple HIG Back Button)
             Button(action: onNavigateUp) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(currentPath.isEmpty ? .secondary.opacity(0.35) : .primary)
-                    .frame(width: 26, height: 26)
-                    .background(
-                        Circle()
-                            .fill(Color(NSColor.controlBackgroundColor).opacity(currentPath.isEmpty ? 0.3 : 0.75))
-                    )
-                    .overlay(
-                        Circle()
-                            .strokeBorder(Color(NSColor.separatorColor).opacity(currentPath.isEmpty ? 0.15 : 0.3), lineWidth: 0.5)
-                    )
+                    .font(.system(size: 11, weight: .semibold))
+                    .frame(width: 20, height: 18)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.bordered)
+            .controlSize(.small)
             .disabled(currentPath.isEmpty)
             .help("Bir üst klasöre dön (⌘↑)")
 
-            // MARK: 2. Hiyerarşik Yol Kapsülü (Interactive Breadcrumb Capsule)
+            // MARK: 2. Hiyerarşik Yol Çubuğu (Finder Path Bar)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 3) {
+                HStack(spacing: 4) {
                     // Kök Arşiv
                     PathSegmentButton(
                         title: archiveName.isEmpty ? "Ana Dizin" : archiveName,
-                        icon: "archivebox.fill",
+                        icon: "archivebox",
                         isSelected: currentPath.isEmpty,
                         accentColor: accentColor,
                         action: { onNavigateTo("") }
@@ -70,38 +62,37 @@ public struct BreadcrumbBar: View {
                     // Klasör Hiyerarşisi
                     ForEach(0..<pathComponents.count, id: \.self) { index in
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundColor(.secondary.opacity(0.6))
-                            .padding(.horizontal, 1)
+                            .font(.system(size: 8, weight: .semibold))
+                            .foregroundColor(.secondary.opacity(0.5))
 
                         let subPath = pathComponents[0...index].joined(separator: "/")
                         let isLast = index == pathComponents.count - 1
 
                         PathSegmentButton(
                             title: pathComponents[index],
-                            icon: "folder.fill",
+                            icon: "folder",
                             isSelected: isLast,
                             accentColor: accentColor,
                             action: { onNavigateTo(subPath) }
                         )
                     }
                 }
-                .padding(.horizontal, 3)
+                .padding(.horizontal, 2)
                 .padding(.vertical, 2)
             }
 
             Spacer()
 
-            // MARK: 3. Spotlight Tarzı Arama Çubuğu (Spotlight Search Pill)
-            HStack(spacing: 6) {
+            // MARK: 3. macOS Standart Arama Çubuğu
+            HStack(spacing: 5) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: 11))
                     .foregroundColor(isSearchFocused ? accentColor : .secondary)
 
                 TextField("Arşivde ara...", text: $searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 11.5))
-                    .frame(minWidth: 110, idealWidth: 150)
+                    .frame(minWidth: 120, idealWidth: 160)
                     .focused($isSearchFocused)
 
                 if !searchText.isEmpty {
@@ -113,29 +104,26 @@ public struct BreadcrumbBar: View {
                     .buttonStyle(.plain)
                 } else if !isSearchFocused {
                     Text("⌘F")
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
-                        .foregroundColor(.secondary.opacity(0.7))
-                        .padding(.horizontal, 4)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundColor(.secondary.opacity(0.6))
+                        .padding(.horizontal, 3)
                         .padding(.vertical, 1)
-                        .background(Color(NSColor.quaternaryLabelColor).opacity(0.5))
+                        .background(Color(NSColor.quaternaryLabelColor).opacity(0.4))
                         .cornerRadius(3)
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4.5)
-            .background(
-                Capsule()
-                    .fill(Color(NSColor.textBackgroundColor).opacity(0.85))
-            )
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3.5)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
             .overlay(
-                Capsule()
-                    .strokeBorder(isSearchFocused ? accentColor.opacity(0.5) : Color(NSColor.separatorColor).opacity(0.35), lineWidth: isSearchFocused ? 1 : 0.5)
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(isSearchFocused ? accentColor.opacity(0.55) : Color(NSColor.separatorColor).opacity(0.35), lineWidth: 0.8)
             )
-            .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isSearchFocused)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 5)
-        .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+        .background(Color(NSColor.windowBackgroundColor))
     }
 }
 
